@@ -265,7 +265,7 @@ static void* navdata_loop(void *arg)
 	int sendstuff=1;
 	struct sockaddr_in *my_addr, *from;
 
-	INFO("NAVDATA thread starting (thread=%d)...\n", (int64_t)pthread_self());
+	INFO("NAVDATA thread starting (thread=%d)...\n", static_cast<int>(pthread_self()));
 
 
 	addr_in_size = sizeof(struct sockaddr_in);

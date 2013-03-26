@@ -1,7 +1,6 @@
 
 
-SRC=raw_to_jpeg.cpp \
-	libfree/cyber_kinect.cpp \
+SRC=libfree/cyber_kinect.cpp \
     msl/sprite.cpp \
     msl/socket.cpp \
     msl/file_util.cpp \
@@ -21,7 +20,7 @@ LIBS=	-pthread \
 	-lSDL
 
 OPTS=-O2
-CFLAGS=-Wall $(OPTS)
+CFLAGS=-Wall -Wno-strict-aliasing $(OPTS)
 COMPILE=g++
 
 all: drone kinect

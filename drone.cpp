@@ -4,7 +4,7 @@
 #include "helisimple/CGui.h"
 #include "helisimple/CRecognition.h"
 #include "helisimple/CHeli.h"
-#include "raw_to_jpeg.h"
+#include "helisimple/raw_to_jpeg.h"
 #include <pthread.h>
 
 //Kinect libraries
@@ -210,9 +210,7 @@ void service_client(msl::socket& client, std::string& message)
 
 		int pos = request.find('?');
 		if(pos != -1)
-		{
 			request = request.substr(0, pos);
-		}
 
 		//std::cout << request << std::endl;
 
@@ -254,20 +252,20 @@ void service_client(msl::socket& client, std::string& message)
 		std::string file;
 
 		//Load File
-		//std::cout<<msl::file_to_string(web_root+"/"+request,file)<<std::endl;
+		std::cout<<msl::file_to_string(web_root+"/"+request,file)<<std::endl;
 
 		pthread_mutex_lock(&image_mutex);
-		if(msl::file_to_string(web_root+"/"+request,file))
-			client<<msl::http_pack_string(file,mime_type);
+			if(msl::file_to_string(web_root+"/"+request,file))
+				client<<msl::http_pack_string(file,mime_type);
+
+			//Bad File
+			else if(msl::file_to_string(web_root+"/not_found.html",file))
+				client<<msl::http_pack_string(file);
+
+			//not_found.html Not Found?!
+			else
+				client.close();
 		pthread_mutex_unlock(&image_mutex);
-
-		//Bad File
-		//else if(msl::file_to_string(web_root+"/not_found.html",file))
-		//	client<<msl::http_pack_string(file);
-
-		//not_found.html Not Found?!
-		//else
-		//	client.close();
 	}
 
 	//Other Requests (Just kill connection...)
@@ -281,7 +279,7 @@ void *server_thread_function(void*)
 {
 	//Added
 	//Create Server
-	msl::socket server("0.0.0.0:8080");
+	msl::socket server("0.0.0.0:80");
 	server.create();
 
 	//Check Server
@@ -355,12 +353,12 @@ void *server_thread_function(void*)
 		}
 	}
 
-
+	return NULL;
 }
 
 int main(int argc,char* argv[])
 {
-	int res = pthread_create(&server_thread, NULL, server_thread_function, NULL);
+	pthread_create(&server_thread, NULL, server_thread_function, NULL);
 
 	startKinectThread(argc, argv, x_size, y_size, z_size, z_size/2+1.5, false);
 

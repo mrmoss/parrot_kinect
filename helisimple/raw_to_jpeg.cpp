@@ -4,7 +4,7 @@
 #include <sstream>
 #include <vector>
 #include <iostream> 
-bool raw_to_jpeg(char * filename, unsigned char* raw_image, int width, int height,
+bool raw_to_jpeg(const std::string& filename, unsigned char* raw_image, int width, int height,
                  int bytes_per_pixel, int color_space)
 {
     struct jpeg_compress_struct cinfo;
@@ -12,11 +12,11 @@ bool raw_to_jpeg(char * filename, unsigned char* raw_image, int width, int heigh
 	
 	/* this is a pointer to one row of image data */
 	JSAMPROW row_pointer[1];
-	FILE *outfile = fopen( filename, "wb" );
+	FILE *outfile = fopen( filename.c_str(), "wb" );
 	
 	if ( !outfile )
 	{
-		printf("Error opening output jpeg file %s\n!", filename );
+		printf("Error opening output jpeg file %s\n!", filename.c_str() );
 		return -1;
 	}
 	cinfo.err = jpeg_std_error( &jerr );

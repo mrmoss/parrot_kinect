@@ -4,12 +4,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <string> 
+#include <string>
 
 /**
 @author Tom Krajnik
 */
-//simple image class 
+//simple image class
+
 class CRawImage
 {
 	public:
@@ -17,26 +18,18 @@ class CRawImage
 		CRawImage(int w,int h);
 		~CRawImage();
 
-		//saves the image to a file with bmp format 
-		void saveBmp(const char* name);
-    
-        void saveJPEG(char* name);
+		//saves the image to a file with bmp format
+		void saveBmp(const std::string& name="%04i.bmp");
 
-		//saves the image to a file with bmp format,
-		//calling this consecutivelly causes to save files with names 0000.bmp, 0001.bmp, 0002.bmp etc. 
-		void saveBmp();
+        void saveJPEG(const std::string& name);
 
 		//checks if there are images in the directory and sets the saving number in order to avoid overwriting them
 		int  getSaveNumber();
 
-		//loads a file in BMP format 
-		//usefull only for bitmaps created with saveBmp(...) functions 
-		bool loadBmp(const char* name);
-
-		//plots a vertical and horizontal line crossing at x,y position 
+		//plots a vertical and horizontal line crossing at x,y position
 		void plotLine(int x,int y);
 
-		//plots a square in the center 
+		//plots a square in the center
 		void plotCenter();
 
 		//image parameters
@@ -46,14 +39,14 @@ class CRawImage
 		int size;
 		int bpp;
 
-		//the image data in 24bit RGB bitmap format 
+		//the image data in 24bit RGB bitmap format
 		unsigned char* data;
 	private:
 		//turns the image upside down, usefull for saving
 		void swap();
-    
+
         void swap_jpeg();
-    
+
 		int numSaved;
 };
 

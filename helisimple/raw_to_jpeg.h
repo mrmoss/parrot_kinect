@@ -7,7 +7,7 @@
 #ifndef RAW_TO_JPEG_H_
 #define RAW_TO_JPEG_H_
 
-bool raw_to_jpeg(char *filename, unsigned char* raw_image, int width, int height,
+bool raw_to_jpeg(const std::string& filename, unsigned char* raw_image, int width, int height,
                  int bytes_per_pixel, int color_space);
 
 std::string raw_to_jpeg_string(unsigned char* raw_image, int width, int height,

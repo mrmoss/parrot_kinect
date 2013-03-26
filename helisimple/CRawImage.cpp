@@ -1,5 +1,5 @@
 #include "CRawImage.h"
-#include "../raw_to_jpeg.h"
+#include "raw_to_jpeg.h"
 #include <iostream> 
 
 static unsigned char header[] =  {66,77,54,16,14,0,0,0,0,0,54,0,0,0,40,0,0,0,128,2,0,0,224,1,0,0,1,0,24,0,0,0,0,0,0,16,14,0,18,11,0,0,18,11,0,0,0,0,0,0,0,0,0,0};
@@ -76,9 +76,9 @@ void CRawImage::swap_jpeg()
     free(newData);
 }
 
-void CRawImage::saveBmp(const char* inName)
+void CRawImage::saveBmp(const std::string& inName)
 {
-	FILE* file = fopen(inName,"wb");
+	FILE* file = fopen(inName.c_str(),"wb");
 	//swap();
 	fwrite(header,54,1,file);
 	fwrite(data,size,1,file);
@@ -86,36 +86,12 @@ void CRawImage::saveBmp(const char* inName)
 	fclose(file);
 }
 
-void CRawImage::saveJPEG(char* inName)
+void CRawImage::saveJPEG(const std::string& inName)
 {
     swap_jpeg();
     //swap();
-    raw_to_jpeg(inName, data, 640, 368, 3, JCS_RGB);
+    raw_to_jpeg(inName.c_str(), data, 640, 368, 3, JCS_RGB);
     swap_jpeg();
-}
-
-void CRawImage::saveBmp()
-{
-	char name[100];
-	sprintf(name,"%04i.bmp",numSaved++);
-	saveBmp(name);
-}
-
-
-bool CRawImage::loadBmp(const char* inName)
-{
-	FILE* file = fopen(inName,"rb");
-	if (file!=NULL)
-	{
-		fread(data,54,1,file);
-		bpp = 3;
-		size = height*width*bpp;
-		fread(data,size,1,file);
-		fclose(file);
-		swap();
-		return true;
-	}
-	return false;
 }
 
 void CRawImage::plotCenter()

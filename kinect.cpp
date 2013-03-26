@@ -1,7 +1,7 @@
 //Code based on Helisimple2 ... insert full documentation!!!
 
 #include <stdlib.h>
-#include "raw_to_jpeg.h"
+#include "helisimple/raw_to_jpeg.h"
 #include <pthread.h>
 
 //Kinect libraries

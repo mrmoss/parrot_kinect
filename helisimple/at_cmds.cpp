@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
+#include <iostream>
 
 #include <sys/time.h>
 
@@ -25,6 +26,8 @@
 #include <net/if.h>
 
 #include "app.h"
+
+#include "../msl/string_util.hpp"
 
 /* AT constant */
 #define AT_PORT                   5556
@@ -44,7 +47,7 @@ typedef enum {
     MYKONOS_UI_BIT_AH             = 3, /* Button altitude up (ah - ab)*/
     MYKONOS_UI_BIT_L1             = 4, /* Button - z-axis (r1 - l1) */
     MYKONOS_UI_BIT_R1             = 5, /* Not used */
-    MYKONOS_UI_BIT_L2             = 6, /* Button + z-axis (r1 - l1) */ 
+    MYKONOS_UI_BIT_L2             = 6, /* Button + z-axis (r1 - l1) */
     MYKONOS_UI_BIT_R2             = 7, /* Not used */
     MYKONOS_UI_BIT_SELECT         = 8, /* Button emergency reset all */
     MYKONOS_UI_BIT_START          = 9, /* Button Takeoff / Landing */
@@ -56,10 +59,10 @@ typedef enum {
 } mykonos_ui_bitfield_t;
 
 typedef struct _radiogp_cmd_t {
-  float32_t enable; 
-  float32_t pitch; 
+  float32_t enable;
+  float32_t pitch;
   float32_t roll;
-  float32_t gaz; 
+  float32_t gaz;
   float32_t yaw;
 } radiogp_cmd_t;
 static radiogp_cmd_t radiogp_cmd = {0};
@@ -101,7 +104,7 @@ static void boot_drone(int attempt)
 	sprintf(cmds,"AT*CONFIG=%i,\"general:navdata_demo\",\"TRUE\"\r",nb_sequence++);
 	nb_sequence = nb_sequence+2;
 	at_write ((int8_t*)cmds, strlen (cmds));
-	printf (cmds);
+	std::cout<<cmds;
 	at_comwdg();
 	if ( get_mask_from_state( mykonos_state,MYKONOS_NAVDATA_BOOTSTRAP)) {
 		at_write ((int8_t*)cmds, strlen (cmds));
@@ -122,7 +125,7 @@ static void boot_drone(int attempt)
 			}
 			else {
 /*				char str[AT_BUFFER_SIZE];
-				memset (str, 0, AT_BUFFER_SIZE); 
+				memset (str, 0, AT_BUFFER_SIZE);
 				sprintf (str, "AT*CTRL=%d,%d\r", ACK_CONTROL_MODE, 0);
 				at_write ((int8_t*)str, strlen (str));
 				fprintf(stdout,"Mykonos 2\n");*/
@@ -179,9 +182,27 @@ static void send_command(int nab_sequence)
 	current = get_time_ms();
 
 	pthread_mutex_lock( &at_cmd_lock );
-	int flag = 0;
-	if (radiogp_cmd.pitch == 0 && radiogp_cmd.roll == 0) flag = 0; else flag = 1;
-	snprintf(str, AT_BUFFER_SIZE, "AT*PCMD=%d,%d,%d,%d,%d,%d\r",nb_sequence++,flag,*(int*)&radiogp_cmd.pitch,*(int*)&radiogp_cmd.roll,*(int*)&radiogp_cmd.gaz,*(int*)&radiogp_cmd.yaw);
+
+	int flag = 1;
+
+	if (radiogp_cmd.pitch == 0 && radiogp_cmd.roll == 0)
+		flag = 0;
+
+	std::string command="AT*PCMD=";
+	command+=msl::to_string(nb_sequence++)+',';
+	command+=msl::to_string(flag)+',';
+	command+=msl::to_string(*reinterpret_cast<int*>(&radiogp_cmd.pitch));
+	command+=',';
+	command+=msl::to_string(*reinterpret_cast<int*>(&radiogp_cmd.roll));
+	command+=',';
+	command+=msl::to_string(*reinterpret_cast<int*>(&radiogp_cmd.gaz));
+	command+=',';
+	command+=msl::to_string(*reinterpret_cast<int*>(&radiogp_cmd.yaw));
+	command+='\r';
+
+	for(unsigned int ii=0;ii<std::min(static_cast<unsigned int>(AT_BUFFER_SIZE),static_cast<unsigned int>(command.size()));++ii)
+		str[ii]=command[ii];
+
 //	printf("AT*PCMD=%d,%i,%lf,%lf,%lf,%lf\n",nb_sequence++,flag,radiogp_cmd.pitch,radiogp_cmd.roll,radiogp_cmd.gaz,radiogp_cmd.yaw);
 	pthread_mutex_unlock( &at_cmd_lock );
 	at_write((int8_t*)str, strlen (str));
@@ -274,7 +295,7 @@ void at_stop( void )
 {
 	if ( !at_thread )
 		return;
-   
+
    at_thread_alive = 0;
 	pthread_join(at_thread, NULL);
 	at_thread = 0;
@@ -287,7 +308,7 @@ void at_stop( void )
 }
 
 /************* at_init ****************
-* Description : Initialize AT process.    
+* Description : Initialize AT process.
 */
 void at_run( void )
 {
@@ -309,7 +330,7 @@ void at_run( void )
 }
 
 /************* at_set_flat_trim ****************
-* Description : Calibration of the ARDrone.   
+* Description : Calibration of the ARDrone.
 */
 void at_trim( void )
 {
@@ -323,7 +344,7 @@ void at_trim( void )
 }
 
 /************* at_ui_pad_start_pressed ****************
-* Description : Takeoff/Landing, used with at_cmds_loop function.  
+* Description : Takeoff/Landing, used with at_cmds_loop function.
 */
 void at_ui_reset( void )
 {
@@ -347,7 +368,7 @@ void at_zap(int cam)
 }
 
 /************* at_ui_pad_start_pressed ****************
-* Description : Takeoff/Landing, used with at_cmds_loop function.  
+* Description : Takeoff/Landing, used with at_cmds_loop function.
 */
 void at_ui_pad_start_pressed( void )
 {
