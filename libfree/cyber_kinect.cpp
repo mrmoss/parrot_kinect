@@ -290,8 +290,8 @@ void depth_cb(freenect_device *dev, void *v_depth, uint32_t timestamp)
 
   //pthread_mutex_lock(&gl_backbuf_mutex);
 //  for (i=0; i<IMG_WIDTH*IMG_HEIGHT; i+=3) {
-  for (int y=0;y<IMG_HEIGHT;y++)
-  for (int x=0;x<IMG_WIDTH;x++)
+  for (int y=0;y<IMG_HEIGHT;y+=2)
+  for (int x=0;x<IMG_WIDTH;x+=2)
   {
     int i=y*IMG_WIDTH+x;
 
