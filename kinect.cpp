@@ -29,7 +29,7 @@
 #include <vector>
 
 double x_size = 2;
-double y_size = .5;
+double y_size = 1;
 double z_size = 3;
 int main(int argc,char* argv[])
 {

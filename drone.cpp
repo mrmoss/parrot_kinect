@@ -1,11 +1,11 @@
 //Code based on Helisimple2 ... insert full documentation!!!
 
-#include <stdlib.h>
-#include "helisimple/CGui.h"
-#include "helisimple/CRecognition.h"
 #include "helisimple/CHeli.h"
 #include "helisimple/raw_to_jpeg.h"
 #include <pthread.h>
+
+//2D Header
+#include "msl/2d.hpp"
 
 //Kinect libraries
 #include "libfree/cyber_kinect.h"
@@ -31,121 +31,46 @@
 //Vector Header
 #include <vector>
 
+pthread_t server_thread;
+std::string web_root="web";
 
-int i = 0;
-int numSaved = 0;
-bool stop = false;
-CGui* gui;
-CRawImage *image;
-SDL_Event event;
-CRecognition *recognition;
-SPixelPosition pos;
-bool move = false;
-Uint8 lastKeys[10000];
-int keyNumber = 10000;
-Uint8 *keys = NULL;
-CHeli *heli;
+pthread_mutex_t image_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t image_cond = PTHREAD_COND_INITIALIZER;
+CRawImage* image;
+unsigned int camTexture=0;
+
+CHeli* heli;
 float pitch,roll,yaw,height;
-SDL_Joystick* joystick;
-TJoyState joy,lastJoy;
 
-//Center bool
-bool center = false;
-vec3 desired_loc = vec3(0,0,2);
+//Kinect-drone autonomous values
+bool autonomous=false;
+vec3 desired_loc=vec3(0,0,2);
+
 double x_error_old=0;
 double y_error_old=0;
 double z_error_old=0;
 
-double x_size = 2;
-double y_size = .5;
-double z_size = 3;
+double x_gain_p=1;
+double y_gain_p=1;
+double z_gain_p=1;
 
-double x_gain_p = 1;
-double y_gain_p = 1;
-double z_gain_p = 1;
+double x_gain_d=-50;
+double y_gain_d=10;
+double z_gain_d=-50;
 
-double x_gain_d = -25;
-double y_gain_d = 10;
-double z_gain_d = -25;
+double x_size=2;
+double y_size=1;
+double z_size=3;
 
-void processJoystick()
-{
-	SDL_JoystickUpdate();
-	//printf("Joystick ");
-	for (int i = 0;i<SDL_JoystickNumAxes(joystick);i++){
-		joy.axis[i] = SDL_JoystickGetAxis (joystick, i);
-		//printf("%i ",joy.axis[i]);
-		if (fabs(joy.axis[i]) < 20) joy.axis[i] = 0;
-	}
-
-	for (int i = 0;i<11;i++){
-		 joy.buttons[i+1] =  SDL_JoystickGetButton (joystick,i);
-	}
-	//printf("\n");
-	roll	= joy.axis[0];
-	pitch 	= joy.axis[1];
-	yaw 	= joy.axis[2];
-	height 	= joy.axis[3];
-
-	if (joy.buttons[7] && lastJoy.buttons[7] == false) heli->takeoff();
-	if (joy.buttons[8] && lastJoy.buttons[8] == false) heli->land();
-	for (int i = 1;i<5;i++){
-		if (joy.buttons[i] && lastJoy.buttons[i]==false) heli->switchCamera(i-1);
-	}
-	lastJoy = joy;
-}
-
-void processKeys()
-{
-	while (SDL_PollEvent(&event)){
-		if (event.type == SDL_MOUSEBUTTONDOWN) recognition->learnPixel(&image->data[3*(image->width*event.motion.y + event.motion.x)]);
-	}
-	keys = SDL_GetKeyState(&keyNumber);
-	if (keys[SDLK_ESCAPE]) stop = true;
-	if (keys[SDLK_r]) recognition->resetColorMap();
-	if (keys[SDLK_RETURN])image->saveBmp();
-
-	if(keys[SDLK_1])
-		desired_loc = vec3(0,0,3);
-
-	if(keys[SDLK_2])
-		desired_loc = vec3(-0.5,0,3);
-
-	if(keys[SDLK_3])
-		desired_loc = vec3(.5,0,3);
-
-	if (keys[SDLK_KP7])  yaw = -20000.0;
-	if (keys[SDLK_KP9])  yaw = 20000.0;
-	if (keys[SDLK_KP4])  roll = -20000.0;
-	if (keys[SDLK_KP6])  roll = 20000.0;
-	if (keys[SDLK_KP8])  pitch = -20000.0;
-	if (keys[SDLK_KP2])  pitch = 20000.0;
-	if (keys[SDLK_KP_PLUS])  height = 20000.0;
-	if (keys[SDLK_KP_MINUS])  height = -20000.0;
-
-	/*if (keys[SDLK_t])  yaw = -20000.0;
-	if (keys[SDLK_y])  yaw = 20000.0;
-	if (keys[SDLK_g])  roll = -20000.0;
-	if (keys[SDLK_h])  roll = 20000.0;
-	if (keys[SDLK_b])  pitch = -20000.0;
-	if (keys[SDLK_n])  pitch = 20000.0;
-	if (keys[SDLK_1])  height = 20000.0;
-	if (keys[SDLK_2])  height = -20000.0;*/
-
-	if (keys[SDLK_p]) center = true;
-	if (keys[SDLK_o]) center = false;
-
-	//changes camera
-	if (keys[SDLK_z]) heli->switchCamera(0);
-	if (keys[SDLK_x]) heli->switchCamera(1);
-	if (keys[SDLK_c]) heli->switchCamera(2);
-	if (keys[SDLK_v]) heli->switchCamera(3);
-
-	if (keys[SDLK_q]) heli->takeoff();
-	if (keys[SDLK_a]) heli->land();
-
-	memcpy(lastKeys,keys,keyNumber);
-}
+//Keyboard control bools
+bool auto_button_down=false;
+bool auto_button_pressed=false;
+bool land_button_down=false;
+bool land_button_pressed=false;
+bool takeoff_button_down=false;
+bool takeoff_button_pressed=false;
+bool exit_button_down=false;
+bool exit_button_pressed=false;
 
 template <typename T>
 void clamp(T& input,const T min,const T max)
@@ -157,18 +82,18 @@ void clamp(T& input,const T min,const T max)
 		input=max;
 }
 
-void processKinect()
+void drone_autonomous()
 {
-	vec3 temp_loc = getLocation();
+	vec3 temp_loc=getLocation();
 
-	if(center && temp_loc.z != -1)
+	if(autonomous&&temp_loc.z!=-1)
 	{
-		float x_error_new=temp_loc.x - desired_loc.x;
-		float y_error_new=temp_loc.y - desired_loc.y;
-		float z_error_new=temp_loc.z - desired_loc.z;
+		float x_error_new=temp_loc.x-desired_loc.x;
+		float y_error_new=temp_loc.y-desired_loc.y;
+		float z_error_new=temp_loc.z-desired_loc.z;
 
-		roll = (x_gain_p * x_error_new + x_gain_d * (x_error_old-x_error_new)) * 20000.0;
-		pitch = -(z_gain_p * z_error_new + z_gain_d * (z_error_old-z_error_new)) * 20000.0;
+		roll=(x_gain_p*x_error_new+x_gain_d*(x_error_old-x_error_new))*20000.0;
+		pitch=-(z_gain_p*z_error_new+z_gain_d*(z_error_old-z_error_new))*20000.0;
 
 		x_error_old=x_error_new;
 		y_error_old=y_error_new;
@@ -181,13 +106,7 @@ void processKinect()
 		std::cout<<"BATTERY\t"<<helidata.battery<<std::endl;
 		std::cout<<roll<<"\t"<<x_error_new<<"\t"<<pitch<<"\t"<<z_error_new<<"\tROLLPITCH\n";
 	}
-
-	return;
 }
-
-pthread_t server_thread;
-pthread_mutex_t image_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t image_cond = PTHREAD_COND_INITIALIZER;
 
 //Service Client Function Definition
 void service_client(msl::socket& client, std::string& message)
@@ -208,14 +127,9 @@ void service_client(msl::socket& client, std::string& message)
 			if(request.size()>0)
 				request.erase(request.end()-1);
 
-		int pos = request.find('?');
-		if(pos != -1)
-			request = request.substr(0, pos);
-
-		//std::cout << request << std::endl;
-
-		//Web Root Variable (Where your web files are)
-		std::string web_root=".";
+		int pos=request.find('?');
+		if(pos!=-1)
+			request=request.substr(0,pos);
 
 		//Check for Index
 		if(request=="")
@@ -252,20 +166,20 @@ void service_client(msl::socket& client, std::string& message)
 		std::string file;
 
 		//Load File
-		std::cout<<msl::file_to_string(web_root+"/"+request,file)<<std::endl;
-
 		pthread_mutex_lock(&image_mutex);
-			if(msl::file_to_string(web_root+"/"+request,file))
-				client<<msl::http_pack_string(file,mime_type);
-
-			//Bad File
-			else if(msl::file_to_string(web_root+"/not_found.html",file))
-				client<<msl::http_pack_string(file);
-
-			//not_found.html Not Found?!
-			else
-				client.close();
+		bool loaded=msl::file_to_string(web_root+"/"+request,file);
 		pthread_mutex_unlock(&image_mutex);
+
+		if(loaded)
+			client<<msl::http_pack_string(file,mime_type);
+
+		//Bad File
+		else if(msl::file_to_string(web_root+"/not_found.html",file))
+			client<<msl::http_pack_string(file);
+
+		//not_found.html Not Found?!
+		else
+			client.close();
 	}
 
 	//Other Requests (Just kill connection...)
@@ -275,9 +189,8 @@ void service_client(msl::socket& client, std::string& message)
 	}
 }
 
-void *server_thread_function(void*)
+void* server_thread_function(void*)
 {
-	//Added
 	//Create Server
 	msl::socket server("0.0.0.0:80");
 	server.create();
@@ -358,77 +271,140 @@ void *server_thread_function(void*)
 
 int main(int argc,char* argv[])
 {
-	pthread_create(&server_thread, NULL, server_thread_function, NULL);
+	pthread_create(&server_thread,NULL,server_thread_function,NULL);
 
-	startKinectThread(argc, argv, x_size, y_size, z_size, z_size/2+1.5, false);
+	startKinectThread(argc,argv,x_size,y_size,z_size,z_size/2+1.5,false);
 
-	//initializing stuff
-	heli = new CHeli();
-	gui = new CGui(640,368);
+	heli=new CHeli();
 
-	image = new CRawImage(640,368);
+	image=new CRawImage(640,368);
 
-	joystick = SDL_JoystickOpen(0);
-	fprintf(stdout,"Joystick with %i axes, %i buttons and %i hats initialized.\n",SDL_JoystickNumAxes(joystick),SDL_JoystickNumButtons(joystick),SDL_JoystickNumHats(joystick));
-
-	//this class holds the image
-	recognition = new CRecognition();
 	image->getSaveNumber();
 
-	while (stop == false){
-
-		//fprintf(stdout,"Angles %.2lf %.2lf %.2lf ",helidata.phi,helidata.psi,helidata.theta);
-		//fprintf(stdout,"Speeds %.2lf %.2lf %.2lf ",helidata.vx,helidata.vy,helidata.vz);
-		//fprintf(stdout,"Battery %.0lf \n",helidata.battery);
-		//fprintf(stdout,"Largest blob %i %i\n",pos.x,pos.y);
-
-		//image capture
-		heli->renewImage(image);
-		processJoystick();
-		processKeys();
-
-		//Added routine --
-		processKinect();
-		//std::cout << "I am at x: " << getLocation().x << std::endl;
-		//std::cout << "I am at y: " << getLocation().y << std::endl;
-		//std::cout << "I am at z: " << getLocation().z << std::endl;
-
-		//fprintf(stdout, "Height is %.2lf", height);
-		//fprintf(stdout, "Center is %s", (center ? "true" : "false"));
-
-		heli->setAngles(pitch,roll,yaw,height);
-
-		pthread_mutex_lock(&image_mutex);
-		image->saveJPEG("photo.jpeg");
-		pthread_mutex_unlock(&image_mutex);
-
-		//std::cout << center << std::endl;
-
-		//image->saveBmp("photo.bmp");
-
-
-		//finding a blob in the image
-		pitch=roll=yaw=height=0.0;
-		pos = recognition->findSegment(image);
-
-		//turns the drone towards the colored blob
-		//yaw = 100*(pos.x-160); //uncomment to make the drone to turn towards a colored target
-
-		//drawing the image, the cross etc.
-		image->plotLine(pos.x,pos.y);
-		image->plotCenter();
-		gui->drawImage(image);
-		gui->update();
-		i++;
-
-		usleep(20000);
-	}
-
-	delete recognition;
-	delete heli;
-	delete image;
-	delete gui;
+	msl::start_2d("Parrot");
 
 	return 0;
 }
 
+
+void setup()
+{
+	glGenTextures(1,&camTexture);
+
+	msl::ui_panel_begin(ui_panel_left);
+		msl::ui_set_alignment(ui_center);
+		msl::ui_spinner_add("x: ",desired_loc.x,-static_cast<float>(x_size),static_cast<float>(x_size));
+		msl::ui_spinner_add("y: ",desired_loc.y,0,static_cast<float>(y_size));
+		msl::ui_spinner_add("z: ",desired_loc.z,-static_cast<float>(z_size),static_cast<float>(z_size));
+		msl::ui_separator_add();
+		msl::ui_button_add("autonomous",auto_button_down,auto_button_pressed);
+		msl::ui_separator_add();
+		msl::ui_button_add("take off",takeoff_button_down,takeoff_button_pressed);
+		msl::ui_button_add("land",land_button_down,land_button_pressed);
+		msl::ui_separator_add();
+		msl::ui_button_add("exit",exit_button_down,exit_button_pressed);
+	msl::ui_panel_end();
+}
+
+void loop(const double dt)
+{
+	if(msl::input_check_pressed(kb_escape)||exit_button_pressed)
+	{
+		while(!heli->is_landed())
+		{
+			autonomous=false;
+			heli->land();
+		}
+
+		delete image;
+		delete heli;
+		exit(0);
+	}
+
+	if(msl::input_check_pressed(kb_space))
+	{
+		if(heli->is_landed())
+			heli->takeoff();
+		else
+			heli->land();
+	}
+
+	if(land_button_pressed)
+		heli->land();
+
+	if(takeoff_button_pressed)
+		heli->takeoff();
+
+	if(msl::input_check_pressed(kb_c))
+		heli->switchCamera(2);
+
+	if(msl::input_check_pressed(kb_v))
+		heli->switchCamera(3);
+
+	float speed=20000.0;
+
+	if(msl::input_check(kb_q))
+		yaw=-speed;
+
+	if(msl::input_check(kb_e))
+		yaw=speed;
+
+	if(msl::input_check(kb_a))
+		roll=-speed;
+
+	if(msl::input_check(kb_d))
+		roll=speed;
+
+	if(msl::input_check(kb_w))
+		pitch=-speed;
+
+	if(msl::input_check(kb_s))
+		pitch=speed;
+
+	if(msl::input_check(kb_down))
+		height=speed;
+
+	if(msl::input_check(kb_up))
+		height=-speed;
+
+	if(msl::input_check_pressed(kb_enter)||auto_button_pressed)
+		autonomous=!autonomous;
+
+	if(autonomous&&heli->is_landed())
+		autonomous=false;
+
+	heli->renewImage(image);
+	drone_autonomous();
+	heli->setAngles(pitch,roll,yaw,height);
+
+	pthread_mutex_lock(&image_mutex);
+	image->saveJPEG(web_root+"/"+"photo.jpeg");
+	pthread_mutex_unlock(&image_mutex);
+
+	pitch=roll=yaw=height=0.0;
+
+	glBindTexture(GL_TEXTURE_2D,camTexture);
+	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,image->width,image->height,0,GL_RGB,GL_UNSIGNED_BYTE,image->data);
+}
+
+void draw()
+{
+	//msl::sprite cam(web_root+"/"+"photo.jpeg");
+	//cam.draw(0,0);
+
+	glEnable(GL_TEXTURE_2D);
+	glBegin(GL_QUADS);
+		glTexCoord2d(0,0);
+		glVertex2d(-320,240);
+		glTexCoord2d(1,0);
+		glVertex2d(320,240);
+		glTexCoord2d(1,1);
+		glVertex2d(320,-240);
+		glTexCoord2d(0,1);
+		glVertex2d(-320,-240);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+
+	if(autonomous)
+		msl::draw_circle(0,0,30,msl::color(1,0,0));
+}

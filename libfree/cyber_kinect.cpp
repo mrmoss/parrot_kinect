@@ -257,7 +257,7 @@ void *gl_threadfunc(void *arg)
 {
   printf("GL thread\n");
 
-  glutInit(&g_argc, g_argv);
+  //glutInit(&g_argc, g_argv);
 
   glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH);
   glutInitWindowSize(1280, 480);

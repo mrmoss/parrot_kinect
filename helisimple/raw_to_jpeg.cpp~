@@ -3,18 +3,17 @@
 #include "raw_to_jpeg.h"
 #include <sstream>
 #include <vector>
-#include <iostream>
-
+#include <iostream> 
 bool raw_to_jpeg(const std::string& filename, unsigned char* raw_image, int width, int height,
                  int bytes_per_pixel, int color_space)
 {
-    	struct jpeg_compress_struct cinfo;
+    struct jpeg_compress_struct cinfo;
 	struct jpeg_error_mgr jerr;
-
+	
 	/* this is a pointer to one row of image data */
 	JSAMPROW row_pointer[1];
 	FILE *outfile = fopen( filename.c_str(), "wb" );
-
+	
 	if ( !outfile )
 	{
 		printf("Error opening output jpeg file %s\n!", filename.c_str() );
@@ -23,7 +22,7 @@ bool raw_to_jpeg(const std::string& filename, unsigned char* raw_image, int widt
 	cinfo.err = jpeg_std_error( &jerr );
 	jpeg_create_compress(&cinfo);
 	jpeg_stdio_dest(&cinfo, outfile);
-
+    
 	/* Setting the parameters of the output file here */
 	cinfo.image_width = width;
 	cinfo.image_height = height;
@@ -47,4 +46,9 @@ bool raw_to_jpeg(const std::string& filename, unsigned char* raw_image, int widt
 	return 1;
 }
 
+std::string raw_to_jpeg_string(unsigned char* raw_image, int width, int height,
+                        int bytes_per_pixel, int color_space)
+{
+	return ""; 
+}
 

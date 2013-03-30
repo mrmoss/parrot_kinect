@@ -13,7 +13,6 @@ CHeli::CHeli()
 	appInit();
 	imageWidth = 640;
 	imageHeight = 368;
-//	sem_init(&imageSem,0,1);
 	client = new CImageClient(&imageSem);
 	client->connectServer(WIFI_MYKONOS_IP,"5555");
         image = new CRawImage(imageWidth,imageHeight);
@@ -63,9 +62,7 @@ void CHeli::close()
 
 int CHeli::renewImage(CRawImage* im)
 {
-//	sem_wait(&imageSem);
 	memcpy(im->data,client->image->data,im->size);
-//	sem_post(&imageSem);
 	return 0;
 }
 
@@ -78,6 +75,10 @@ void CHeli::setAngles(float ipitch, float iroll,float iyaw,float iheight)
 	pitch = saturation(ipitch,33000);
 	height = saturation(iheight,33000);
 
-//	fprintf(stdout,"Angle request: %d %d %d %d ",pitch,roll,height,yaw);
 	at_set_radiogp_input(roll,pitch,height,yaw);
-}	
+}
+
+bool CHeli::is_landed() const
+{
+	return landed;
+}

@@ -1,6 +1,6 @@
 #include "CRawImage.h"
 #include "raw_to_jpeg.h"
-#include <iostream> 
+#include <iostream>
 
 static unsigned char header[] =  {66,77,54,16,14,0,0,0,0,0,54,0,0,0,40,0,0,0,128,2,0,0,224,1,0,0,1,0,24,0,0,0,0,0,0,16,14,0,18,11,0,0,18,11,0,0,0,0,0,0,0,0,0,0};
 
@@ -42,9 +42,9 @@ void CRawImage::swap()
   for (int j = 0;j<height;j++){
 	  memcpy(&newData[span*j],&data[span*(height-1-j)],span);
 	  for (int i = 0;i<width;i++){
-		  char a = newData[(width*j+i)*3]; 
+		  char a = newData[(width*j+i)*3];
 		  newData[(width*j+i)*3] = newData[(width*j+i)*3+2];
-		  newData[(width*j+i)*3+2] = a; 
+		  newData[(width*j+i)*3+2] = a;
 	  }
   }
   memcpy(data,newData,size);
@@ -63,15 +63,7 @@ void CRawImage::swap_jpeg()
             newData[(width*j+i)*3+2] = a;
         }
     }
-    
-    //for (int j = 0;j<height/2;j++){
-      //  memcpy(&newData[span*j],&data[span*(height-1-j)],span);
-        //for (int i = 0;i<width;i++){
-          //  char a = newData[(width*j+i)];
-            //newData[(width*j+i)] = newData[(width*(height - j)+i)];
-            //newData[(width*(height - j)+i)] = a;
-        //}
-    //}
+
     memcpy(data,newData,size);
     free(newData);
 }
@@ -79,17 +71,14 @@ void CRawImage::swap_jpeg()
 void CRawImage::saveBmp(const std::string& inName)
 {
 	FILE* file = fopen(inName.c_str(),"wb");
-	//swap();
 	fwrite(header,54,1,file);
 	fwrite(data,size,1,file);
-	//swap();
 	fclose(file);
 }
 
 void CRawImage::saveJPEG(const std::string& inName)
 {
     swap_jpeg();
-    //swap();
     raw_to_jpeg(inName.c_str(), data, 640, 368, 3, JCS_RGB);
     swap_jpeg();
 }

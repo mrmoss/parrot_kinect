@@ -1,11 +1,6 @@
 
 
-SRC=libfree/cyber_kinect.cpp \
-    msl/sprite.cpp \
-    msl/socket.cpp \
-    msl/file_util.cpp \
-    msl/socket_util.cpp \
-    msl/string_util.cpp
+SRC=libfree/cyber_kinect.cpp
 
 LIBS=	-pthread \
     -ljpeg \
@@ -16,8 +11,9 @@ LIBS=	-pthread \
     -lfreenect \
     -lGLEW \
     -lglut \
+	-lSDL \
 	-lSOIL \
-	-lSDL
+	-lglui
 
 OPTS=-O2
 CFLAGS=-Wall -Wno-strict-aliasing $(OPTS)
@@ -27,8 +23,8 @@ all: drone kinect
 
 
 
-drone: $(SRC) drone.cpp helisimple/*.cpp
-	$(COMPILE) $(CFLAGS) $(SRC) drone.cpp helisimple/*.cpp $(LIBS) -o $@
+drone: $(SRC) drone.cpp helisimple/*.cpp msl/*.cpp
+	$(COMPILE) $(CFLAGS) $(SRC) drone.cpp helisimple/*.cpp msl/*.cpp $(LIBS) -o $@
 
 kinect:  $(SRC) kinect.cpp
 	$(COMPILE) $(CFLAGS) $(SRC) kinect.cpp $(LIBS) -o $@
@@ -42,7 +38,7 @@ clean:
 
 # Usage: sudo make apt
 apt:
-	apt-get install libsoil-dev freeglut3-dev libglu1-mesa-dev libavcodec-dev libswscale-dev libsdl1.2-dev libjpeg62-dev liblz-dev libxi-dev libglew1.5-dev
+	apt-get install libsoil-dev freeglut3-dev libglu1-mesa-dev libavcodec-dev libswscale-dev libjpeg62-dev liblz-dev libxi-dev libglew1.5-dev libglui-dev
 	add-apt-repository ppa:floe/libtisch
 	apt-get update
 	apt-get install libfreenect libfreenect-dev libfreenect-demos

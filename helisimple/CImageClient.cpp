@@ -4,7 +4,7 @@
 
 CImageClient::CImageClient(sem_t *im)
 {
-	imageSem = im;	
+	imageSem = im;
 	stop=stopped=false;
 }
 
