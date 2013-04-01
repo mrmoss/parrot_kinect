@@ -12,12 +12,31 @@
 
 <body onload="init()">
 
-<div id="container" style="width: 512px; height: 512px;" onclick="getCoords(event)"></div>
-
+<table>
+<tr>
+  <td style="border-style: outset; border-color: black; border-width: 3; border-collapse: collapse;">
+    <div id="container" style="width: 512px; height: 512px;" onclick="getCoords(event)"></div>
+  </td>
+</tr>
+<tr>
+  <td>
+    <table>
+      <tr>
+        <td>
+          <button id="take-off" style="border-style: outset; border-color: black; border-width: 3;">Let's Go!!</buton>
+        </td>
+        <td>
+          <button id="land" style="border-style: outset; border-color: black; border-width: 3;">Land!</button>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
 </body>
 
 
-<script src="three.js"></script>
+<script src="js/three.js"></script>
 <script src="js/Detector.js"></script>
 
 <script type = text/javascript>
@@ -67,14 +86,14 @@ function init()
   var wIncrement = hIncrement = 1;
   var mapGeometry = new THREE.PlaneGeometry(mapWidth, mapHeight, wIncrement, hIncrement);
   var mapMaterial = new THREE.MeshBasicMaterial( 
-    { map: THREE.ImageUtils.loadTexture("SampleMap.jpg") } );
+    { map: THREE.ImageUtils.loadTexture("images/SampleMap.jpg") } );
   var arenaMap = new THREE.Mesh(mapGeometry, mapMaterial);
   scene.add(arenaMap);
   
   // create object to display arrow animation
   var arrowWidth = arrowHeight = 1;
   totalFrames = 10;
-  arrowTex = THREE.ImageUtils.loadTexture("ArrowAnimation.gif");
+  arrowTex = THREE.ImageUtils.loadTexture("images/ArrowAnimation.gif");
   arrowTex.wrapS = arrowTex.wrapT = THREE.RepeatWrapping;
   arrowTex.repeat.set(1/totalFrames, 1);
   var arrowGeometry = new THREE.PlaneGeometry(arrowWidth, arrowHeight, wIncrement, hIncrement);
@@ -134,7 +153,6 @@ function getCoords(event)
   
   var request = new XMLHttpRequest();
   var url = "/uav/0/goto?x="+x+"&y="+y+"&z="+z+"&number="+message_count;
-  alert(url);
   request.open("GET", url);
   request.send(null);
   message_count += 1;
