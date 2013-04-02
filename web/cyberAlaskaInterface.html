@@ -3,9 +3,15 @@
   <title>CyberAlaska UAV Interface</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <style>
-    body 
-    {
-      margin: 0px;
+    body {margin: 0px;}
+    button {border-style: outset; border-color: black; border-width: 3;}
+    #container {
+      width: 512px;
+      height: 512px;
+      border-style: outset;
+      border-color: black;
+      border-width: 3;
+      border-collapse: collapse;
     }
   </style>
 </head>
@@ -14,25 +20,23 @@
 
 <table>
 <tr>
-  <td style="border-style: outset; border-color: black; border-width: 3; border-collapse: collapse;">
-    <div id="container" style="width: 512px; height: 512px;" onclick="getCoords(event)"></div>
-  </td>
-</tr>
-<tr>
   <td>
-    <table>
-      <tr>
-        <td>
-          <button id="take-off" style="border-style: outset; border-color: black; border-width: 3;">Let's Go!!</buton>
-        </td>
-        <td>
-          <button id="land" style="border-style: outset; border-color: black; border-width: 3;">Land!</button>
-        </td>
-      </tr>
-    </table>
+    <div id="container" onclick="getCoords(event)"></div>
   </td>
 </tr>
 </table>
+
+<table>
+<tr>
+  <td>
+    <button id="take-off" onclick="takeOff()">Take-Off</buton>
+  </td>
+  <td>
+    <button id="land" onclick="land()">Land</button>
+  </td>
+</tr>
+</table>
+
 </body>
 
 
@@ -50,6 +54,7 @@ var container, camera, scene, renderer;
 var arrow, arrowTex, currentFrame, totalFrames;
 var clock, elapsedTime = 0;
 
+var request = new XMLHttpRequest();
 var message_count = 0;
 
 function init()
@@ -151,14 +156,27 @@ function getCoords(event)
   y = y * METERS_PER_FOOT;
   z = 1;
   
-  var request = new XMLHttpRequest();
-  var url = "/uav/0/goto?x="+x+"&y="+y+"&z="+z+"&number="+message_count;
+  send_message("/uav/0/goto?x="+x+"&y="+y+"&z="+z+"&number="+message_count);
+}
+
+function takeOff()
+{
+  send_message("/uav/0/takeoff?number="+message_count);
+}
+
+function land()
+{
+  send_message("/uav/0/land?number="+message_count);
+}
+
+function send_message(url)
+{
   request.open("GET", url);
   request.send(null);
-  message_count += 1;
+  message_count+=1;
+  alert(url);
 }
-  
-//  alert("(" + x + ", " + y + ")");
+
 </script>
 
 </html>
