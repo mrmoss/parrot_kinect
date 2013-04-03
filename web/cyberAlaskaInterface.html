@@ -5,7 +5,15 @@
   <style>
     body {margin: 0px;}
     button {border-style: outset; border-color: black; border-width: 3;}
-    #container {
+    #if_container {
+      width: 512px;
+      height: 512px;
+      border-style: outset;
+      border-color: black;
+      border-width: 3;
+      border-collapse: collapse;
+    }
+    #video_container {
       width: 512px;
       height: 512px;
       border-style: outset;
@@ -21,7 +29,10 @@
 <table>
 <tr>
   <td>
-    <div id="container" onclick="getCoords(event)"></div>
+    <div id="if_container" onclick="getCoords(event)"></div>
+  </td>
+  <td>
+    <div id="video_container"></div>
   </td>
 </tr>
 </table>
@@ -83,7 +94,7 @@ function init()
   renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
   // create a div element to contain the renderer
-  container = document.getElementById( 'container' );
+  container = document.getElementById( 'if_container' );
   container.appendChild( renderer.domElement );
   
   // create the map of the challenge arena
@@ -113,7 +124,28 @@ function init()
 
 function mainLoop()
 {
+  getStatus();
+  getVideoFrame();
+  updateAnimation();
+  renderer.render(scene, camera);
+  requestAnimationFrame(mainLoop);
+}
+  
+function getStatus()
+{
+  sendMessage("/uav/0/status?number="+message_count);
+}
+
+function getVideoFrame()
+{
+  sendMessage("/uav/0/videoframe?number="+message_count);
+}
+
+function updateAnimation()
+{
   dt = clock.getDelta();
+  
+  // If the animation has not finished, advance the frame at a controlled rate.
   if(currentFrame<(totalFrames-1))
   {
     elapsedTime += dt;
@@ -123,11 +155,10 @@ function mainLoop()
       currentFrame += 1;
     }
   }
-  arrowTex.offset.x = currentFrame/totalFrames;
-  renderer.render(scene, camera);
-  requestAnimationFrame(mainLoop);
-}
   
+  arrowTex.offset.x = currentFrame/totalFrames;
+}
+
 function getCoords(event)
 {
   mouseX = event.clientX;
@@ -156,25 +187,25 @@ function getCoords(event)
   y = y * METERS_PER_FOOT;
   z = 1;
   
-  send_message("/uav/0/goto?x="+x+"&y="+y+"&z="+z+"&number="+message_count);
+  sendMessage("/uav/0/goto?x="+x+"&y="+y+"&z="+z+"&number="+message_count);
 }
 
 function takeOff()
 {
-  send_message("/uav/0/takeoff?number="+message_count);
+  sendMessage("/uav/0/takeoff?number="+message_count);
 }
 
 function land()
 {
-  send_message("/uav/0/land?number="+message_count);
+  sendMessage("/uav/0/land?number="+message_count);
 }
 
-function send_message(url)
+function sendMessage(url)
 {
   request.open("GET", url);
   request.send(null);
   message_count+=1;
-  alert(url);
+//  alert(url);
 }
 
 </script>
