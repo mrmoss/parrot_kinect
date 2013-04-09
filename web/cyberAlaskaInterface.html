@@ -1,0 +1,182 @@
+<html>
+<head>
+  <title>CyberAlaska UAV Interface</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <style>
+    body {margin: 0px;}
+    button {border-style: outset; border-color: black; border-width: 3;}
+    #container {
+      width: 512px;
+      height: 512px;
+      border-style: outset;
+      border-color: black;
+      border-width: 3;
+      border-collapse: collapse;
+    }
+  </style>
+</head>
+
+<body onload="init()">
+
+<table>
+<tr>
+  <td>
+    <div id="container" onclick="getCoords(event)"></div>
+  </td>
+</tr>
+</table>
+
+<table>
+<tr>
+  <td>
+    <button id="take-off" onclick="takeOff()">Take-Off</buton>
+  </td>
+  <td>
+    <button id="land" onclick="land()">Land</button>
+  </td>
+</tr>
+</table>
+
+</body>
+
+
+<script src="js/three.js"></script>
+<script src="js/Detector.js"></script>
+
+<script type = text/javascript>
+
+var SCREEN_WIDTH = 512, SCREEN_HEIGHT = 512;
+
+var mouseX, mouseY;
+var container, camera, scene, renderer;
+
+// for the arrow animation
+var arrow, arrowTex, currentFrame, totalFrames;
+var clock, elapsedTime = 0;
+
+var request = new XMLHttpRequest();
+var message_count = 0;
+
+function init()
+{
+  // Chech for webgl implementation
+  if(!Detector.webgl)
+  {
+    Detector.addGetWebGLMessage();
+  }
+  
+  var VIEW_ANGLE   = 60;
+  var ASPECT_RATIO  = SCREEN_WIDTH/SCREEN_HEIGHT;
+  var NEAR_CLIP = .1, FAR_CLIP = 20;
+
+  clock = new THREE.Clock();
+  scene = new THREE.Scene();
+
+  // Setup camera
+  camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT_RATIO, NEAR_CLIP, FAR_CLIP);
+  scene.add(camera);
+  camera.position.set(0,0,10.4);
+  camera.lookAt(scene.position);	
+  
+  // Setup Renderer
+  renderer = new THREE.WebGLRenderer( {antialias:true} );
+  renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+  // create a div element to contain the renderer
+  container = document.getElementById( 'container' );
+  container.appendChild( renderer.domElement );
+  
+  // create the map of the challenge arena
+  var mapWidth = mapHeight = 12; // In feet
+  var wIncrement = hIncrement = 1;
+  var mapGeometry = new THREE.PlaneGeometry(mapWidth, mapHeight, wIncrement, hIncrement);
+  var mapMaterial = new THREE.MeshBasicMaterial( 
+    { map: THREE.ImageUtils.loadTexture("images/SampleMap.jpg") } );
+  var arenaMap = new THREE.Mesh(mapGeometry, mapMaterial);
+  scene.add(arenaMap);
+  
+  // create object to display arrow animation
+  var arrowWidth = arrowHeight = 1;
+  totalFrames = 10;
+  arrowTex = THREE.ImageUtils.loadTexture("images/ArrowAnimation.gif");
+  arrowTex.wrapS = arrowTex.wrapT = THREE.RepeatWrapping;
+  arrowTex.repeat.set(1/totalFrames, 1);
+  var arrowGeometry = new THREE.PlaneGeometry(arrowWidth, arrowHeight, wIncrement, hIncrement);
+  var arrowMaterial = new THREE.MeshBasicMaterial( { map: arrowTex, transparent: true } );
+  arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
+  arrow.position.z = .01;
+  scene.add(arrow);
+  currentFrame = totalFrames-1;
+
+  mainLoop();
+}
+
+function mainLoop()
+{
+  dt = clock.getDelta();
+  if(currentFrame<(totalFrames-1))
+  {
+    elapsedTime += dt;
+    if( elapsedTime > .05)
+    {
+      elapsedTime = 0;
+      currentFrame += 1;
+    }
+  }
+  arrowTex.offset.x = currentFrame/totalFrames;
+  renderer.render(scene, camera);
+  requestAnimationFrame(mainLoop);
+}
+  
+function getCoords(event)
+{
+  mouseX = event.clientX;
+  mouseY = event.clientY;
+
+  // Convert mouseX and mouseY to the range -.5*SCREEN_HEIGHT,+.5*SCREEN_HEIGHT
+  var x= mouseX-SCREEN_WIDTH/2;
+  var y=-mouseY+SCREEN_HEIGHT/2;
+  
+  // Convert x and y to the range -6,+6 feet
+  x = x/(SCREEN_WIDTH/2) * 6;
+  y = y/(SCREEN_HEIGHT/2)* 6;
+  
+  // Round to the nearest .5 foot
+  x = Math.floor(x) + 0.5;
+  y = Math.floor(y) + 0.5;
+  
+  // Place the arrow animation and set it to the first frame
+  arrow.position.x = x;
+  arrow.position.y = y;
+  currentFrame = 0;
+  
+  // Convert coordinates to meters and send to drone
+  var METERS_PER_FOOT = 0.3048;
+  x = x * METERS_PER_FOOT;
+  y = y * METERS_PER_FOOT;
+  z = 1;
+  
+  send_message("/uav/0/goto?x="+x+"&y="+y+"&z="+z+"&number="+message_count);
+}
+
+function takeOff()
+{
+  send_message("/uav/0/takeoff?number="+message_count);
+}
+
+function land()
+{
+  send_message("/uav/0/land?number="+message_count);
+}
+
+function send_message(url)
+{
+  request.open("GET", url);
+  request.send(null);
+  message_count+=1;
+  alert(url);
+}
+
+</script>
+
+</html>
