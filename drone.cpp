@@ -31,6 +31,8 @@
 //Vector Header
 #include <vector>
 
+#include <sstream>
+
 pthread_t server_thread;
 std::string web_root="web";
 
@@ -92,7 +94,7 @@ std::string curr_JPEG_string;
 
 void drone_autonomous()
 {
-	/*vec3 temp_loc=getLocation();
+	vec3 temp_loc=getLocation();
 
 	if(autonomous&&temp_loc.z!=-1)
 	{
@@ -113,20 +115,15 @@ void drone_autonomous()
 
 		//std::cout<<"BATTERY\t"<<helidata.battery<<std::endl;
 		//std::cout<<roll<<"\t"<<x_error_new<<"\t"<<pitch<<"\t"<<z_error_new<<"\tROLLPITCH\n";
-	}*/
+	}
 }
 
 //Service Client Function Definition
 void service_client(msl::socket& client, std::string& message)
 {
-	std::cout << "ving" << std::endl;
-
 	//Get Requests
 	if(msl::starts_with(message,"GET"))
 	{
-		std::cout << message << std::endl;
-		std::cout << client.str() << std::endl;
-
 		//Convert Request
 		std::string request=msl::http_to_ascii(message);
 
@@ -140,10 +137,6 @@ void service_client(msl::socket& client, std::string& message)
 			if(request.size()>0)
 				request.erase(request.end()-1);
 
-		int pos=request.find('?');
-		if(pos!=-1)
-			request=request.substr(0,pos);
-
 		//Check for Index
 		if(request=="")
 			request="index.html";
@@ -151,37 +144,112 @@ void service_client(msl::socket& client, std::string& message)
 		//Mime Type Variable (Default plain text)
 		std::string mime_type="text/plain";
 
+		bool file_request = false;
+
 		//Check for Code Mime Type
 		if(msl::ends_with(request,".js"))
+		{
 			mime_type="application/x-javascript";
+			file_request = true;
+		}
 
 		//Check for Images Mime Type
 		else if(msl::ends_with(request,".gif"))
+		{
 			mime_type="image/gif";
+			file_request = true;
+		}
 		else if(msl::ends_with(request,".jpg")||msl::ends_with(request,".jpeg"))
+		{
+			int pos=request.find('?');
+
+			if(pos!=-1)
+				request=request.substr(0,pos);
+
 			mime_type="image/jpeg";
+			file_request = true;
+		}
 		else if(msl::ends_with(request,".png"))
+		{
 			mime_type="image/png";
+			file_request = true;
+		}
 		else if(msl::ends_with(request,".tiff"))
+		{
 			mime_type="image/tiff";
+			file_request = true;
+		}
 		else if(msl::ends_with(request,".svg"))
+		{
 			mime_type="image/svg+xml";
+			file_request = true;
+		}
 		else if(msl::ends_with(request,".ico"))
+		{
 			mime_type="image/vnd.microsoft.icon";
+			file_request = true;
+		}
 
 		//Check for Text Mime Type
 		else if(msl::ends_with(request,".css"))
+		{
 			mime_type="text/css";
+			file_request = true;
+		}
 		else if(msl::ends_with(request,".htm")||msl::ends_with(request,".html"))
+		{
 			mime_type="text/html";
+			file_request = true;
+		}
 
 		//File Data Variable
 		std::string file;
 
+		bool loaded = false;
+		std::stringstream stringstr;
+
 		//Load File
-		pthread_mutex_lock(&image_mutex);
-		bool loaded=msl::file_to_string(web_root+"/"+request,file);
-		pthread_mutex_unlock(&image_mutex);
+		if(file_request)
+		{
+			pthread_mutex_lock(&image_mutex);
+			loaded=msl::file_to_string(web_root+"/"+request,file);
+			pthread_mutex_unlock(&image_mutex);
+		}
+		else
+		{
+			if(msl::starts_with(request,"uav/0/goto"))
+			{
+				for(unsigned int i = 0; i < request.size() ; ++i)
+				{
+					if( request[i] == '&')
+						request[i] = ' ';
+				}
+
+				std::cout << request << std::endl;
+				stringstr << request;
+
+				stringstr.ignore(request.size(), '=');
+				stringstr >> desired_loc.x;
+
+				stringstr.ignore(request.size(), '=');
+				stringstr >> desired_loc.y;
+
+				stringstr.ignore(request.size(), '=');
+				stringstr >> desired_loc.z;
+
+				loaded = true;
+
+				file = "No message";
+			}
+			else if(msl::starts_with(request, "uav/0/takeoff"))
+			{
+				heli->takeoff();
+			}
+			else if(msl::starts_with(request, "uav/0/land"))
+			{
+				heli->land();
+			}
+		}
 
 		if(loaded)
 		{
@@ -213,7 +281,7 @@ void* server_thread_function(void*)
 	pthread_mutex_lock(&image_mutex);
 
 	//Create Server
-	msl::socket server("0.0.0.0:80");
+	msl::socket server("0.0.0.0:8080");
 	server.create();
 
 	//Check Server
@@ -315,7 +383,7 @@ int main(int argc,char* argv[])
 
 void setup()
 {
-	/*glGenTextures(1,&camTexture);
+	glGenTextures(1,&camTexture);
 
 	msl::ui_panel_begin(ui_panel_left);
 		msl::ui_set_alignment(ui_center);
@@ -331,7 +399,7 @@ void setup()
 		msl::ui_button_add("exit",exit_button_down,exit_button_pressed);
 	msl::ui_panel_end();
 
-	startKinectThread(global_argc,global_argv,x_size,y_size,z_size,z_size/2+1.5,false);*/
+	startKinectThread(global_argc,global_argv,x_size,y_size,z_size,z_size/2+1.5,false);
 }
 
 void loop(const double dt)
@@ -401,7 +469,7 @@ void loop(const double dt)
 	if(autonomous&&heli->is_landed())
 		autonomous=false;
 
-	//drone_autonomous();
+	drone_autonomous();
 	heli->setAngles(pitch,roll,yaw,height);
 
 	pthread_mutex_lock(&image_mutex);
@@ -434,8 +502,8 @@ void draw()
 		glTexCoord2d(0,1);
 		glVertex2d(-320,-240);
 	glEnd();
-	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_TEXTURE_2D);*/
 
 	if(autonomous)
-		msl::draw_circle(0,0,30,msl::color(1,0,0));*/
+		msl::draw_circle(0,0,30,msl::color(1,0,0));
 }
