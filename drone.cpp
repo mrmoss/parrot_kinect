@@ -36,6 +36,7 @@ std::string web_root="web";
 
 pthread_mutex_t image_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t image_cond = PTHREAD_COND_INITIALIZER;
+
 CRawImage* image;
 unsigned int camTexture=0;
 
@@ -62,6 +63,11 @@ double x_size=2;
 double y_size=1;
 double z_size=3;
 
+int global_argc;
+char** global_argv;
+
+long long count = 0;
+
 //Keyboard control bools
 bool auto_button_down=false;
 bool auto_button_pressed=false;
@@ -82,9 +88,11 @@ void clamp(T& input,const T min,const T max)
 		input=max;
 }
 
+std::string curr_JPEG_string;
+
 void drone_autonomous()
 {
-	vec3 temp_loc=getLocation();
+	/*vec3 temp_loc=getLocation();
 
 	if(autonomous&&temp_loc.z!=-1)
 	{
@@ -103,17 +111,22 @@ void drone_autonomous()
 		clamp(roll,-max,max);
 		clamp(pitch,-max,max);
 
-		std::cout<<"BATTERY\t"<<helidata.battery<<std::endl;
-		std::cout<<roll<<"\t"<<x_error_new<<"\t"<<pitch<<"\t"<<z_error_new<<"\tROLLPITCH\n";
-	}
+		//std::cout<<"BATTERY\t"<<helidata.battery<<std::endl;
+		//std::cout<<roll<<"\t"<<x_error_new<<"\t"<<pitch<<"\t"<<z_error_new<<"\tROLLPITCH\n";
+	}*/
 }
 
 //Service Client Function Definition
 void service_client(msl::socket& client, std::string& message)
 {
+	std::cout << "ving" << std::endl;
+
 	//Get Requests
 	if(msl::starts_with(message,"GET"))
 	{
+		std::cout << message << std::endl;
+		std::cout << client.str() << std::endl;
+
 		//Convert Request
 		std::string request=msl::http_to_ascii(message);
 
@@ -171,26 +184,34 @@ void service_client(msl::socket& client, std::string& message)
 		pthread_mutex_unlock(&image_mutex);
 
 		if(loaded)
+		{
+			//std::cout << "file aways " << count++ << std::endl;
+			//client<<msl::http_pack_string(file,mime_type);
+			//std::cout << "file aways sent " << std::endl;
+			pthread_mutex_lock(&image_mutex);
 			client<<msl::http_pack_string(file,mime_type);
-
-		//Bad File
-		else if(msl::file_to_string(web_root+"/not_found.html",file))
-			client<<msl::http_pack_string(file);
-
+			//client<<msl::http_pack_string(curr_JPEG_string,mime_type);
+			pthread_mutex_unlock(&image_mutex);
+		}
 		//not_found.html Not Found?!
 		else
+		{
 			client.close();
+		}
 	}
 
 	//Other Requests (Just kill connection...)
 	else
 	{
+		//std::cout << message << std::endl;
 		client.close();
 	}
 }
 
 void* server_thread_function(void*)
 {
+	pthread_mutex_lock(&image_mutex);
+
 	//Create Server
 	msl::socket server("0.0.0.0:80");
 	server.create();
@@ -214,6 +235,8 @@ void* server_thread_function(void*)
 		clients.push_back(client);
 		client_messages.push_back("");
 	}
+
+	pthread_mutex_unlock(&image_mutex);
 
 	//Be a server...forever...
 	while(true)
@@ -258,6 +281,7 @@ void* server_thread_function(void*)
 			//Disconnect Bad Clients
 			else
 			{
+				//std::cout << "client closed" << clients.size() << std::endl;
 				clients[ii].close();
 				clients.erase(clients.begin()+ii);
 				client_messages.erase(client_messages.begin()+ii);
@@ -271,17 +295,19 @@ void* server_thread_function(void*)
 
 int main(int argc,char* argv[])
 {
-	pthread_create(&server_thread,NULL,server_thread_function,NULL);
+	//global_argc = argc;
+	//global_argv = argv;
 
-	startKinectThread(argc,argv,x_size,y_size,z_size,z_size/2+1.5,false);
+	pthread_create(&server_thread,NULL,server_thread_function,NULL);
 
 	heli=new CHeli();
 
 	image=new CRawImage(640,368);
 
-	image->getSaveNumber();
+	//image->getSaveNumber();
 
 	msl::start_2d("Parrot");
+	pthread_join(server_thread,NULL);
 
 	return 0;
 }
@@ -289,7 +315,7 @@ int main(int argc,char* argv[])
 
 void setup()
 {
-	glGenTextures(1,&camTexture);
+	/*glGenTextures(1,&camTexture);
 
 	msl::ui_panel_begin(ui_panel_left);
 		msl::ui_set_alignment(ui_center);
@@ -304,6 +330,8 @@ void setup()
 		msl::ui_separator_add();
 		msl::ui_button_add("exit",exit_button_down,exit_button_pressed);
 	msl::ui_panel_end();
+
+	startKinectThread(global_argc,global_argv,x_size,y_size,z_size,z_size/2+1.5,false);*/
 }
 
 void loop(const double dt)
@@ -373,18 +401,21 @@ void loop(const double dt)
 	if(autonomous&&heli->is_landed())
 		autonomous=false;
 
-	heli->renewImage(image);
-	drone_autonomous();
+	//drone_autonomous();
 	heli->setAngles(pitch,roll,yaw,height);
 
 	pthread_mutex_lock(&image_mutex);
+	msl::remove_file(web_root+"/"+"photo.jpeg");
+	heli->renewImage(image);
+	//std::cout << "saving image" << std::endl;
 	image->saveJPEG(web_root+"/"+"photo.jpeg");
+	//std::cout << "image saved" << std::endl;
 	pthread_mutex_unlock(&image_mutex);
 
 	pitch=roll=yaw=height=0.0;
 
-	glBindTexture(GL_TEXTURE_2D,camTexture);
-	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,image->width,image->height,0,GL_RGB,GL_UNSIGNED_BYTE,image->data);
+	/*glBindTexture(GL_TEXTURE_2D,camTexture);
+	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,image->width,image->height,0,GL_RGB,GL_UNSIGNED_BYTE,image->data);*/
 }
 
 void draw()
@@ -392,7 +423,7 @@ void draw()
 	//msl::sprite cam(web_root+"/"+"photo.jpeg");
 	//cam.draw(0,0);
 
-	glEnable(GL_TEXTURE_2D);
+	/*glEnable(GL_TEXTURE_2D);
 	glBegin(GL_QUADS);
 		glTexCoord2d(0,0);
 		glVertex2d(-320,240);
@@ -406,5 +437,5 @@ void draw()
 	glDisable(GL_TEXTURE_2D);
 
 	if(autonomous)
-		msl::draw_circle(0,0,30,msl::color(1,0,0));
+		msl::draw_circle(0,0,30,msl::color(1,0,0));*/
 }

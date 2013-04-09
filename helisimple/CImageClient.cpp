@@ -1,4 +1,5 @@
 #include "CImageClient.h"
+#include <pthread.h>
 
 #define NETWORK_BLOCK MSG_WAITALL
 

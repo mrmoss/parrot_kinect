@@ -552,3 +552,13 @@ bool socket_write(const SOCKET socket,void* buffer,const unsigned int size)
 	//Return Success
 	return true;
 }
+
+std::string msl::socket::str() const
+{
+	return _address.str();
+}
+
+
+
+
+

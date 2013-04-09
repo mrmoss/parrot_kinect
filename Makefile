@@ -38,7 +38,7 @@ clean:
 
 # Usage: sudo make apt
 apt:
-	apt-get install libsoil-dev freeglut3-dev libglu1-mesa-dev libavcodec-dev libswscale-dev libjpeg62-dev liblz-dev libxi-dev libglew1.5-dev libglui-dev
+	apt-get install libsoil-dev freeglut3-dev libglu1-mesa-dev libavcodec-dev libsdl1.6-dev libswscale-dev libjpeg62-dev liblz-dev libxi-dev libglew1.5-dev libglui-dev
 	add-apt-repository ppa:floe/libtisch
 	apt-get update
 	apt-get install libfreenect libfreenect-dev libfreenect-demos

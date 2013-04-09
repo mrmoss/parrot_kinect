@@ -76,11 +76,26 @@ void CRawImage::saveBmp(const std::string& inName)
 	fclose(file);
 }
 
-void CRawImage::saveJPEG(const std::string& inName)
+int CRawImage::saveJPEG(const std::string& inName)
 {
     swap_jpeg();
-    raw_to_jpeg(inName.c_str(), data, 640, 368, 3, JCS_RGB);
+
+    int error = raw_to_jpeg(inName.c_str(), data, 640, 368, 3, JCS_RGB);
     swap_jpeg();
+
+    return error;
+}
+
+std::string CRawImage::stringJPEG(const std::string& inName)
+{
+	swap_jpeg();
+    std::string jpeg_string = "";
+    std::cout << "I'm here" << std::endl;
+    //jpeg_string =
+    raw_to_jpeg_string(inName.c_str(), data, 640, 368, 3, JCS_RGB);
+    swap_jpeg();
+
+    return jpeg_string;
 }
 
 void CRawImage::plotCenter()

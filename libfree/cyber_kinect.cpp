@@ -360,8 +360,8 @@ void depth_cb(freenect_device *dev, void *v_depth, uint32_t timestamp)
   {	// Take the average location of all pixels inside box and draw it
     pthread_mutex_lock(&location_mutex);
     loc = sum/sumW;
-    printf("%.3f %.3f %.3f XYZ (w=%.0f pixels)\n",
-       loc.x,loc.y,loc.z,sumW);
+    //printf("%.3f %.3f %.3f XYZ (w=%.0f pixels)\n",
+     //  loc.x,loc.y,loc.z,sumW);
     pthread_mutex_unlock(&location_mutex);
     if( using_open_gl ){
       int avgx = sumx/sumW;
