@@ -39,6 +39,9 @@ std::string web_root="web";
 pthread_mutex_t image_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t image_cond = PTHREAD_COND_INITIALIZER;
 
+pthread_mutex_t drone_command_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t drone_location_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 CRawImage* image;
 unsigned int camTexture=0;
 
@@ -139,7 +142,7 @@ void service_client(msl::socket& client, std::string& message)
 
 		//Check for Index
 		if(request=="")
-			request="index.html";
+			request="cyberAlaskaInterface.html";
 
 		//Mime Type Variable (Default plain text)
 		std::string mime_type="text/plain";
@@ -206,7 +209,9 @@ void service_client(msl::socket& client, std::string& message)
 		std::string file;
 
 		bool loaded = false;
-		std::stringstream stringstr;
+
+		std::stringstream parse_sstr;
+		std::stringstream output_sstr;
 
 		//Load File
 		if(file_request)
@@ -217,6 +222,8 @@ void service_client(msl::socket& client, std::string& message)
 		}
 		else
 		{
+			loaded = true;
+
 			if(msl::starts_with(request,"uav/0/goto"))
 			{
 				for(unsigned int i = 0; i < request.size() ; ++i)
@@ -226,41 +233,52 @@ void service_client(msl::socket& client, std::string& message)
 				}
 
 				std::cout << request << std::endl;
-				stringstr << request;
+				parse_sstr << request;
 
-				stringstr.ignore(request.size(), '=');
-				stringstr >> desired_loc.x;
+				pthread_mutex_lock(&drone_location_mutex);
 
-				stringstr.ignore(request.size(), '=');
-				stringstr >> desired_loc.y;
+				parse_sstr.ignore(request.size(), '=');
+				parse_sstr >> desired_loc.x;
 
-				stringstr.ignore(request.size(), '=');
-				stringstr >> desired_loc.z;
+				parse_sstr.ignore(request.size(), '=');
+				parse_sstr >> desired_loc.y;
 
-				loaded = true;
+				parse_sstr.ignore(request.size(), '=');
+				parse_sstr >> desired_loc.z;
 
-				file = "No message";
+				pthread_mutex_unlock(&drone_location_mutex);
+
+				output_sstr << "Location recieved";
 			}
 			else if(msl::starts_with(request, "uav/0/takeoff"))
 			{
+				pthread_mutex_lock(&drone_command_mutex);
 				heli->takeoff();
+				pthread_mutex_unlock(&drone_command_mutex);
+
+				output_sstr << "takeoff recieved";
 			}
 			else if(msl::starts_with(request, "uav/0/land"))
 			{
+				pthread_mutex_lock(&drone_command_mutex);
 				heli->land();
+				pthread_mutex_unlock(&drone_command_mutex);
+
+				output_sstr << "land recieved";
+			}
+			else if(msl::starts_with(request, "uav/0/battery"))
+			{
+				output_sstr << "battery= " << helidata.battery << "\n";
 			}
 		}
 
 		if(loaded)
 		{
-			//std::cout << "file aways " << count++ << std::endl;
-			//client<<msl::http_pack_string(file,mime_type);
-			//std::cout << "file aways sent " << std::endl;
 			pthread_mutex_lock(&image_mutex);
 			client<<msl::http_pack_string(file,mime_type);
-			//client<<msl::http_pack_string(curr_JPEG_string,mime_type);
 			pthread_mutex_unlock(&image_mutex);
 		}
+
 		//not_found.html Not Found?!
 		else
 		{
@@ -281,7 +299,7 @@ void* server_thread_function(void*)
 	pthread_mutex_lock(&image_mutex);
 
 	//Create Server
-	msl::socket server("0.0.0.0:8080");
+	msl::socket server("0.0.0.0:80");
 	server.create();
 
 	//Check Server
@@ -371,8 +389,6 @@ int main(int argc,char* argv[])
 	heli=new CHeli();
 
 	image=new CRawImage(640,368);
-
-	//image->getSaveNumber();
 
 	msl::start_2d("Parrot");
 	pthread_join(server_thread,NULL);
@@ -475,12 +491,14 @@ void loop(const double dt)
 	pthread_mutex_lock(&image_mutex);
 	msl::remove_file(web_root+"/"+"photo.jpeg");
 	heli->renewImage(image);
-	//std::cout << "saving image" << std::endl;
 	image->saveJPEG(web_root+"/"+"photo.jpeg");
-	//std::cout << "image saved" << std::endl;
 	pthread_mutex_unlock(&image_mutex);
 
 	pitch=roll=yaw=height=0.0;
+
+	//std::cout << "theta " << helidata.theta << std::endl;
+	//std::cout << "phi " << helidata.phi << std::endl;
+	//std::cout << "psi " << helidata.psi << std::endl;
 
 	/*glBindTexture(GL_TEXTURE_2D,camTexture);
 	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,image->width,image->height,0,GL_RGB,GL_UNSIGNED_BYTE,image->data);*/
