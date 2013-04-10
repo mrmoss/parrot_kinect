@@ -116,6 +116,9 @@ namespace msl
 			//Stream Out Operator
 			template <typename T> friend msl::socket& operator<<(msl::socket& lhs,const T& rhs);
 
+			//Comment goes here
+			std::string str() const;
+
 		private:
 			//Member Variables
 			msl::ipv4 _address;

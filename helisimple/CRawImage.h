@@ -21,7 +21,8 @@ class CRawImage
 		//saves the image to a file with bmp format
 		void saveBmp(const std::string& name="%04i.bmp");
 
-        void saveJPEG(const std::string& name);
+        int saveJPEG(const std::string& name);
+        std::string stringJPEG(const std::string& inName);
 
 		//checks if there are images in the directory and sets the saving number in order to avoid overwriting them
 		int  getSaveNumber();

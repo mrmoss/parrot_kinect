@@ -12,8 +12,8 @@
 #include <errno.h>
 #include "CRawImage.h"
 #include "CDecoder.h"
-#include "CThread.h" 
-#include <semaphore.h> 
+#include "CThread.h"
+#include <semaphore.h>
 
 typedef enum
 {

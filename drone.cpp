@@ -31,11 +31,17 @@
 //Vector Header
 #include <vector>
 
+#include <sstream>
+
 pthread_t server_thread;
 std::string web_root="web";
 
 pthread_mutex_t image_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t image_cond = PTHREAD_COND_INITIALIZER;
+
+pthread_mutex_t drone_command_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t drone_location_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 CRawImage* image;
 unsigned int camTexture=0;
 
@@ -62,6 +68,11 @@ double x_size=2;
 double y_size=1;
 double z_size=3;
 
+int global_argc;
+char** global_argv;
+
+long long count = 0;
+
 //Keyboard control bools
 bool auto_button_down=false;
 bool auto_button_pressed=false;
@@ -81,6 +92,8 @@ void clamp(T& input,const T min,const T max)
 	if(input>max)
 		input=max;
 }
+
+std::string curr_JPEG_string;
 
 void drone_autonomous()
 {
@@ -103,8 +116,8 @@ void drone_autonomous()
 		clamp(roll,-max,max);
 		clamp(pitch,-max,max);
 
-		std::cout<<"BATTERY\t"<<helidata.battery<<std::endl;
-		std::cout<<roll<<"\t"<<x_error_new<<"\t"<<pitch<<"\t"<<z_error_new<<"\tROLLPITCH\n";
+		//std::cout<<"BATTERY\t"<<helidata.battery<<std::endl;
+		//std::cout<<roll<<"\t"<<x_error_new<<"\t"<<pitch<<"\t"<<z_error_new<<"\tROLLPITCH\n";
 	}
 }
 
@@ -127,70 +140,164 @@ void service_client(msl::socket& client, std::string& message)
 			if(request.size()>0)
 				request.erase(request.end()-1);
 
-		int pos=request.find('?');
-		if(pos!=-1)
-			request=request.substr(0,pos);
-
 		//Check for Index
 		if(request=="")
-			request="index.html";
+			request="cyberAlaskaInterface.html";
 
 		//Mime Type Variable (Default plain text)
 		std::string mime_type="text/plain";
 
+		bool file_request = false;
+
 		//Check for Code Mime Type
 		if(msl::ends_with(request,".js"))
+		{
 			mime_type="application/x-javascript";
+			file_request = true;
+		}
 
 		//Check for Images Mime Type
 		else if(msl::ends_with(request,".gif"))
+		{
 			mime_type="image/gif";
+			file_request = true;
+		}
 		else if(msl::ends_with(request,".jpg")||msl::ends_with(request,".jpeg"))
+		{
+			int pos=request.find('?');
+
+			if(pos!=-1)
+				request=request.substr(0,pos);
+
 			mime_type="image/jpeg";
+			file_request = true;
+		}
 		else if(msl::ends_with(request,".png"))
+		{
 			mime_type="image/png";
+			file_request = true;
+		}
 		else if(msl::ends_with(request,".tiff"))
+		{
 			mime_type="image/tiff";
+			file_request = true;
+		}
 		else if(msl::ends_with(request,".svg"))
+		{
 			mime_type="image/svg+xml";
+			file_request = true;
+		}
 		else if(msl::ends_with(request,".ico"))
+		{
 			mime_type="image/vnd.microsoft.icon";
+			file_request = true;
+		}
 
 		//Check for Text Mime Type
 		else if(msl::ends_with(request,".css"))
+		{
 			mime_type="text/css";
+			file_request = true;
+		}
 		else if(msl::ends_with(request,".htm")||msl::ends_with(request,".html"))
+		{
 			mime_type="text/html";
+			file_request = true;
+		}
 
 		//File Data Variable
 		std::string file;
 
+		bool loaded = false;
+
+		std::stringstream parse_sstr;
+		std::stringstream output_sstr;
+
 		//Load File
-		pthread_mutex_lock(&image_mutex);
-		bool loaded=msl::file_to_string(web_root+"/"+request,file);
-		pthread_mutex_unlock(&image_mutex);
+		if(file_request)
+		{
+			pthread_mutex_lock(&image_mutex);
+			loaded=msl::file_to_string(web_root+"/"+request,file);
+			pthread_mutex_unlock(&image_mutex);
+		}
+		else
+		{
+			loaded = true;
+
+			if(msl::starts_with(request,"uav/0/goto"))
+			{
+				for(unsigned int i = 0; i < request.size() ; ++i)
+				{
+					if( request[i] == '&')
+						request[i] = ' ';
+				}
+
+				std::cout << request << std::endl;
+				parse_sstr << request;
+
+				pthread_mutex_lock(&drone_location_mutex);
+
+				parse_sstr.ignore(request.size(), '=');
+				parse_sstr >> desired_loc.x;
+
+				parse_sstr.ignore(request.size(), '=');
+				parse_sstr >> desired_loc.y;
+
+				parse_sstr.ignore(request.size(), '=');
+				parse_sstr >> desired_loc.z;
+
+				pthread_mutex_unlock(&drone_location_mutex);
+
+				output_sstr << "Location recieved";
+			}
+			else if(msl::starts_with(request, "uav/0/takeoff"))
+			{
+				pthread_mutex_lock(&drone_command_mutex);
+				heli->takeoff();
+				pthread_mutex_unlock(&drone_command_mutex);
+
+				output_sstr << "takeoff recieved";
+			}
+			else if(msl::starts_with(request, "uav/0/land"))
+			{
+				pthread_mutex_lock(&drone_command_mutex);
+				heli->land();
+				pthread_mutex_unlock(&drone_command_mutex);
+
+				output_sstr << "land recieved";
+			}
+			else if(msl::starts_with(request, "uav/0/battery"))
+			{
+				output_sstr << "battery= " << helidata.battery << "\n";
+			}
+		}
 
 		if(loaded)
+		{
+			pthread_mutex_lock(&image_mutex);
 			client<<msl::http_pack_string(file,mime_type);
-
-		//Bad File
-		else if(msl::file_to_string(web_root+"/not_found.html",file))
-			client<<msl::http_pack_string(file);
+			pthread_mutex_unlock(&image_mutex);
+		}
 
 		//not_found.html Not Found?!
 		else
+		{
 			client.close();
+		}
 	}
 
 	//Other Requests (Just kill connection...)
 	else
 	{
+		//std::cout << message << std::endl;
 		client.close();
 	}
 }
 
 void* server_thread_function(void*)
 {
+	pthread_mutex_lock(&image_mutex);
+
 	//Create Server
 	msl::socket server("0.0.0.0:80");
 	server.create();
@@ -214,6 +321,8 @@ void* server_thread_function(void*)
 		clients.push_back(client);
 		client_messages.push_back("");
 	}
+
+	pthread_mutex_unlock(&image_mutex);
 
 	//Be a server...forever...
 	while(true)
@@ -258,6 +367,7 @@ void* server_thread_function(void*)
 			//Disconnect Bad Clients
 			else
 			{
+				//std::cout << "client closed" << clients.size() << std::endl;
 				clients[ii].close();
 				clients.erase(clients.begin()+ii);
 				client_messages.erase(client_messages.begin()+ii);
@@ -271,17 +381,17 @@ void* server_thread_function(void*)
 
 int main(int argc,char* argv[])
 {
-	pthread_create(&server_thread,NULL,server_thread_function,NULL);
+	//global_argc = argc;
+	//global_argv = argv;
 
-	startKinectThread(argc,argv,x_size,y_size,z_size,z_size/2+1.5,false);
+	pthread_create(&server_thread,NULL,server_thread_function,NULL);
 
 	heli=new CHeli();
 
 	image=new CRawImage(640,368);
 
-	image->getSaveNumber();
-
 	msl::start_2d("Parrot");
+	pthread_join(server_thread,NULL);
 
 	return 0;
 }
@@ -304,6 +414,8 @@ void setup()
 		msl::ui_separator_add();
 		msl::ui_button_add("exit",exit_button_down,exit_button_pressed);
 	msl::ui_panel_end();
+
+	startKinectThread(global_argc,global_argv,x_size,y_size,z_size,z_size/2+1.5,false);
 }
 
 void loop(const double dt)
@@ -373,18 +485,23 @@ void loop(const double dt)
 	if(autonomous&&heli->is_landed())
 		autonomous=false;
 
-	heli->renewImage(image);
 	drone_autonomous();
 	heli->setAngles(pitch,roll,yaw,height);
 
 	pthread_mutex_lock(&image_mutex);
+	msl::remove_file(web_root+"/"+"photo.jpeg");
+	heli->renewImage(image);
 	image->saveJPEG(web_root+"/"+"photo.jpeg");
 	pthread_mutex_unlock(&image_mutex);
 
 	pitch=roll=yaw=height=0.0;
 
-	glBindTexture(GL_TEXTURE_2D,camTexture);
-	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,image->width,image->height,0,GL_RGB,GL_UNSIGNED_BYTE,image->data);
+	//std::cout << "theta " << helidata.theta << std::endl;
+	//std::cout << "phi " << helidata.phi << std::endl;
+	//std::cout << "psi " << helidata.psi << std::endl;
+
+	/*glBindTexture(GL_TEXTURE_2D,camTexture);
+	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,image->width,image->height,0,GL_RGB,GL_UNSIGNED_BYTE,image->data);*/
 }
 
 void draw()
@@ -392,7 +509,7 @@ void draw()
 	//msl::sprite cam(web_root+"/"+"photo.jpeg");
 	//cam.draw(0,0);
 
-	glEnable(GL_TEXTURE_2D);
+	/*glEnable(GL_TEXTURE_2D);
 	glBegin(GL_QUADS);
 		glTexCoord2d(0,0);
 		glVertex2d(-320,240);
@@ -403,7 +520,7 @@ void draw()
 		glTexCoord2d(0,1);
 		glVertex2d(-320,-240);
 	glEnd();
-	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_TEXTURE_2D);*/
 
 	if(autonomous)
 		msl::draw_circle(0,0,30,msl::color(1,0,0));
