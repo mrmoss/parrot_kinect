@@ -41,6 +41,7 @@ pthread_cond_t image_cond = PTHREAD_COND_INITIALIZER;
 
 pthread_mutex_t drone_command_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t drone_location_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t kinect_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 CRawImage* image;
 unsigned int camTexture=0;
@@ -119,6 +120,23 @@ void drone_autonomous()
 		//std::cout<<"BATTERY\t"<<helidata.battery<<std::endl;
 		//std::cout<<roll<<"\t"<<x_error_new<<"\t"<<pitch<<"\t"<<z_error_new<<"\tROLLPITCH\n";
 	}
+}
+
+std::string make_json()
+{
+	std::stringstream json;
+
+	pthread_mutex_lock(&kinect_mutex);
+	vec3 curr_location = getLocation();
+	pthread_mutex_unlock(&kinect_mutex);
+
+	json << "{ \n";
+	json << "current_x : " << curr_location.x << ",\n";
+	json << "current_y : " << curr_location.y << ",\n";
+	json << "current_z : " << curr_location.z << "\n";
+	json << "}";
+
+	return json.str();
 }
 
 //Service Client Function Definition
@@ -266,9 +284,10 @@ void service_client(msl::socket& client, std::string& message)
 
 				output_sstr << "land recieved";
 			}
-			else if(msl::starts_with(request, "uav/0/battery"))
+			else if(msl::starts_with(request, "uav/0/status"))
 			{
-				output_sstr << "battery= " << helidata.battery << "\n";
+				output_sstr << make_json();
+				std::cout << output_sstr.str() << std::endl;
 			}
 		}
 
@@ -401,6 +420,9 @@ void setup()
 {
 	glGenTextures(1,&camTexture);
 
+	float myTheta = helidata.theta;
+	std::cout << myTheta << std::endl;
+
 	msl::ui_panel_begin(ui_panel_left);
 		msl::ui_set_alignment(ui_center);
 		msl::ui_spinner_add("x: ",desired_loc.x,-static_cast<float>(x_size),static_cast<float>(x_size));
@@ -496,9 +518,9 @@ void loop(const double dt)
 
 	pitch=roll=yaw=height=0.0;
 
-	//std::cout << "theta " << helidata.theta << std::endl;
-	//std::cout << "phi " << helidata.phi << std::endl;
-	//std::cout << "psi " << helidata.psi << std::endl;
+	std::cout << "theta-> " << helidata.theta;
+	std::cout << " phi-> " << helidata.phi;
+	std::cout << " psi-> " << helidata.psi << " \r";
 
 	/*glBindTexture(GL_TEXTURE_2D,camTexture);
 	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,image->width,image->height,0,GL_RGB,GL_UNSIGNED_BYTE,image->data);*/
