@@ -160,16 +160,6 @@ function resizeFunc()
 
 }
 
-function getStatus()
-{
-  sendMessage("/uav/0/status?number="+message_count);
-}
-
-function getVideoFrame()
-{
-  sendMessage("/uav/0/videoframe?number="+message_count);
-}
-
 function updateAnimation()
 {
   dt = clock.getDelta();
@@ -216,30 +206,56 @@ function getCoords(event)
   y = y * METERS_PER_FOOT;
   z = 1;
   
-  sendMessage("/uav/0/goto?x="+x+"&y="+y+"&z="+z+"&number="+message_count);
+  sendMessage("/uav/0/goto?x="+x+"&y="+y+"&z="+z+"&number="+message_count, gotoResponse);
+}
+
+function getStatus()
+{
+  sendMessage("/uav/0/status?number="+message_count, statusResponse);
+}
+
+function getVideoFrame()
+{
+  sendMessage("/uav/0/videoframe?number="+message_count, videoResponse);
 }
 
 function takeOff()
 {
-  sendMessage("/uav/0/takeoff?number="+message_count);
+  sendMessage("/uav/0/takeoff?number="+message_count, takeOffResponse);
 }
 
 function land()
 {
-  sendMessage("/uav/0/land?number="+message_count);
+  sendMessage("/uav/0/land?number="+message_count, landResponse);
 }
 
-function sendMessage(url)
+function sendMessage(url, callBackFunc)
 {
   $.ajax({
     url: url,
     timeout: 500,
-    success: getResponse,
+    success: callBackFunc,
     error: timeOutError});
   message_count+=1;
 }
 
-function getResponse(data)
+function statusResponse(data)
+{
+}
+
+function videoResponse(data)
+{
+}
+
+function takeOffResponse(data)
+{
+}
+
+function landResponse(data)
+{
+}
+
+function gotoResponse(data)
 {
 }
 
