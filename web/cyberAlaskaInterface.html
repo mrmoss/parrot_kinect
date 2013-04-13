@@ -237,7 +237,7 @@ function sendMessage(url, callBackFunc)
     url: url,
     timeout: 500,
     success: callBackFunc,
-    error: showMessage("errorMsg", "Error: No response from server.")});
+    error: timeOut});
   message_count+=1;
 }
 
@@ -270,7 +270,12 @@ function errorCount()
 
   return errorCount.val;
 }
-  
+
+function timeOut()
+{
+  showMessage("errorMsg", "Error: No response from server.");
+}
+
 function showMessage(msgType, message)
 {
   if(msgType == "errorMsg")
