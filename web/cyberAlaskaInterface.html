@@ -207,6 +207,7 @@ function getCoords(event)
   z = z * METERS_PER_FOOT;
   
   sendMessage("/uav/0/goto?x="+x+"&y="+y+"&z="+z+"&number="+message_count, gotoResponse);
+  $("#messages").val( $("#messages").val()+"X: "+ x +" Y: "+ y +" Z: "+ z +"\n");  
 }
 
 function getStatus()
@@ -271,7 +272,7 @@ function errorCount()
   
 function timeOutError()
 {
-  $("#messages").val("("+errorCount()+")Error: No response from server.\n");
+  $("#messages").val( $("#messages").val()+"Error: No response from server.\n");
 }
 
 function togglePause()
