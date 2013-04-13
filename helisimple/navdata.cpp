@@ -26,6 +26,8 @@
 
 #include "app.h"
 
+#include <iostream>
+
 /* Navdata constant */
 #define NAVDATA_SEQUENCE_DEFAULT  1
 #define NAVDATA_PORT              5554
@@ -110,8 +112,11 @@ typedef struct _navdata_demo_t {
 
     // Camera parameters compute by detection
     matrix33_t  detection_camera_rot;
-    matrix33_t  detection_camera_homo;
+    //matrix33_t  detection_camera_homo;
     vector31_t  detection_camera_trans;
+	uint32_t	  detection_tag_index;    /*!<  Deprecated ! Don't use ! */
+
+	uint32_t	  detection_camera_type;  /*!<  Type of tag searched in detection */
 
     // Camera parameters compute by drone
     matrix33_t  drone_camera_rot;
@@ -169,11 +174,11 @@ static inline int get_mask_from_state( uint32_t state, uint32_t mask )
     return state & mask ? TRUE : FALSE;
 }
 
-static inline uint8_t* navdata_unpack_option( uint8_t* navdata_ptr, uint8_t* data, uint32_t size )
+static inline uint8_t* navdata_unpack_option( uint8_t* navdata_ptr, uint32_t move, uint8_t* data, uint32_t copy )
 {
-    memcpy(data, navdata_ptr, size);
+    memcpy(data, navdata_ptr, copy);
 
-    return (navdata_ptr + size);
+    return (navdata_ptr + move);
 }
 
 
@@ -198,9 +203,10 @@ static inline uint32_t navdata_compute_cks( uint8_t* nv, int32_t size )
     return cks;
 }
 
-#define navdata_unpack( navdata_ptr, option ) (navdata_option_t*) navdata_unpack_option( (uint8_t*) navdata_ptr, \
-                                                                                         (uint8_t*) &option, \
-                                                                                         navdata_ptr->size )
+#define navdata_unpack( ptr, option ) \
+			/*printf("   ---- NAVDATA: tag=%d,  navsize=%d bytes, option=%ld bytes\n",  ptr->tag, ptr->size,sizeof(option)); */ \
+           ptr=(navdata_option_t*) navdata_unpack_option( (uint8_t*) ptr, ptr->size, (uint8_t*) &(option), sizeof(option))
+
 static void mykonos_navdata_unpack_all(navdata_unpacked_t* navdata_unpacked, navdata_t* navdata, uint32_t* cks)
 {
     navdata_cks_t navdata_cks = { 0 };
@@ -225,22 +231,22 @@ static void mykonos_navdata_unpack_all(navdata_unpacked_t* navdata_unpacked, nav
                     switch( navdata_option_ptr->tag )
                         {
                         case NAVDATA_DEMO_TAG:
-//			    memcpy(navdata_unpacked->navdata_demo,navdata_ptr,navdata_ptr->size);
-                            navdata_option_ptr = navdata_unpack( navdata_option_ptr, navdata_unpacked->navdata_demo );
+							//memcpy(navdata_unpacked->navdata_demo,navdata_option_ptr,navdata_option_ptr->size);
+                            navdata_unpack( navdata_option_ptr, navdata_unpacked->navdata_demo );
                             break;
 
                         case NAVDATA_IPHONE_ANGLES_TAG:
-                            navdata_option_ptr = navdata_unpack( navdata_option_ptr, navdata_unpacked->navdata_iphone_angles );
+                            navdata_unpack( navdata_option_ptr, navdata_unpacked->navdata_iphone_angles );
                             break;
 
                         case NAVDATA_VISION_DETECT_TAG:
-                            navdata_option_ptr = navdata_unpack( navdata_option_ptr, navdata_unpacked->navdata_vision_detect );
+                            navdata_unpack( navdata_option_ptr, navdata_unpacked->navdata_vision_detect );
                             break;
 
                         case NAVDATA_CKS_TAG:
-                            navdata_option_ptr = navdata_unpack( navdata_option_ptr, navdata_cks );
+                            navdata_unpack( navdata_option_ptr, navdata_cks );
                             *cks = navdata_cks.cks;
-			     navdata_option_ptr = NULL;
+							navdata_option_ptr = NULL;
                             break;
 
                         default:
@@ -257,15 +263,16 @@ navdata_unpacked_t navdata_unpacked;
 
 static void* navdata_loop(void *arg)
 {
-	return NULL;
 	uint8_t msg[NAVDATA_BUFFER_SIZE];
 	int sockfd = -1, addr_in_size;
-	unsigned int cks, navdata_cks, sequence = NAVDATA_SEQUENCE_DEFAULT-1;
+	unsigned int cks = NAVDATA_SEQUENCE_DEFAULT-1;
+	unsigned int navdata_cks = NAVDATA_SEQUENCE_DEFAULT-1;
+	unsigned int sequence = NAVDATA_SEQUENCE_DEFAULT-1;
 	int size;
 	int sendstuff=1;
 	struct sockaddr_in *my_addr, *from;
 
-	INFO("NAVDATA thread starting (thread=%d)...\n", static_cast<int>(pthread_self()));
+	INFO("NAVDATA thread starting (thread=%d)...\n", (int)pthread_self());
 
 
 	addr_in_size = sizeof(struct sockaddr_in);
@@ -281,6 +288,7 @@ static void* navdata_loop(void *arg)
 	my_addr->sin_family = AF_INET;
 	my_addr->sin_addr.s_addr = INADDR_ANY;
 	my_addr->sin_port = htons(NAVDATA_PORT);
+
 
 	if((sockfd = socket (AF_INET, SOCK_DGRAM, 0)) < 0){
         INFO ("socket: %s\n", strerror(errno));
@@ -310,8 +318,10 @@ static void* navdata_loop(void *arg)
 
 	INFO("Ready to receive\n");
 
+
 	while ( nav_thread_alive ) {
 		size = recvfrom (sockfd, &msg[0], NAVDATA_BUFFER_SIZE, 0, (struct sockaddr *)from,(socklen_t *)&addr_in_size);
+
 		if (size > 0){
 			if( navdata->header == NAVDATA_HEADER )
 			{
@@ -331,6 +341,7 @@ static void* navdata_loop(void *arg)
 				{
 					if ( get_mask_from_state( mykonos_state, MYKONOS_NAVDATA_DEMO_MASK ))
 					{
+
 						mykonos_navdata_unpack_all(&navdata_unpacked, navdata, &navdata_cks);
 						cks = navdata_compute_cks(&msg[0],size-sizeof(navdata_cks_t));
 						if( cks == navdata_cks)
@@ -344,6 +355,7 @@ static void* navdata_loop(void *arg)
 							helidata.vy = -(double)navdata_unpacked.navdata_demo.vy;
 							helidata.vz = (double)navdata_unpacked.navdata_demo.vz;
 						}else{
+							std::cout << cks << " " << navdata_cks << std::endl;
 							INFO ("CKS Mismatch\n");
 						}
 					}
@@ -401,4 +413,3 @@ void navdata_run( void )
 		INFO("pthread_create: %s\n", strerror(errno));
 	}
 }
-

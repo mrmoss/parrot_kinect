@@ -28,7 +28,7 @@
 //Vector Header
 #include <vector>
 
-double x_size = 2;
+double x_size = 3;
 double y_size = 1;
 double z_size = 3;
 int main(int argc,char* argv[])

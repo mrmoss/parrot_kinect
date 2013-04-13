@@ -340,7 +340,10 @@ void at_trim( void )
 	at_write((int8_t*)str, strlen (str));
 	usleep(100000);
 	sprintf(str,"AT*CONFIG=%i,\"control:altitude_max\",\"5000\"\r",nb_sequence++);
+	//sprintf(str,"AT*CONFIG=%i,\"control:altitude_min\",\"0\"\r",nb_sequence++);
 	at_write((int8_t*)str, strlen (str));
+	//sprintf(str,"AT*CONFIG=%i,\"control:altitude_min\",\"0\"\r",nb_sequence++);
+	//at_write((int8_t*)str, strlen (str));
 }
 
 /************* at_ui_pad_start_pressed ****************
