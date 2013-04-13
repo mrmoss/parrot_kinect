@@ -20,12 +20,13 @@
       border-width: 1px;
       border-collapse: collapse;
     }
-    #messages {
-      width: 100%;
-      resize: none;
-      color: red; 
-      font-weight: bold;
+    .normalMsg {
+      color: black;
+    }
+    .errorMsg {
+      color: red;
     } -->
+
   </style>
 </head>
 
@@ -49,7 +50,7 @@
 </tr>
 <tr>
   <td colspan="2">
-    <textarea id="messages" readonly></textarea>
+    <div id="messages"></div>
   </td>
 </tr>
 </table>
@@ -207,7 +208,7 @@ function getCoords(event)
   z = z * METERS_PER_FOOT;
   
   sendMessage("/uav/0/goto?x="+x+"&y="+y+"&z="+z+"&number="+message_count, gotoResponse);
-  $("#messages").val( $("#messages").val()+"X: "+ x +" Y: "+ y +" Z: "+ z +"\n");  
+  showMessage("normalMsg","X: "+ x.toFixed(4) +" Y: "+ y.toFixed(4) +" Z: "+ z.toFixed(4));
 }
 
 function getStatus()
@@ -236,7 +237,7 @@ function sendMessage(url, callBackFunc)
     url: url,
     timeout: 500,
     success: callBackFunc,
-    error: timeOutError});
+    error: showMessage("errorMsg", "Error: No response from server.")});
   message_count+=1;
 }
 
@@ -262,7 +263,7 @@ function gotoResponse(data)
 
 function errorCount()
 {
-  if(!errorCount.val)
+  if(errorCount.val == undefined)
     errorCount.val=1;
   else
     errorCount.val += 1;
@@ -270,9 +271,20 @@ function errorCount()
   return errorCount.val;
 }
   
-function timeOutError()
+function showMessage(msgType, message)
 {
-  $("#messages").val( $("#messages").val()+"Error: No response from server.\n");
+  if(msgType == "errorMsg")
+  {
+    if(errorCount.val == undefined)
+    {
+      $("#messages").append("<div  class='errorMsg' id='timeOut'></div>");
+    }
+    $("#timeOut").html("("+errorCount()+")"+message);
+  }
+  else
+  {
+    $("#messages").append("<div class='"+msgType+"'>"+message+"</div>");
+  }
 }
 
 function togglePause()
