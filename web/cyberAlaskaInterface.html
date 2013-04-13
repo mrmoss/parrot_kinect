@@ -185,26 +185,26 @@ function getCoords(event)
 
   // Convert mouseX and mouseY to the range -.5*CANVAS_HEIGHT,+.5*CANVAS_HEIGHT
   var x= mouseX-CANVAS_WIDTH/2;
-  var y=-mouseY+CANVAS_HEIGHT/2;
+  var z=-mouseY+CANVAS_HEIGHT/2;
   
   // Convert x and y to the range -6,+6 feet
   x = x/(CANVAS_WIDTH/2) * 6;
-  y = y/(CANVAS_HEIGHT/2)* 6;
+  z = z/(CANVAS_HEIGHT/2)* 6;
   
   // Round to the nearest .5 foot
   x = Math.floor(x) + 0.5;
-  y = Math.floor(y) + 0.5;
+  z = Math.floor(z) + 0.5;
   
   // Place the arrow animation and set it to the first frame
   arrow.position.x = x;
-  arrow.position.y = y;
+  arrow.position.y = z;
   currentFrame = 0;
   
   // Convert coordinates to meters and send to drone
   var METERS_PER_FOOT = 0.3048;
   x = x * METERS_PER_FOOT;
-  y = y * METERS_PER_FOOT;
-  z = 1;
+  y = 1.0;
+  z = y * METERS_PER_FOOT;
   
   sendMessage("/uav/0/goto?x="+x+"&y="+y+"&z="+z+"&number="+message_count, gotoResponse);
 }
