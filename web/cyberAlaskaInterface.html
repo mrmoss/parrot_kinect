@@ -204,7 +204,7 @@ function getCoords(event)
   var METERS_PER_FOOT = 0.3048;
   x = x * METERS_PER_FOOT;
   y = 1.0;
-  z = y * METERS_PER_FOOT;
+  z = z * METERS_PER_FOOT;
   
   sendMessage("/uav/0/goto?x="+x+"&y="+y+"&z="+z+"&number="+message_count, gotoResponse);
 }
