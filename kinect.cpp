@@ -33,10 +33,10 @@ double y_size = 1;
 double z_size = 3;
 int main(int argc,char* argv[])
 {
-    bool doOpenGL=true;
-    startKinectThread(argc, argv, x_size, y_size, z_size, z_size/2+1.5, doOpenGL);
+    startKinectThread(argc, argv, x_size, y_size, z_size, z_size/2+1.5);
 
-    while (true) {sleep(10);};
+    while (true)
+    {}
+
     return 0;
 }
-

@@ -5,9 +5,11 @@
 #include "CRawImage.h"
 #include <semaphore.h>
 
-extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libswscale/swscale.h>
+extern "C"
+{
+	typedef unsigned long UINT64_C;
+	#include <libavcodec/avcodec.h>
+	#include <libswscale/swscale.h>
 }
 
 #define INBUF_SIZE 4096

@@ -16,7 +16,7 @@ LIBS=	-pthread \
 	-lglui
 
 OPTS=-O2
-CFLAGS=-Wall -Wno-strict-aliasing $(OPTS)
+CFLAGS= -Wall -Wno-strict-aliasing $(OPTS)
 COMPILE=g++
 
 all: drone kinect
