@@ -12,13 +12,11 @@
       border-style: outset;
       border-color: black;
       border-width: 1px;
-      border-collapse: collapse;
     }
     #video_container {
       border-style: outset;
       border-color: black;
       border-width: 1px;
-      border-collapse: collapse;
     }
     .normalMsg {
       color: black;
@@ -38,7 +36,7 @@
     <div id="if_container" onclick="getCoords(event)"></div>
   </td>
   <td>
-    <div id="video_container"></div>
+    <canvas id="video_container"></canvas>
   </td>
 </tr>
 <tr>
@@ -78,6 +76,11 @@ var message_count = 0;
 
 var paused = false;
 
+var video = new Image();
+var v_container = getElementById("video_container");
+var video_context = v_container.getContext('2d');
+
+
 function init()
 {
   // Chech for webgl implementation
@@ -92,6 +95,13 @@ function init()
 
   clock = new THREE.Clock();
   scene = new THREE.Scene();
+
+  // Setup video feed
+  video.onload = function(){
+    v_container.width  = CANVAS_WIDTH;
+    v_container.height = CANVAS_HEIGHT;
+    video_context.drawImage(image, 0, 0, image.width, image.height);
+  }
 
   // Setup camera
   camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT_RATIO, NEAR_CLIP, FAR_CLIP);
@@ -218,7 +228,7 @@ function getStatus()
 
 function getVideoFrame()
 {
-  sendMessage("/uav/0/videoframe?number="+message_count, videoResponse);
+  video.src = "/uav/0/photo.jpg?number="+message_count;
 }
 
 function takeOff()
@@ -242,10 +252,6 @@ function sendMessage(url, callBackFunc)
 }
 
 function statusResponse(data)
-{
-}
-
-function videoResponse(data)
 {
 }
 
