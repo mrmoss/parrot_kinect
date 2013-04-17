@@ -228,7 +228,7 @@ function getStatus()
 
 function getVideoFrame()
 {
-  video.src = "photo.jpg?number="+message_count;
+  video.src = "photo.jpeg?number="+message_count;
   message_count += 1;
 }
 
@@ -246,7 +246,7 @@ function sendMessage(url, callBackFunc)
 {
   $.ajax({
     url: url,
-    timeout: 500,
+    timeout: 5000,
     success: callBackFunc,
     error: timeOut});
   message_count+=1;
