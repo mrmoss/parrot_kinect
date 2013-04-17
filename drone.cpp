@@ -196,6 +196,11 @@ void service_client(msl::socket& client, std::string& message)
 
 		bool file_request = false;
 
+		int pos=request.find('?');
+
+		if(pos!=-1)
+			request=request.substr(0,pos);
+
 		//Check for Code Mime Type
 		if(msl::ends_with(request,".js"))
 		{
@@ -209,14 +214,11 @@ void service_client(msl::socket& client, std::string& message)
 			mime_type="image/gif";
 			file_request = true;
 		}
-		else if(msl::ends_with(request,".jpg")||msl::ends_with(request,".jpeg"))
+		else if(msl::ends_with(request,".jpg") || msl::ends_with(request,".jpeg"))
 		{
-			int pos=request.find('?');
-
-			if(pos!=-1)
-				request=request.substr(0,pos);
-
+			//std::cout << request << std::endl;
 			mime_type="image/jpeg";
+			//request = "photo.jpeg";
 			file_request = true;
 		}
 		else if(msl::ends_with(request,".png"))
@@ -260,10 +262,11 @@ void service_client(msl::socket& client, std::string& message)
 		std::stringstream parse_sstr;
 		std::stringstream output_sstr;
 
-		//Load File
 		if(file_request)
 		{
+			//std::cout << "Load this image" << std::endl;
 			pthread_mutex_lock(&image_mutex);
+			//std::cout << "Loading this image" << std::endl;
 			loaded=msl::file_to_string(web_root+"/"+request,file);
 			pthread_mutex_unlock(&image_mutex);
 		}
