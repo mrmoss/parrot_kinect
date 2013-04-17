@@ -138,6 +138,8 @@ function init()
   scene.add(arrow);
   currentFrame = totalFrames-1;
 
+  setInterval(getStatus, 100);
+  setInterval(getVideoFrame, 100);
   mainLoop();
 }
 
@@ -151,14 +153,30 @@ function mainLoop()
 {
   if(!paused)
   {
-    getStatus();
-    getVideoFrame();
     updateAnimation();
     renderer.render(scene, camera);
     requestAnimationFrame(mainLoop);
   }
 }
   
+function updateAnimation()
+{
+  dt = clock.getDelta();
+
+  // If the animation has not finished, advance the frame at a controlled rate.
+  if(currentFrame<(totalFrames-1))
+  {
+    elapsedTime += dt;
+    if( elapsedTime > .05)
+    {
+      elapsedTime = 0;
+      currentFrame += 1;
+    }
+  }
+
+  arrowTex.offset.x = currentFrame/totalFrames;
+}
+
 function resizeFunc()
 {
   var height = $(window).height();
@@ -171,24 +189,6 @@ function resizeFunc()
   $("#messages").height(height * 0.2);
   renderer.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
 
-}
-
-function updateAnimation()
-{
-  dt = clock.getDelta();
-  
-  // If the animation has not finished, advance the frame at a controlled rate.
-  if(currentFrame<(totalFrames-1))
-  {
-    elapsedTime += dt;
-    if( elapsedTime > .05)
-    {
-      elapsedTime = 0;
-      currentFrame += 1;
-    }
-  }
-  
-  arrowTex.offset.x = currentFrame/totalFrames;
 }
 
 function getCoords(event)
