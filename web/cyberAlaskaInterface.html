@@ -97,11 +97,7 @@ function init()
   scene = new THREE.Scene();
 
   // Setup video feed
-  video.onload = function(){
-    v_container.width  = CANVAS_WIDTH;
-    v_container.height = CANVAS_HEIGHT;
-    video_context.drawImage(image, 0, 0, image.width, image.height);
-  }
+  video.onload = drawFrame();
 
   // Setup camera
   camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT_RATIO, NEAR_CLIP, FAR_CLIP);
@@ -143,6 +139,12 @@ function init()
   currentFrame = totalFrames-1;
 
   mainLoop();
+}
+
+function drawFrame(){
+  v_container.width  = CANVAS_WIDTH;
+  v_container.height = CANVAS_HEIGHT;
+  video_context.drawImage(image, 0, 0, image.width, image.height);
 }
 
 function mainLoop()
