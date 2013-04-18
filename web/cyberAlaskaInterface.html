@@ -98,6 +98,7 @@ function init()
   var v_container = document.getElementById("video_container");
   video_context = v_container.getContext("2d");
   video.onload = drawFrame();
+  video.onError = function () { alert("video error") }
 
   // Setup camera
   camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT_RATIO, NEAR_CLIP, FAR_CLIP);
