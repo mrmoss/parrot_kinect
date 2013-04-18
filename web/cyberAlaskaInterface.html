@@ -77,9 +77,7 @@ var message_count = 0;
 var paused = false;
 
 var video = new Image();
-var v_container = document.getElementById("video_container");
-var video_context = v_container.getContext('2d');
-
+var video_context;
 
 function init()
 {
@@ -97,6 +95,8 @@ function init()
   scene = new THREE.Scene();
 
   // Setup video feed
+  var v_container = document.getElementById("video_container");
+  video_context = v_container.getContext("2d");
   video.onload = drawFrame();
 
   // Setup camera
@@ -144,9 +144,7 @@ function init()
 }
 
 function drawFrame(){
-  v_container.width  = CANVAS_WIDTH;
-  v_container.height = CANVAS_HEIGHT;
-  video_context.drawImage(video, 0, 0, video.width, video.height);
+  video_context.drawImage(video, 0, 0);
 }
 
 function mainLoop()
