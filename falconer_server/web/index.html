@@ -1,0 +1,697 @@
+<html>
+<head>
+<title>Three.js - examples</title>
+
+<style>
+body 
+{
+	background-color: #eeeeee;
+	background-image: url("html-images/white-pixels.png");
+	background-repeat: repeat;      /* repeat, no-repeat */
+	background-attachment: fixed;   /* scroll, fixed */
+	background-position: top left;  /* for no-repeat setting: top/bottom, left/right */
+	margin: 2% 5% 0% 5%;            /* top, left, bottom, right or TRBL */
+	
+	font-family: Georgia, Serif;	/* list font names in order of preference */
+	font-weight: normal;            /* normal, bold */
+	font-style: normal;             /* normal, italic */
+	font-variant: normal;           /* normal, small-caps */
+	font-size: 16px;                /* font size */
+	color: #000000;                 /* hexadecimal RGB color code */
+	text-decoration: none;          /* none, underline, overline, line-through */
+	text-align: left;               /* left, right, center, justify */
+}
+
+.fancy
+{
+	min-height: 150px;
+	/* next two lines for elder IE compatibility */
+	height: auto !important; 
+	height: 150px; 
+	
+	/* Background color and gradients */
+	background: #eeeeee;
+	background: -moz-linear-gradient(top, #ffffff, #cccccc);
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ffffff), to(#cccccc));
+	/* really nifty translucence */
+	background: -moz-linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(200, 200, 200, 0.8) );
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from( rgba(255, 255, 255, 0.8) ), to( rgba(200, 200, 200, 0.8) ));
+	
+	/* Rounded corners */
+	-moz-border-radius: 15px 15px 15px 15px;
+	-webkit-border-radius: 15px 15px 15px 15px;
+	border-radius: 15px 15px 15px 15px;
+}
+
+/* Page text links */
+a 
+{
+	font-size: 20px;
+	font-weight: bold;
+	font-variantx: small-caps;
+	color:#00c;
+	text-shadow: 1px 1px 0px #aaa;
+	margin: 13px 0px 0px 0px;
+	text-decoration: none;
+	
+	-webkit-transition: all 300ms ease-in-out;
+	-moz-transition: all 300ms ease-in-out;
+	-o-transition: all 300ms ease-in-out;
+	-ms-transition: all 300ms ease-in-out;
+	transition: all 300ms ease-in-out; 
+}
+.toc
+{
+	font-size: 16px;
+}
+a:hover 
+{
+	color:#c00;
+	/*text-shadow: 1px 1px 0px #f00;
+	/* gradual change */
+	-webkit-transition: all 300ms ease-in-out;
+	-moz-transition: all 300ms ease-in-out;
+	-o-transition: all 300ms ease-in-out;
+	-ms-transition: all 300ms ease-in-out;
+	transition: all 300ms ease-in-out; 
+}
+
+.superText
+{
+	color: #000;
+	text-shadow: 1px 1px 0px #aaa;
+}
+
+a .superImage
+{  
+	height: 148px;
+	border: 1px solid #000000;
+	margin: 0px 20px 0px 0px;
+	float:left;
+	
+	/* Rounded corners */
+	-moz-border-radius: 15px 15px 15px 15px;
+	-webkit-border-radius: 15px 15px 15px 15px;
+	border-radius: 15px 15px 15px 15px;
+	
+	position: relative; 
+	
+	-webkit-transition: all 300ms ease-in-out;
+	-moz-transition: all 300ms ease-in-out;
+	-o-transition: all 300ms ease-in-out;
+	-ms-transition: all 300ms ease-in-out;
+	transition: all 300ms ease-in-out; 
+}  
+a:hover .superImage
+{  
+	top: -10px;  
+	
+	/* fallback on standard opaque colors */
+	-moz-box-shadow: 10px 10px 5px #888;
+	-webkit-box-shadow: 10px 10px 5px #888;
+	box-shadow: 10px 10px 5px #888;
+	/* translucent: the way shadows should be */
+	-moz-box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.5);
+	-webkit-box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.5);
+	box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.5);
+	
+	-webkit-transition: all 300ms ease-in-out;
+	-moz-transition: all 300ms ease-in-out;
+	-o-transition: all 300ms ease-in-out;
+	-ms-transition: all 300ms ease-in-out;
+	transition: all 300ms ease-in-out;
+}  
+
+.bigTitle
+{
+	font-size: 32px;
+	font-weight: bold;
+	font-variantx: small-caps;
+	color:#004;
+	text-align: center;
+	text-shadow: -1px -1px 2px #fff, 1px 1px 3px #000;	
+}
+</style>
+
+</head>
+<body>
+
+<div class="bigTitle">Three.js Examples</div>
+<hr>
+The goal of this collection is to provide a set of basic and instructive examples that introduce the various features in 
+<a class="toc" href="https://github.com/mrdoob/three.js/">Three.js.</a> The source code for each page contains detailed comments.
+<hr>
+Hosted at <a class="toc" href="https://github.com/stemkoski/stemkoski.github.com">GitHub</a>. Total examples: 51. Last updated: 26 March 2013. Compatible with Three.js version 56.
+<hr>
+&bull; <a class="toc" href="#hello-world">Hello World</a>
+&bull; <a class="toc" href="#template">Template</a>
+&bull; <a class="toc" href="#materials-solid">Materials - Solid</a>
+&bull; <a class="toc" href="#color-explorer">Color Explorer</a>
+&bull; <a class="toc" href="#wireframe">Wireframe</a>
+&bull; <a class="toc" href="#dashed-lines">Lines and Dashed Lines</a>
+&bull; <a class="toc" href="#dashed-3d">Multi-Wireframe Effect</a>
+&bull; <a class="toc" href="#vertex-colors">Vertex Colors</a>
+&bull; <a class="toc" href="#shapes">Shapes</a>
+&bull; <a class="toc" href="#extrusion">Extrusion</a>
+&bull; <a class="toc" href="#text3D">Text 3D</a>
+&bull; <a class="toc" href="#textures">Textures</a>
+&bull; <a class="toc" href="#sprites">Sprites</a>
+&bull; <a class="toc" href="#texture-repeat">Texture - Repeat</a>
+&bull; <a class="toc" href="#subdivision-cube">Subdivision Modifier - Cube</a>
+&bull; <a class="toc" href="#skybox">SkyBox</a>
+&bull; <a class="toc" href="#translucence">Translucence</a>
+&bull; <a class="toc" href="#shadow">Shadow</a>
+&bull; <a class="toc" href="#reflection">Reflection</a>
+&bull; <a class="toc" href="#particles">Particles</a>
+&bull; <a class="toc" href="#texture-from-canvas">Texture from Canvas</a>
+&bull; <a class="toc" href="#texture-animation">Texture Animation</a>
+&bull; <a class="toc" href="#mesh-movement">Mesh Movement</a>
+&bull; <a class="toc" href="#chase-camera">Chase Camera</a>
+&bull; <a class="toc" href="#multiple-cameras">Multiple Cameras</a>
+&bull; <a class="toc" href="#camera-texture">Camera to Texture</a>
+&bull; <a class="toc" href="#viewports-dual">Viewports - Dual</a>
+&bull; <a class="toc" href="#viewports-quad">Viewports - Quad</a>
+&bull; <a class="toc" href="#shader-simple">Shader - Simple</a>
+&bull; <a class="toc" href="#shader-explorer">Shader - Explorer</a>
+&bull; <a class="toc" href="#selective-glow">Selective Glow Effect using Shaders</a>
+&bull; <a class="toc" href="#video-texture">Video to Texture</a>
+&bull; <a class="toc" href="#webcam-test">Webcam Test</a>
+&bull; <a class="toc" href="#webcam-texture">Webcam to Texture</a>
+&bull; <a class="toc" href="#many-cameras">Many Cameras</a>
+&bull; <a class="toc" href="#gamepad-test">Gamepad Test</a>
+&bull; <a class="toc" href="#mesh-movement-gamepad">Mesh Movement - Gamepad</a>
+&bull; <a class="toc" href="#gui">GUI</a>
+&bull; <a class="toc" href="#gui-controller">GUI Controller</a>
+&bull; <a class="toc" href="#mouse-sprite">Mouse Sprite</a>
+&bull; <a class="toc" href="#mouse-hovering">Mouse Hovering</a>
+&bull; <a class="toc" href="#mouse-tooltip">Mouse Tooltip</a>
+&bull; <a class="toc" href="#model">Model</a>
+&bull; <a class="toc" href="#model-animation">Animated Model</a>
+&bull; <a class="toc" href="#model-animation-control">Animated Model with Controls</a>
+&bull; <a class="toc" href="#collision-detection">Collision Detection</a>
+&bull; <a class="toc" href="#marching-cubes">Marching Cubes Algorithm</a>
+&bull; <a class="toc" href="#csg">Constructive Solid Geometry</a>
+&bull; <a class="toc" href="#graphulus-function">Function Grapher</a>
+&bull; <a class="toc" href="#graphulus-surface">Parametric Surface Grapher</a>
+&bull; <a class="toc" href="#graphulus-curve">Parametric Curve Grapher</a>
+&bull;
+<hr/>
+<br/><br/>
+<div class="fancy">
+<a name="hello-world"></a>
+<a href="HelloWorld.html" target="_blank">
+<img src="html-images/HelloWorld.png" class="superImage" />
+<br/>Hello World</a>
+<p class ="superText"> A heavily commented but basic scene. Illustrates the setup of a scene, camera, renderer, event handlers (for window resize and fullscreen, provided by the THREEx library), mouse controls to rotate/zoom/pan the scene, mini-display for FPS stats, and setting up basic geometries: a sphere with lighting effects, a multi-colored cube, a plane with an image texture applied, and skybox/fog options for rendering objects distant from the camera.
+<br/> Many of these features are described in more detail in the examples below. 
+</p>
+</div>
+
+<div class="fancy">
+<a name="template"></a>
+<a href="Template.html" target="_blank">
+<img src="html-images/Template.png" class="superImage" />
+<br/>Template</a>
+<p class ="superText"> The "Hello World" code with most comments and meshes removed. </p>
+</div>
+
+<div class="fancy">
+<a name="materials-solid"></a>
+<a href="Materials-Solid.html" target="_blank">
+<img src="html-images/Materials-Solid.png" class="superImage" />
+<br/>Materials - Solid</a>
+<p class ="superText"> Illustrates the difference between the Basic, Lambert, and Phong materials. </p>
+</div>
+
+<div class="fancy">
+<a name="color-explorer"></a>
+<a href="Color-Explorer.html" target="_blank">
+<img src="html-images/Color-Explorer.png" class="superImage" />
+<br/>Color Explorer</a>
+<p class ="superText"> Illustrates the effects of changing the Color (Diffuse Color), Ambient Color, Emissive Color, Specular Color, Shininess amount, and Opacity amount. </p>
+</div>
+
+<div class="fancy">
+<a name="wireframe"></a>
+<a href="Wireframe.html" target="_blank">
+<img src="html-images/Wireframe.png" class="superImage" />
+<br/>Wireframe</a>
+<p class ="superText"> Demonstrates how to create and apply wireframe materials. </p>
+</div>
+
+<div class="fancy">
+<a name="dashed-lines"></a>
+<a href="Dashed-Lines.html" target="_blank">
+<img src="html-images/Dashed-Lines.png" class="superImage" />
+<br/>Lines and Dashed Lines</a>
+<p class ="superText"> Demonstrates how to create solid lines, dashed lines, and contains a function to convert geometries into line-style objects. </p>
+</div>
+
+<div class="fancy">
+<a name="dashed-3d"></a>
+<a href="Dashed-3D.html" target="_blank">
+<img src="html-images/Dashed-3D.png" class="superImage" />
+<br/>Multi-Wireframe Effect</a>
+<p class ="superText"> Demonstrates a neat effect to display a wireframe-style object where the obscured lines display different than the visible lines (e.g. dashed vs. solid). </p>
+</div>
+
+
+<div class="fancy">
+<a name="vertex-colors"></a>
+<a href="Vertex-Colors.html" target="_blank">
+<img src="html-images/Vertex-Colors.png" class="superImage" />
+<br/>Vertex Colors</a>
+<p class ="superText"> Assigning colors to vertices to achieve special effects such as gradients and randomization. </p>
+</div>
+
+<div class="fancy">
+<a name="shapes"></a>
+<a href="Shapes.html" target="_blank">
+<img src="html-images/Shapes.png" class="superImage" />
+<br/>Shapes</a>
+<p class ="superText"> Uses some of the built-in geometry constructors to create the following three dimensional shapes (and variations): cube, icosahedron, octahedron, tetrahedron, sphere, dome, cylinder, prism, cone, pyramid, frustum (truncated cone and truncated pyramid), torus, torus knots. </p>
+</div>
+
+<div class="fancy">
+<a name="extrusion"></a>
+<a href="Extrusion.html" target="_blank">
+<img src="html-images/Extrusion.png" class="superImage" />
+<br/>Extrusion</a>
+<p class ="superText"> Create an array of 2D points,
+make a 2D shape, and create an extrusion (a 3D shape whose cross-sections are the given 2D shape). </p>
+</div>
+
+<div class="fancy">
+<a name="text3D"></a>
+<a href="Text3D.html" target="_blank">
+<img src="html-images/Text3D.png" class="superImage" />
+<br/>Text3D</a>
+<p class ="superText"> Create a 3D text object (an extruded version of text rendered as a 2D image). </p>
+</div>
+
+<div class="fancy">
+<a name="textures"></a>
+<a href="Textures.html" target="_blank">
+<img src="html-images/Textures.png" class="superImage" />
+<br/>Textures</a>
+<p class ="superText"> Demonstrates surfaces with textures (image-based materials), including shading and coloring effects. </p>
+</div>
+
+<div class="fancy">
+<a name="sprites"></a>
+<a href="Sprites.html" target="_blank">
+<img src="html-images/Sprites.png" class="superImage" />
+<br/>Sprites</a>
+<p class ="superText"> Sprites are images (not attached to geometries/surfaces) displayed in a scene, always orthogonal to the camera.
+They can either appear in the 3D scene (useful as part of a particle effect) or rendered using screen coordinates (useful as part of a graphical user interface (GUI) or a heads-up display (HUD)). </p>
+</div>
+
+<div class="fancy">
+<a name="texture-repeat"></a>
+<a href="Texture-Repeat.html" target="_blank">
+<img src="html-images/Texture-Repeat.png" class="superImage" />
+<br/>Texture - Repeat</a>
+<p class ="superText"> Repeating (tiling) a texture on a surface. </p>
+</div>
+
+<div class="fancy">
+<a name="subdivision-cube"></a>
+<a href="Subdivision-Cube.html" target="_blank">
+<img src="html-images/Subdivision-Cube.png" class="superImage" />
+<br/>Subdivision Modifier - Cube</a>
+<p class ="superText"> Demostrates a function that interpolates additional points to a geometry, creating a "smoothing" effect. This example applies the modifier to a variety of cube geometries, resulting in spherical and beveled cubes. </p>
+</div>
+
+<div class="fancy">
+<a name="skybox"></a>
+<a href="Skybox.html" target="_blank">
+<img src="html-images/Skybox.png" class="superImage" />
+<br/>SkyBox</a>
+<p class ="superText"> Using textures to create a "SkyBox": backgrounds images projected onto a cube surrounding the rendering region, which creates the illusion of distant 3D surroundings. </p>
+</div>
+
+<div class="fancy">
+<a name="translucence"></a>
+<a href="Translucence.html" target="_blank">
+<img src="html-images/Translucence.png" class="superImage" />
+<br/>Translucence</a>
+<p class ="superText"> Illustrates using basic and phong-shaded translucent materials, making image textures translucent, using additive blending for a glow-like effect, and using image textures that already have alpha transparency. </p>
+</div>
+
+<div class="fancy">
+<a name="shadow"></a>
+<a href="Shadow.html" target="_blank">
+<img src="html-images/Shadow.png" class="superImage" />
+<br/>Shadow</a>
+<p class ="superText"> Using spotlights to create shadow effects in a scene. </p>
+</div>
+
+<div class="fancy">
+<a name="reflection"></a>
+<a href="Reflection.html" target="_blank">
+<img src="html-images/Reflection.png" class="superImage" />
+<br/>Reflection</a>
+<p class ="superText"> Creating a mirror-like material by projecting an image of the surroundings onto a object. </p>
+</div>
+
+<div class="fancy">
+<a name="particles"></a>
+<a href="Particles.html" target="_blank">
+<img src="html-images/Particles.png" class="superImage" />
+<br/>Particles</a>
+<p class ="superText"> Create a particle effect using a group of sprites and alpha blending (or transparency). </p>
+</div>
+
+<div class="fancy">
+<a name="texture-from-canvas"></a>
+<a href="Texture-From-Canvas.html" target="_blank">
+<img src="html-images/Texture-From-Canvas.png" class="superImage" />
+<br/>Texture from Canvas</a>
+<p class ="superText"> Create a canvas element via JavaScript, draw text or images on it, and then use it as a texture for a mesh. </p>
+</div>
+
+<div class="fancy">
+<a name="texture-animation"></a>
+<a href="Texture-Animation.html" target="_blank">
+<img src="html-images/Texture-Animation.png" class="superImage" />
+<br/>Texture Animation</a>
+<p class ="superText"> Animate a spritesheet image texture on a surface. </p>
+</div>
+
+<div class="fancy">
+<a name="mesh-movement"></a>
+<a href="Mesh-Movement.html" target="_blank">
+<img src="html-images/Mesh-Movement.png" class="superImage" />
+<br/>Mesh Movement</a>
+<p class ="superText"> Using the functionality provided by THREEx.Keyboard, translate and rotate a mesh, with the following controls:
+<br/> W/S/Q/E: translate forwards/backwards/left/right (local). <br/> A/D/R/F: rotate left/right/up/down (local). 
+<br/> UP/DOWN/LEFT/RIGHT: translate Z-/Z+/X-/X+ (global). </p>
+</div>
+
+<div class="fancy">
+<a name="chase-camera"></a>
+<a href="Chase-Camera.html" target="_blank">
+<img src="html-images/Chase-Camera.png" class="superImage" />
+<br/>Chase Camera</a>
+<p class ="superText"> Create a "chase cam" -- move the camera around together with a mesh. (Same controls as in "Mesh Movement" example.)</p>
+</div>
+
+<div class="fancy">
+<a name="multiple-cameras"></a>
+<a href="Multiple-Cameras.html" target="_blank">
+<img src="html-images/Multiple-Cameras.png" class="superImage" />
+<br/>Multiple Cameras</a>
+<p class ="superText"> Switch between multiple cameras: chase camera (press "1") and fixed top view (press "2"). (Otherwise, same controls as in "Mesh Movement" example.)</p>
+</div>
+
+<div class="fancy">
+<a name="camera-texture"></a>
+<a href="Camera-Texture.html" target="_blank">
+<img src="html-images/Camera-Texture.png" class="superImage" />
+<br/>Camera to Texture</a>
+<p class ="superText"> Move around a camera and project what it sees it onto a texture. (Same controls as in "Mesh Movement" example.)
+</p>
+</div>
+
+<div class="fancy">
+<a name="viewports-dual"></a>
+<a href="Viewports-Dual.html" target="_blank">
+<img src="html-images/Viewports-Dual.png" class="superImage" />
+<br/>Viewports - Dual</a>
+<p class ="superText"> Simultaneously render two different camera views onto the same canvas element.
+(Same controls as in "Mesh Movement" example.)
+</p>
+</div>
+
+<div class="fancy">
+<a name="viewports-quad"></a>
+<a href="Viewports-Quad.html" target="_blank">
+<img src="html-images/Viewports-Quad.png" class="superImage" />
+<br/>Viewports - Quad</a>
+<p class ="superText"> Simultaneously render four different camera views onto the same canvas element: one perspective camera and three
+orthographic cameras along the axis directions (similar to many 3D modeling software configurations).
+(Same controls as in "Mesh Movement" example.)
+</p>
+</div>
+
+<div class="fancy">
+<a name="shader-simple"></a>
+<a href="Shader-Simple.html" target="_blank">
+<img src="html-images/Shader-Simple.png" class="superImage" />
+<br/>Shader - Simple</a>
+<p class ="superText"> Demonstrates how to set up a simple pre-defined shader (sepia coloring).
+</p>
+</div>
+
+<div class="fancy">
+<a name="shader-explorer"></a>
+<a href="Shader-Explorer.html" target="_blank">
+<img src="html-images/Shader-Explorer.png" class="superImage" />
+<br/>Shader - Explorer</a>
+<p class ="superText"> Illustrates the effects of changing the parameters in different shaders (sepia, vignette, dot screen).
+</p>
+</div>
+
+<div class="fancy">
+<a name="selective-glow"></a>
+<a href="Selective-Glow.html" target="_blank">
+<img src="html-images/Selective-Glow.png" class="superImage" />
+<br/>Selective Glow Effect using Shaders</a>
+<p class ="superText"> Demonstrates a selective glow effect using shaders. This approach requires the creation of two scenes - the base scene and a secondary scene containing copies of the base scene objects with either bright textures for glow effects or black textures. The secondary scene is blurred and then additively blended with the base scene.
+</p>
+</div>
+
+<div class="fancy">
+<a name="video-texture"></a>
+<a href="Video.html" target="_blank">
+<img src="html-images/Video.png" class="superImage" />
+<br/>Video to Texture</a>
+<p class ="superText"> Display a video as a texture. Keyboard controls: "P" to play/resume, "SPACE" to pause, "R" to rewind, "S" to stop.
+</p>
+</div>
+
+<div class="fancy">
+<a name="webcam-test"></a>
+<a href="Webcam-Test.html" target="_blank">
+<img src="html-images/Webcam-Test.png" class="superImage" />
+<br/>Webcam Test</a>
+<p class ="superText"> Displays user webcam image on this webpage. Requires Webcam,
+user needs to accept permissions to run, requires WebRTC compatible browser  (see http://www.webrtc.org/).
+(No Three.js code required; this example is a lead-in to the following example.)</p>
+</div>
+
+<div class="fancy">
+<a name="webcam-texture"></a>
+<a href="Webcam-Texture.html" target="_blank">
+<img src="html-images/Webcam-Texture.png" class="superImage" />
+<br/>Webcam Texture</a>
+<p class ="superText"> Displays user webcam image as a texture on a mesh. Requires Webcam,
+user needs to accept permissions to run, requires WebRTC compatible browser  (see http://www.webrtc.org/). 
+Press P to pause webcam (image freezes) and R to resume webcam.
+</p>
+</div>
+
+<div class="fancy">
+<a name="many-cameras"></a>
+<a href="Many-Cameras.html" target="_blank">
+<img src="html-images/Many-Cameras.png" class="superImage" />
+<br/>Many Cameras</a>
+<p class ="superText"> Displays user webcam image as a texture on a moveable mesh (W/A/S/D/Q/E). 
+Incorporates code from examples: Webcam Texture, Mesh Movement, Reflection, Skybox, and Viewports - Dual.
+Requires Webcam,
+user needs to accept permissions to run, requires WebRTC compatible browser  (see http://www.webrtc.org/). 
+
+</p>
+</div>
+
+<div class="fancy">
+<a name="gamepad-test"></a>
+<a href="Gamepad-Test.html" target="_blank">
+<img src="html-images/Gamepad-Test.png" class="superImage" />
+<br/>Gamepad Test</a>
+<p class ="superText"> Uses a Gamepad (e.g. XBox controller) to move a square image around a canvas. Requires Chrome browser and connected gamepad to run. Uses gamepad.js library (patched) from http://github.com/inequation/gamepad.js. Analog sticks and directional pad move square up/down/left/right. A/B/X/Y buttons change colors of square. Start/select buttons reset square to original position. [Note: You may need to press one of A/B/X/Y buttons for controller to be recognized by the web browser.]  
+(No Three.js code required; this example is a lead-in to the following example.)</p>
+</div>
+
+<div class="fancy">
+<a name="mesh-movement-gamepad"></a>
+<a href="Mesh-Movement-Gamepad.html" target="_blank">
+<img src="html-images/Mesh-Movement-Gamepad.png" class="superImage" />
+<br/>Mesh Movement - Gamepad</a>
+<p class ="superText"> Uses a Gamepad (e.g. XBox controller) to move a cube around a Three.js scene, similar to Mesh-Movement example above. Requires Chrome browser and connected gamepad to run. Left analog stick moves cube forward/backward and turns left/right.  Directional pad moves cube forward/backward/left/right.  Right analog stick only turns cube left/right.  Right shoulder buttons double speed of movement/turns. Start/select buttons reset cube to original position and rotation.
+</p>
+</div>
+
+<div class="fancy">
+<a name="gui"></a>
+<a href="GUI.html" target="_blank">
+<img src="html-images/GUI.png" class="superImage" />
+<br/>GUI</a>
+<p class ="superText"> Create a graphical user interface (using the DAT.GUI library). </p>
+</div>
+
+<div class="fancy">
+<a name="gui-controller"></a>
+<a href="GUI-Controller.html" target="_blank">
+<img src="html-images/GUI-Controller.png" class="superImage" />
+<br/>GUI Controller</a>
+<p class ="superText"> Create a graphical user interface (using the DAT.GUI library) that controls the appearance of a cube mesh. </p>
+</div>
+
+<div class="fancy">
+<a name="mouse-sprite"></a>
+<a href="Mouse-Sprite.html" target="_blank">
+<img src="html-images/Mouse-Sprite.png" class="superImage" />
+<br/>Mouse Sprite</a>
+<p class ="superText"> Display a sprite at the current position of the mouse. (May be useful for targeting icon or mouse pointer icon.) </p>
+</div>
+
+<div class="fancy">
+<a name="mouse-over"></a>
+<a href="Mouse-Over.html" target="_blank">
+<img src="html-images/Mouse-Over.png" class="superImage" />
+<br/>Mouse Hovering</a>
+<p class ="superText"> Change the color of an object in the scene when the mouse hovers over it. </p>
+</div>
+
+<div class="fancy">
+<a name="mouse-tooltip"></a>
+<a href="Mouse-Tooltip.html" target="_blank">
+<img src="html-images/Mouse-Tooltip.png" class="superImage" />
+<br/>Mouse Tooltip</a>
+<p class ="superText"> Create a tooltip-style effect to display mesh names when mouse hovers. (Uses ideas from examples: Mouse Sprite, Mouse Hovering, and Texture from Canvas.) </p>
+</div>
+
+<div class="fancy">
+<a name="model"></a>
+<a href="Model.html" target="_blank">
+<img src="html-images/Model.png" class="superImage" />
+<br/>Model</a>
+<p class ="superText"> Loading a static 3D model (exported from Blender to JavaScript). </p>
+</div>
+
+<div class="fancy">
+<a name="model-animation"></a>
+<a href="Model-Animation.html" target="_blank">
+<img src="html-images/Model-Animation.png" class="superImage" />
+<br/>Animated Model</a>
+<p class ="superText"> Loading an animated 3D model (exported from Blender to JavaScript). </p>
+</div>
+
+<div class="fancy">
+<a name="model-animation-control"></a>
+<a href="Model-Animation-Control.html" target="_blank">
+<img src="html-images/Model-Animation-Control.png" class="superImage" />
+<br/>Animated Model with Controls</a>
+<p class ="superText"> Loading an animated 3D model (exported from Blender to JavaScript). Model moves with arrow keys; model animates when moving and stops animating when not moving. </p>
+</div>
+
+<div class="fancy">
+<a name="collision-detection"></a>
+<a href="Collision-Detection.html" target="_blank">
+<img src="html-images/Collision-Detection.png" class="superImage" />
+<br/>Collision Detection</a>
+<p class ="superText"> Detect when the vertices of a mesh intersect with another object. (Move the wireframe cube with the arrow keys and rotate with W/A/S/D; the text "Hit" will appear at the top of the screen once for every vertex intersection.)</p>
+</div>
+
+<div class="fancy">
+<a name="marching-cubes"></a>
+<a href="Marching-Cubes.html" target="_blank">
+<img src="html-images/Marching-Cubes.png" class="superImage" />
+<br/>Marching Cubes Algorithm</a>
+<p class ="superText"> An illustration of the "Marching Cubes" algorithm for triangulating a level surface ("isosurface") of an implicitly defined function <i>f(x,y,z) = c</i>. See the websites:
+<br>http://en.wikipedia.org/wiki/Marching_cubes/
+<br>http://paulbourke.net/geometry/polygonise/ </p>
+</div>
+
+<div class="fancy">
+<a name="csg"></a>
+<a href="CSG.html" target="_blank">
+<img src="html-images/CSG.png" class="superImage" />
+<br/>Constructive Solid Geometry</a>
+<p class ="superText"> Create a new mesh from the union, intersection, or subtraction of two meshes. 
+Uses the library at http://github.com/chandlerprall/ThreeCSG/</p>
+</div>
+
+<hr color="black">
+
+<div class="fancy">
+<a name="graphulus-function"></a>
+<a href="Graphulus-Function.html" target="_blank">
+<img src="html-images/Graphulus-Function.png" class="superImage" />
+<br/>Function Grapher</a>
+<p class ="superText"> Graph a function of the form <i>z = f( x, y )</i>. </p>
+</div>
+
+<div class="fancy">
+<a name="graphulus-surface"></a>
+<a href="Graphulus-Surface.html" target="_blank">
+<img src="html-images/Graphulus-Surface.png" class="superImage" />
+<br/>Parametric Surface Grapher</a>
+<p class ="superText"> Graph a parametric surface of the form <i>x = f( u, v ), y = g( u, v ), z = h( u, v )</i>. </p>
+</div>
+
+<div class="fancy">
+<a name="graphulus-curve"></a>
+<a href="Graphulus-Curve.html" target="_blank">
+<img src="html-images/Graphulus-Curve.png" class="superImage" />
+<br/>Parametric Curve Grapher</a>
+<p class ="superText"> Graph a parametric curve of the form <i>x = f( t ), y = g( t ), z = h( t )</i>. </p>
+</div>
+
+<!--
+<div class="fancy">
+<a name="zzzz"></a>
+<a href="zzzz.html" target="_blank">
+<img src="html-images/zzzz.png" class="superImage" />
+<br/>zzzz</a>
+<p class ="superText"> ... </p>
+</div>
+-->
+
+</body>
+</html>
+
+<!--
+What are you doing, poking around in my HTML?  :p
+
+Notes to self (and nosy you):
+
+put up - 
+single triangle, square creation methods
+
+the line-to-cylinder method
+
+mathiness -
+implicit graph
+Calculus-y variations: 
+	tangent line, tangent plane, riemann prisms, ...
+Vector field (R^3 -> R^3), dropped particles flow, leave trails...
+Line integral - c(t) = <x(t),y(t)> & z = f(x,y)
+Flux through surface
+
+categorize table of contents...?
+
+Future goals:
+
+- blur filter
+- selective glow
+- model with subsurf
+- physics
+- specific particle effects (smoke, fire, water, electricity/spark, explosion)
+- particle emitters (check jerome's work...)
+
+Fancy combo demos (not priority):
+Display video on a computer monitor/screen model 
+
+other recent thoughts:
+anaglyph-style effect
+convex hull of a point set
+the earth map from the webgl book
+http://mrdoob.com/projects/editor/
+dynamic terrain---
+http://alteredqualia.com/three/examples/webgl_terrain_dynamic2.html
+http://mrdoob.github.com/three.js/examples/webgl_trackballcamera_earth.html
+
+
+-->

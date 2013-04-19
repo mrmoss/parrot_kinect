@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CyberAlaska UAV Interface</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <style type="text/css"><!--
+    table {margin: 0px; padding: 0px;}
+    td {margin: 0px; padding: 0px;}
+    tr {margin: 0px; padding: 0px;}
+    body {margin: 0px; padding: 0px;}
+    #if_container {
+      border-style: outset;
+      border-color: black;
+      border-width: 1px;
+    }
+    #video_container {
+      border-style: outset;
+      border-color: black;
+      border-width: 1px;
+    }
+    .normalMsg {
+      color: black;
+    }
+    .errorMsg {
+      color: red;
+    } -->
+
+  </style>
+</head>
+
+<body onload="init()">
+
+<table>
+<tr>
+  <td>
+    <div id="if_container" onclick="getCoords(event)"></div>
+  </td>
+  <td>
+    <canvas id="video_container"></canvas>
+  </td>
+</tr>
+<tr>
+  <td colspan="2">
+    <input type="button" id="take-off" value="Take off" onclick="takeOff()" />
+    <input type="button" id="land" value="Land" onclick="land()" />
+    <input type="button" id="pause" value="Pause" onclick="togglePause()" />
+  </td>
+</tr>
+<tr>
+  <td colspan="2">
+    <div id="messages"></div>
+  </td>
+</tr>
+</table>
+
+</body>
+
+
+<script src="js/three.min.js"></script>
+<script src="js/Detector.js"></script>
+<script src="js/jquery-1.9.1.min.js"></script>
+
+<script type = text/javascript>
+
+var CANVAS_WIDTH;
+var CANVAS_HEIGHT = CANVAS_WIDTH = $("#window").height() * 0.7;
+
+var mouseX, mouseY;
+var container, camera, scene, renderer;
+
+// for the arrow animation
+var arrow, arrowTex, currentFrame, totalFrames;
+var clock, elapsedTime = 0;
+
+var request = new XMLHttpRequest();
+var message_count = 0;
+
+var paused = false;
+
+var video = new Image();
+var v_container = document.getElementById("video_container");
+var video_context = v_container.getContext('2d');
+
+
+function init()
+{
+  // Chech for webgl implementation
+  if(!Detector.webgl)
+  {
+    Detector.addGetWebGLMessage();
+  }
+
+  var VIEW_ANGLE   = 60;
+  var ASPECT_RATIO  = CANVAS_WIDTH/CANVAS_HEIGHT;
+  var NEAR_CLIP = .1, FAR_CLIP = 20;
+
+  clock = new THREE.Clock();
+  scene = new THREE.Scene();
+
+  // Setup video feed
+  video.onload = drawFrame();
+
+  // Setup camera
+  camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT_RATIO, NEAR_CLIP, FAR_CLIP);
+  scene.add(camera);
+  camera.position.set(0,0,10.4);
+  camera.lookAt(scene.position);
+
+  // Setup Renderer
+  renderer = new THREE.WebGLRenderer( {antialias:true} );
+
+  // setup layout based on browser window size
+  resizeFunc();
+  $("#window").resize(resizeFunc);
+
+  // create a div element to contain the renderer
+  container = document.getElementById( "if_container" );
+  container.appendChild( renderer.domElement );
+
+  // create the map of the challenge arena
+  var mapWidth = mapHeight = 12; // In feet
+  var wIncrement = hIncrement = 1;
+  var mapGeometry = new THREE.PlaneGeometry(mapWidth, mapHeight, wIncrement, hIncrement);
+  var mapMaterial = new THREE.MeshBasicMaterial(
+    { map: THREE.ImageUtils.loadTexture("images/SampleMap.jpg") } );
+  var arenaMap = new THREE.Mesh(mapGeometry, mapMaterial);
+  scene.add(arenaMap);
+
+  // create object to display arrow animation
+  var arrowWidth = arrowHeight = 1;
+  totalFrames = 10;
+  arrowTex = THREE.ImageUtils.loadTexture("images/ArrowAnimation.gif");
+  arrowTex.wrapS = arrowTex.wrapT = THREE.RepeatWrapping;
+  arrowTex.repeat.set(1/totalFrames, 1);
+  var arrowGeometry = new THREE.PlaneGeometry(arrowWidth, arrowHeight, wIncrement, hIncrement);
+  var arrowMaterial = new THREE.MeshBasicMaterial( { map: arrowTex, transparent: true } );
+  arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
+  arrow.position.z = .01;
+  scene.add(arrow);
+  currentFrame = totalFrames-1;
+
+  setInterval(getStatus, 100);
+  setInterval(getVideoFrame, 100);
+  mainLoop();
+}
+
+function drawFrame(){
+  v_container.width  = CANVAS_WIDTH;
+  v_container.height = CANVAS_HEIGHT;
+  video_context.drawImage(image, 0, 0, image.width, image.height);
+}
+
+function mainLoop()
+{
+  if(!paused)
+  {
+    updateAnimation();
+    renderer.render(scene, camera);
+    requestAnimationFrame(mainLoop);
+  }
+}
+
+function updateAnimation()
+{
+  dt = clock.getDelta();
+
+  // If the animation has not finished, advance the frame at a controlled rate.
+  if(currentFrame<(totalFrames-1))
+  {
+    elapsedTime += dt;
+    if( elapsedTime > .05)
+    {
+      elapsedTime = 0;
+      currentFrame += 1;
+    }
+  }
+
+  arrowTex.offset.x = currentFrame/totalFrames;
+}
+
+function resizeFunc()
+{
+  var height = $(window).height();
+  CANVAS_WIDTH = CANVAS_HEIGHT = height * 0.7;
+  $("#if_container").width(CANVAS_WIDTH);
+  $("#if_container").height(CANVAS_HEIGHT);
+  $("#video_container").width(CANVAS_WIDTH);
+  $("#video_container").height(CANVAS_HEIGHT);
+  $("[type=button]").height(height * 0.05);
+  $("#messages").height(height * 0.2);
+  renderer.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
+
+}
+
+function getCoords(event)
+{
+  mouseX = event.clientX;
+  mouseY = event.clientY;
+
+  // Convert mouseX and mouseY to the range -.5*CANVAS_HEIGHT,+.5*CANVAS_HEIGHT
+  var x= mouseX-CANVAS_WIDTH/2;
+  var z=-mouseY+CANVAS_HEIGHT/2;
+
+  // Convert x and y to the range -6,+6 feet
+  x = x/(CANVAS_WIDTH/2) * 6;
+  z = z/(CANVAS_HEIGHT/2)* 6;
+
+  // Round to the nearest .5 foot
+  x = Math.floor(x) + 0.5;
+  z = Math.floor(z) + 0.5;
+
+  // Place the arrow animation and set it to the first frame
+  arrow.position.x = x;
+  arrow.position.y = z;
+  currentFrame = 0;
+
+  // Convert coordinates to meters and send to drone
+  var METERS_PER_FOOT = 0.3048;
+  x = x * METERS_PER_FOOT;
+  y = 1.0;
+  z = z * METERS_PER_FOOT;
+
+  sendMessage("/uav/0/goto?x="+x+"&y="+y+"&z="+z+"&number="+message_count, gotoResponse);
+  showMessage("normalMsg","X: "+ x.toFixed(4) +" Y: "+ y.toFixed(4) +" Z: "+ z.toFixed(4));
+}
+
+function getStatus()
+{
+  sendMessage("/uav/0/status?number="+message_count, statusResponse);
+}
+
+function getVideoFrame()
+{
+  video.src = "photo.jpeg?number="+message_count;
+  message_count += 1;
+}
+
+function takeOff()
+{
+  sendMessage("/uav/0/takeoff?number="+message_count, takeOffResponse);
+}
+
+function land()
+{
+  sendMessage("/uav/0/land?number="+message_count, landResponse);
+}
+
+function sendMessage(url, callBackFunc)
+{
+  $.ajax({
+    url: url,
+    timeout: 5000,
+    success: callBackFunc,
+    error: timeOut});
+  message_count+=1;
+}
+
+function statusResponse(data)
+{
+}
+
+function takeOffResponse(data)
+{
+}
+
+function landResponse(data)
+{
+}
+
+function gotoResponse(data)
+{
+}
+
+function errorCount()
+{
+  if(errorCount.val == undefined)
+    errorCount.val=1;
+  else
+    errorCount.val += 1;
+
+  return errorCount.val;
+}
+
+function timeOut()
+{
+  showMessage("errorMsg", "Error: No response from server.");
+}
+
+function showMessage(msgType, message)
+{
+  if(msgType == "errorMsg")
+  {
+    if(errorCount.val == undefined)
+    {
+      $("#messages").append("<div  class='errorMsg' id='timeOut'></div>");
+    }
+    $("#timeOut").html("("+errorCount()+")"+message);
+  }
+  else
+  {
+    $("#messages").append("<div class='"+msgType+"'>"+message+"</div>");
+  }
+}
+
+function togglePause()
+{
+  paused = !paused;
+  if(!paused)
+  {
+    $("#pause").val("Pause");
+    requestAnimationFrame(mainLoop);
+  }
+  else
+  {
+    $("#pause").val("Resume");
+  }
+}
+
+</script>
+
+</html>
