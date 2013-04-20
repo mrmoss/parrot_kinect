@@ -343,12 +343,6 @@ void service_client(msl::socket& client,const std::string& message)
 			if(request.size()>0)
 				request.erase(request.end()-1);
 
-
-		int pos=request.find('?');
-
-		if(pos!=-1)
-			request=request.substr(0,pos);
-
 		//std::cout << request << std::endl;
 
 		if(msl::starts_with(request,"uav/0/video"))
@@ -365,10 +359,6 @@ void service_client(msl::socket& client,const std::string& message)
 						response+=static_cast<char>(a.video_data()[ jj*640*3 + ii + 2 ]);
 					}
 				}
-			//for(unsigned int ii=0; ii < 640; ii+=2)
-				//for(unsigned int jj = 0; jj < 360; jj +=2)
-					//for( unsigned int kk = 0; kk < 3; ++kk)
-						//response+=static_cast<char>(a.video_data()[ (ii + jj * 640)*3 + kk] );
 
 			response+='?';
 
@@ -376,7 +366,6 @@ void service_client(msl::socket& client,const std::string& message)
 		}
 		else
 		{
-
 			//Web Root Variable (Where your web files are)
 			std::string web_root="web";
 
@@ -421,14 +410,6 @@ void service_client(msl::socket& client,const std::string& message)
 			//Load File
 			if(mime_type != "drone/command" && msl::file_to_string(web_root+"/"+request,file))
 			{
-				if(file == "photo.jpeg")
-					{
-						//photo_mutex.lock();
-						//raw_to_jpeg("web/photo.jpeg", a.video_data(), 640, 368, 3, JCS_RGB);
-						client<<msl::http_pack_string(file,mime_type);
-						//photo_mutex.unlock();
-					}
-				else
 					client<<msl::http_pack_string(file,mime_type);
 			}
 			else if (mime_type == "drone/command")
@@ -444,7 +425,6 @@ void service_client(msl::socket& client,const std::string& message)
 					}
 
 					std::stringstream parse_sstr;
-					std::stringstream output_sstr;
 
 					parse_sstr << request;
 
@@ -456,11 +436,19 @@ void service_client(msl::socket& client,const std::string& message)
 
 					parse_sstr.ignore(request.size(), '=');
 					parse_sstr >> desired_location.z;
-					desired_location.z += + kinect._z_field_size / 2;
+					desired_location.z += kinect._z_field_size / 2;
 
 					pdcontroller.set_desired_location(desired_location);
 
 					client<<msl::http_pack_string("Location Recieved",mime_type);
+				}
+				else if(msl::starts_with(request,"uav/0/land"))
+				{
+					a.land();
+				}
+				else if(msl::starts_with(request,"uav/0/takeoff"))
+				{
+					a.takeoff();
 				}
 			}
 
