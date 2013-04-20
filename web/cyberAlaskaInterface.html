@@ -172,7 +172,7 @@ function init()
   currentFrame = totalFrames-1;
 
 //  setInterval(getStatus, 1000);
-  setInterval(getVideoFrame, 1000);
+  setTimeout(getVideoFrame, 1000);
   mainLoop();
 }
 
@@ -270,6 +270,10 @@ function getStatus()
 function getVideoFrame()
 {
   sendMessage("/uav/0/video?number="+message_count, videoResponse);
+  if(!paused)
+  {
+    setTimeout(getVideoFrame, 1000);
+  }
 }
 
 function takeOff()
@@ -298,7 +302,7 @@ function statusResponse(data)
 
 function videoResponse(data, status, xmlHttp)
 {
-  showMessage(normalMsg, status);
+  showMessage("normalMsg", status);
   if(xmlHttp.readyState==4 && xmlHttp.status==200)
   {
     //Extract Command
@@ -310,6 +314,8 @@ function videoResponse(data, status, xmlHttp)
       --response.length;
     }
     --response.length;
+    response=response.substr(0, response.length);
+    showMessage("normalMsg", response);
 
     for(var ii=0;ii<response.length;++ii)
       data_array[ii]=response.charCodeAt(ii);
@@ -368,6 +374,7 @@ function togglePause()
   paused = !paused;
   if(!paused)
   {
+    setTimeout(getVideoFrame, 1000);
     $("#pause").val("Pause");
     requestAnimationFrame(mainLoop);
   }
