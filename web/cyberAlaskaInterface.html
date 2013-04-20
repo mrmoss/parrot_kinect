@@ -66,6 +66,7 @@ var clock, elapsedTime = 0;
 
 var request = new XMLHttpRequest();
 var sentTime;
+var averageResponse = 100;	// This will be overwritten when we start recieving data.
 var message_count = 0;
 
 var video;
@@ -148,7 +149,7 @@ function init()
   mapWidth  = mapHeight * VIDEO_ASPECT_RATIO;
   var videoGeometry = new THREE.PlaneGeometry(mapWidth, mapHeight, wIncrement, hIncrement);
   var map = new THREE.DataTexture(data_array, videoWidth, videoHeight, THREE.RGBFormat );
-  map.needsUpdate = true;
+  //map.needsUpdate = true;
   var videoMaterial = new THREE.MeshBasicMaterial(
     { map: map } );
   video = new THREE.Mesh(videoGeometry, videoMaterial);
@@ -168,7 +169,7 @@ function init()
   currentFrame = totalFrames-1;
 
 //  setInterval(getStatus, 1000);
-  setTimeout(getVideoFrame, 1000);
+  getVideoFrame();
   mainLoop();
 }
 
@@ -260,7 +261,7 @@ function getVideoFrame()
   sendMessage("/uav/0/video?number="+message_count, videoResponse, true);
   if(!paused)
   {
-    setTimeout(getVideoFrame, 100);
+    setTimeout(getVideoFrame, averageResponse);
   }
 }
 
@@ -298,21 +299,20 @@ function videoResponse(data, status, xmlHttp)
 {
   if(videoResponse.frameNumber == undefined){
     videoResponse.frameNumber = 0;
-    videoResponse.average = 0;
   }
   
   videoResponse.frameNumber += 1;
   var responseTime = new Date().getTime() - sentTime;
-  videoResponse.average *= (videoResponse.frameNumber-1) / videoResponse.frameNumber;
-  videoResponse.average += responseTime / videoResponse.frameNumber;
-  showMessage("normalMsg", "average: "+videoResponse.average+"mils");
+  averageResponse *= (videoResponse.frameNumber-1) / videoResponse.frameNumber;
+  averageResponse += responseTime / videoResponse.frameNumber;
+
   if(xmlHttp.readyState==4 && xmlHttp.status==200)
   {
     //Extract Command
     var response=xmlHttp.responseText.substr(6,xmlHttp.responseText.length-6);
 
 	//Remove End Whitespace
-	while(response.length > 0 && response[response.length-1]!='?')
+	while(response.length > 0 && response[response.length-1]!="?")
 	{
 		response=response.substr(0,response.length-1);
 	}
@@ -324,7 +324,7 @@ function videoResponse(data, status, xmlHttp)
       data_array[ii]=response.charCodeAt(ii);
 
     var map = new THREE.DataTexture(data_array, videoWidth, videoHeight, THREE.RGBFormat );
-    map.needsUpdate = true;
+    //map.needsUpdate = true;
     video.material.map=map;
   }
 }
