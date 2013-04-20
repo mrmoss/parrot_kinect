@@ -303,8 +303,8 @@ function videoResponse(data, status, xmlHttp)
   
   videoResponse.frameNumber += 1;
   var responseTime = new Date().getTime() - sentTime;
-  videoResponse.average *= (frameNumber-1) / frameNumber;
-  videoResponse.average += responseTime / frameNumber;
+  videoResponse.average *= (videoResponse.frameNumber-1) / videoResponse.frameNumber;
+  videoResponse.average += responseTime / videoResponse.frameNumber;
   showMessage("normalMsg", "average: "+videoResponse.average+"mils");
   if(xmlHttp.readyState==4 && xmlHttp.status==200)
   {
