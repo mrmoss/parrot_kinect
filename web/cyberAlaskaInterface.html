@@ -149,7 +149,7 @@ function init()
   mapWidth  = mapHeight * VIDEO_ASPECT_RATIO;
   var videoGeometry = new THREE.PlaneGeometry(mapWidth, mapHeight, wIncrement, hIncrement);
   var map = new THREE.DataTexture(data_array, videoWidth, videoHeight, THREE.RGBFormat );
-  //map.needsUpdate = true;
+  map.needsUpdate = true;
   var videoMaterial = new THREE.MeshBasicMaterial(
     { map: map } );
   video = new THREE.Mesh(videoGeometry, videoMaterial);
@@ -300,11 +300,22 @@ function videoResponse(data, status, xmlHttp)
   if(videoResponse.frameNumber == undefined){
     videoResponse.frameNumber = 0;
   }
-  
+
+  // Calculate average response time of all successful responses.
   videoResponse.frameNumber += 1;
-  var responseTime = new Date().getTime() - sentTime;
+  var responseTime = new Date().getTime() - sentTime;	// Of this request
+
+  // Cap it for extreme cases
+  if(responseTime > 1000)
+    responseTime = 1000;
+  if(responseTime < 50)
+    responseTime = 50;
+
   averageResponse *= (videoResponse.frameNumber-1) / videoResponse.frameNumber;
   averageResponse += responseTime / videoResponse.frameNumber;
+
+  // Add a little to ensure it is not too fast
+  averageResponse = Math.floor(averageResponse * 1.2);
 
   if(xmlHttp.readyState==4 && xmlHttp.status==200)
   {
@@ -324,7 +335,7 @@ function videoResponse(data, status, xmlHttp)
       data_array[ii]=response.charCodeAt(ii);
 
     var map = new THREE.DataTexture(data_array, videoWidth, videoHeight, THREE.RGBFormat );
-    //map.needsUpdate = true;
+    map.needsUpdate = true;
     video.material.map=map;
   }
 }
