@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<title>Three.js -- Template</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body
+		{
+			font-family: Monospace;
+			font-weight: bold;
+			margin: 0px;
+			overflow: hidden;
+		}
+	</style>
+</head>
+<body>
+
+<div id="message"></div>
+
+<script src="js/Three.js"></script>
+<script src="js/Detector.js"></script>
+
+<script>
+/*
+	Three.js "tutorials by example"
+	Author: Lee Stemkoski
+	Date: March 2013 (three.js v56)
+ */
+
+// MAIN
+
+// standard global variables
+var container, scene, camera, renderer;
+var clock = new THREE.Clock();
+// custom global variables
+var cube;
+
+var mesh;
+var textureWidth = 640/2;
+var textureHeight = 360/2;
+var data_array;
+
+init();
+animate();
+
+function getPicture()
+{
+	//Create Request
+	var xmlhttp=new XMLHttpRequest();
+
+	var command="BYTES?";
+
+	//Set Receive Function
+	xmlhttp.onreadystatechange=function()
+	{
+		if(xmlhttp.readyState==4&&xmlhttp.status==200)
+		{
+
+			//Extract Command
+			var response=xmlhttp.responseText.substr(6,xmlhttp.responseText.length-6);
+
+			//Remove End Whitespace
+			while(response[response.length-1]!='?')
+			{
+				response=response.substr(0,response.length-1);
+			}
+
+			--response.length;
+
+			for(var ii=0;ii<response.length;++ii)
+				data_array[ii]=response.charCodeAt(ii);
+
+			var map = new THREE.DataTexture(data_array, textureWidth, textureHeight, THREE.RGBFormat );
+			map.needsUpdate = true;
+
+			mesh.material.map=map;
+		}
+	}
+
+	//Send Command
+	xmlhttp.open("GET",encodeURIComponent(command),true);
+	xmlhttp.overrideMimeType("text/plain; charset=x-user-defined");
+	xmlhttp.send(null);
+}
+
+// FUNCTIONS
+function init()
+{
+	// SCENE
+	scene = new THREE.Scene();
+	// CAMERA
+	var SCREEN_WIDTH = textureWidth, SCREEN_HEIGHT = textureHeight;
+	var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
+	camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
+	scene.add(camera);
+	camera.position.set(0,0,300);
+	camera.lookAt(scene.position);
+	// RENDERER
+	renderer = new THREE.WebGLRenderer( {antialias:true} );
+	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+	container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	container.appendChild( renderer.domElement );
+
+	data_array=new Uint8Array(textureWidth*textureHeight*3);
+
+	for(var ii=0;ii<textureWidth*textureHeight;++ii)
+	{
+		data_array[ii*3+0]=255;
+		data_array[ii*3+1]=0;
+		data_array[ii*3+2]=0;
+	}
+
+	var sphere =new THREE.PlaneGeometry(textureWidth,textureHeight,1,1)
+
+	var map = new THREE.DataTexture(data_array, textureWidth, textureHeight, THREE.RGBFormat );
+	map.needsUpdate = true;
+
+	var material = new THREE.MeshBasicMaterial( { wireframe: false, map: map } )
+	mesh = new THREE.Mesh(sphere,material);
+	scene.add( mesh );
+
+	setInterval(getPicture,60);
+}
+
+function animate()
+{
+    requestAnimationFrame( animate );
+	render();
+	update();
+}
+
+function update()
+{
+}
+
+function render()
+{
+	renderer.render( scene, camera );
+}
+
+</script>
+
+</body>
+</html>

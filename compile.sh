@@ -1,0 +1,1 @@
+g++ main.cpp msl/*.cpp falconer.cpp Kinect.cpp PDController.cpp libfree/cyber_kinect.cpp raw_to_jpeg.cpp -o falconer -std=c++0x -O -ljpeg -ggdb -lGL -lGLU -lGLEW -lglui -lglut -lSOIL -lavcodec -lswscale -lfreenect
