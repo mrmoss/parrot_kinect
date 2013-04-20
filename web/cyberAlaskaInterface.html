@@ -36,7 +36,7 @@
     <div id="if_container" onclick="getCoords(event)"></div>
   </td>
   <td>
-    <canvas id="video_container"></canvas>
+    <div id="video_container"></div>
   </td>
 </tr>
 <tr>
@@ -62,10 +62,8 @@
 
 <script type = text/javascript>
 
-var CANVAS_WIDTH = CANVAS_HEIGHT = $(window).height() * 0.7;
-
 var mouseX, mouseY;
-var container, camera, scene, renderer;
+var container, v_container, camera1, camera2, scene1, scene2, if_renderer, video_renderer;
 
 // for the arrow animation
 var arrow, arrowTex, currentFrame, totalFrames;
@@ -76,8 +74,19 @@ var message_count = 0;
 
 var paused = false;
 
-var video = new Image();
-var video_context;
+var video;
+var data_array;
+var videoWidth  = 640;
+var videoHeight = 360;
+
+var IF_ASPECT_RATIO  = 1.0;
+var IF_HEIGHT = $(window).height() * 0.7;
+var IF_WIDTH = IF_HEIGHT * IF_ASPECT_RATIO;
+
+var VIDEO_ASPECT_RATIO  = videoWidth / videoHeight;
+var VIDEO_HEIGHT = $(window).height() * 0.7;
+var VIDEO_WIDTH = VIDEO_HEIGHT * VIDEO_ASPECT_RATIO;
+
 
 function init()
 {
@@ -88,44 +97,67 @@ function init()
   }
   
   var VIEW_ANGLE   = 60;
-  var ASPECT_RATIO  = CANVAS_WIDTH/CANVAS_HEIGHT;
   var NEAR_CLIP = .1, FAR_CLIP = 20;
 
-  clock = new THREE.Clock();
-  scene = new THREE.Scene();
+  clock  = new THREE.Clock();
+  scene1 = new THREE.Scene();
+  scene2 = new THREE.Scene();
 
-  // Setup video feed
-  var v_container = document.getElementById("video_container");
-  video_context = v_container.getContext("2d");
-  video.onload = drawFrame();
-  video.onError = function () { alert("video error") }
+  // Setup interface camera
+  camera1 = new THREE.PerspectiveCamera(VIEW_ANGLE, IF_ASPECT_RATIO, NEAR_CLIP, FAR_CLIP);
+  scene1.add(camera1);
+  camera1.position.set(0,0,10.4);
+  camera1.lookAt(scene1.position);	
 
-  // Setup camera
-  camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT_RATIO, NEAR_CLIP, FAR_CLIP);
-  scene.add(camera);
-  camera.position.set(0,0,10.4);
-  camera.lookAt(scene.position);	
-  
+  // Setup video camera
+  camera2 = new THREE.PerspectiveCamera(VIEW_ANGLE, VIDEO_ASPECT_RATIO, NEAR_CLIP, FAR_CLIP);
+  scene2.add(camera2);
+  camera2.position.set(0,0,10.4);
+  camera2.lookAt(scene2.position);
+
   // Setup Renderer
-  renderer = new THREE.WebGLRenderer( {antialias:true} );
+  if_renderer    = new THREE.WebGLRenderer( {antialias:true} );
+  video_renderer = new THREE.WebGLRenderer( {antialias:true} );
 
   // setup layout based on browser window size
   resizeFunc();
   $(window).resize(resizeFunc);
 
-  // create a div element to contain the renderer
+  // create a div elements to contain the renderers
   container = document.getElementById( "if_container" );
-  container.appendChild( renderer.domElement );
+  container.appendChild( if_renderer.domElement );
+  v_container = document.getElementById("video_container");
+  v_container.appendChild( video_renderer.domElement );
   
   // create the map of the challenge arena
   var mapWidth = mapHeight = 12; // In feet
   var wIncrement = hIncrement = 1;
+
   var mapGeometry = new THREE.PlaneGeometry(mapWidth, mapHeight, wIncrement, hIncrement);
   var mapMaterial = new THREE.MeshBasicMaterial( 
     { map: THREE.ImageUtils.loadTexture("images/SampleMap.jpg") } );
   var arenaMap = new THREE.Mesh(mapGeometry, mapMaterial);
-  scene.add(arenaMap);
-  
+  scene1.add(arenaMap);
+
+  // create the viewing plane for the video feed
+  data_array=new Uint8Array(videoWidth*videoHeight*3);
+
+  for(var ii=0;ii<videoWidth*videoHeight;++ii)
+  {
+    data_array[ii*3+0]=255;
+    data_array[ii*3+1]=0;
+    data_array[ii*3+2]=0;
+  }
+
+  mapWidth  = mapHeight * VIDEO_ASPECT_RATIO;
+  var videoGeometry = new THREE.PlaneGeometry(mapWidth, mapHeight, wIncrement, hIncrement);
+  var map = new THREE.DataTexture(data_array, videoWidth, videoHeight, THREE.RGBFormat );
+  map.needsUpdate = true;
+  var videoMaterial = new THREE.MeshBasicMaterial(
+    { map: map } );
+  var video = new THREE.Mesh(videoGeometry, videoMaterial);
+  scene2.add(video);
+
   // create object to display arrow animation
   var arrowWidth = arrowHeight = 1;
   totalFrames = 10;
@@ -136,29 +168,35 @@ function init()
   var arrowMaterial = new THREE.MeshBasicMaterial( { map: arrowTex, transparent: true } );
   arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
   arrow.position.z = .01;
-  scene.add(arrow);
+  scene1.add(arrow);
   currentFrame = totalFrames-1;
 
-  setInterval(getStatus, 100);
-  setInterval(getVideoFrame, 100);
+//  setInterval(getStatus, 1000);
+  setInterval(getVideoFrame, 1000);
   mainLoop();
 }
 
 function drawFrame(){
-  video_context.drawImage(video, 0, 0);
+  try {
+    video_context.drawImage(video, 0, 0);
+  } catch(err) {
+    console.log(err);
+    console.trace();
+  }
 }
 
 function mainLoop()
 {
   if(!paused)
   {
-    updateAnimation();
-    renderer.render(scene, camera);
+    updateAnimations();
+    if_renderer.render(scene1, camera1);
+    video_renderer.render(scene2, camera2);
     requestAnimationFrame(mainLoop);
   }
 }
   
-function updateAnimation()
+function updateAnimations()
 {
   dt = clock.getDelta();
 
@@ -179,15 +217,17 @@ function updateAnimation()
 function resizeFunc()
 {
   var height = $(window).height();
-  CANVAS_WIDTH = CANVAS_HEIGHT = height * 0.7;
-  $("#if_container").width(CANVAS_WIDTH);
-  $("#if_container").height(CANVAS_HEIGHT);
-  $("#video_container").width(CANVAS_WIDTH);
-  $("#video_container").height(CANVAS_HEIGHT);
+  IF_HEIGHT = VIDEO_HEIGHT = height * 0.7;
+  IF_WIDTH  = IF_HEIGHT * IF_ASPECT_RATIO;
+  VIDEO_WIDTH  = VIDEO_HEIGHT * VIDEO_ASPECT_RATIO;
+  $("#if_container").width(IF_WIDTH);
+  $("#if_container").height(IF_HEIGHT);
+  $("#video_container").width(VIDEO_WIDTH);
+  $("#video_container").height(VIDEO_HEIGHT);
   $("[type=button]").height(height * 0.05);
   $("#messages").height(height * 0.2);
-  renderer.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
-
+  if_renderer.setSize(IF_WIDTH, IF_HEIGHT);
+  video_renderer.setSize(VIDEO_WIDTH, VIDEO_HEIGHT);
 }
 
 function getCoords(event)
@@ -195,13 +235,13 @@ function getCoords(event)
   mouseX = event.clientX;
   mouseY = event.clientY;
 
-  // Convert mouseX and mouseY to the range -.5*CANVAS_HEIGHT,+.5*CANVAS_HEIGHT
-  var x= mouseX-CANVAS_WIDTH/2;
-  var z=-mouseY+CANVAS_HEIGHT/2;
+  // Convert mouseX and mouseY to the range -.5*range,+.5*range
+  var x= mouseX-IF_WIDTH/2;
+  var z=-mouseY+IF_HEIGHT/2;
   
   // Convert x and y to the range -6,+6 feet
-  x = x/(CANVAS_WIDTH/2) * 6;
-  z = z/(CANVAS_HEIGHT/2)* 6;
+  x = x/(IF_WIDTH/2) * 6;
+  z = z/(IF_HEIGHT/2)* 6;
   
   // Round to the nearest .5 foot
   x = Math.floor(x) + 0.5;
@@ -229,8 +269,7 @@ function getStatus()
 
 function getVideoFrame()
 {
-  video.src = "photo.jpeg?number="+message_count;
-  message_count += 1;
+  sendMessage("/uav/0/video?number="+message_count, videoResponse);
 }
 
 function takeOff()
@@ -255,6 +294,30 @@ function sendMessage(url, callBackFunc)
 
 function statusResponse(data)
 {
+}
+
+function videoResponse(data, status, xmlHttp)
+{
+  showMessage(normalMsg, status);
+  if(xmlHttp.readyState==4 && xmlHttp.status==200)
+  {
+    //Extract Command
+    var response=xmlHttp.responseText.substr(6,xmlHttp.responseText.length-6);
+    
+    //Remove End Whitespace
+    while(response[response.length-1]!='?')
+    {
+      --response.length;
+    }
+    --response.length;
+
+    for(var ii=0;ii<response.length;++ii)
+      data_array[ii]=response.charCodeAt(ii);
+
+    var map = new THREE.DataTexture(data_array, videoWidth, videoHeight, THREE.RGBFormat );
+    map.needsUpdate = true;
+    video.material.map=map;
+  }
 }
 
 function takeOffResponse(data)
