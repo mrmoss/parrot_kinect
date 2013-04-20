@@ -37,21 +37,25 @@
 
 #include <sstream>
 
-pthread_t server_thread;
+#include "falconer.hpp"
+
+//pthread_t server_thread;
 std::string web_root="web";
 
-pthread_mutex_t image_mutex = PTHREAD_MUTEX_INITIALIZER; //Protects JPEG file written to by saveJPEG and accessed by file_to_string
+//pthread_mutex_t image_mutex = pthread_mutex_INITIALIZER; //Protects JPEG file written to by saveJPEG and accessed by file_to_string
+
+pthread_t server_thread;
 
 CRawImage* image;
 unsigned int camTexture=0;
 
-pthread_mutex_t drone_command_mutex = PTHREAD_MUTEX_INITIALIZER; //Protect heli object
+//pthread_mutex_t drone_command_mutex = //pthread_mutex_INITIALIZER; //Protect heli object
 CHeli* heli;
 
 //Kinect-drone autonomous values
 bool autonomous=false;
 
-pthread_mutex_t drone_location_mutex = PTHREAD_MUTEX_INITIALIZER; //Protects desired location edited by server client function
+//pthread_mutex_t drone_location_mutex = //pthread_mutex_INITIALIZER; //Protects desired location edited by server client function
 vec3 desired_loc=vec3(0,0,2);
 
 double x_error_old=0;
@@ -74,6 +78,8 @@ int global_argc;
 char** global_argv;
 
 long long count = 0;
+
+ardrone test;
 
 //Keyboard control bools
 bool auto_button_down=false;
@@ -126,13 +132,13 @@ void Drone::drone_autonomous()
 
 	if(autonomous&&temp_loc.z!=-1)
 	{
-		pthread_mutex_lock(&drone_location_mutex);
+		//pthread_mutex_lock(&drone_location_mutex);
 
 		float x_error_new=temp_loc.x-desired_loc.x;
 		float y_error_new=temp_loc.y-desired_loc.y;
 		float z_error_new=temp_loc.z-desired_loc.z;
 
-		pthread_mutex_unlock(&drone_location_mutex);
+		//pthread_mutex_unlock(&drone_location_mutex);
 
 		roll=(x_gain_p*x_error_new+x_gain_d*(x_error_old-x_error_new))*20000.0;
 		pitch=-(z_gain_p*z_error_new+z_gain_d*(z_error_old-z_error_new))*20000.0;
@@ -174,6 +180,7 @@ void service_client(msl::socket& client, std::string& message)
 	//Get Requests
 	if(msl::starts_with(message,"GET"))
 	{
+		std::cout << message << std::endl;
 		//Convert Request
 		std::string request=msl::http_to_ascii(message);
 
@@ -191,15 +198,15 @@ void service_client(msl::socket& client, std::string& message)
 		if(request=="")
 			request="cyberAlaskaInterface.html";
 
-		//Mime Type Variable (Default plain text)
-		std::string mime_type="text/plain";
-
-		bool file_request = false;
-
 		int pos=request.find('?');
 
 		if(pos!=-1)
 			request=request.substr(0,pos);
+
+		//Mime Type Variable (Default plain text)
+		std::string mime_type="text/plain";
+
+		bool file_request = false;
 
 		//Check for Code Mime Type
 		if(msl::ends_with(request,".js"))
@@ -265,10 +272,11 @@ void service_client(msl::socket& client, std::string& message)
 		if(file_request)
 		{
 			//std::cout << "Load this image" << std::endl;
-			pthread_mutex_lock(&image_mutex);
+			//pthread_mutex_lock(&image_mutex);
 			//std::cout << "Loading this image" << std::endl;
 			loaded=msl::file_to_string(web_root+"/"+request,file);
-			pthread_mutex_unlock(&image_mutex);
+			//std::cout<<"FILE LENGTH:\t"<<file.size()<<std::endl;
+			//pthread_mutex_unlock(&image_mutex);
 		}
 		else
 		{
@@ -284,8 +292,6 @@ void service_client(msl::socket& client, std::string& message)
 
 				parse_sstr << request;
 
-				pthread_mutex_lock(&drone_location_mutex);
-
 				parse_sstr.ignore(request.size(), '=');
 				parse_sstr >> desired_loc.x;
 
@@ -294,35 +300,31 @@ void service_client(msl::socket& client, std::string& message)
 
 				parse_sstr.ignore(request.size(), '=');
 				parse_sstr >> desired_loc.z;
-				desired_loc.z += + z_size / 2;
+				desired_loc.z += + kinect._z_field_size / 2;\
 
-				pthread_mutex_unlock(&drone_location_mutex);
+				PDController.set_desired_location(desired_loc);
 
 				output_sstr << "Location recieved";
 			}
 			else if(msl::starts_with(request, "uav/0/takeoff"))
 			{
-				pthread_mutex_lock(&drone_command_mutex);
-				heli->takeoff();
-				pthread_mutex_unlock(&drone_command_mutex);
+				drone_mutex.lock();
+				a->takeoff();
+				drone_mutex.unlock();
 
 				output_sstr << "takeoff recieved";
 			}
 			else if(msl::starts_with(request, "uav/0/land"))
 			{
-				pthread_mutex_lock(&drone_command_mutex);
+				drone_mutex.lock();
 				heli->land();
-				pthread_mutex_unlock(&drone_command_mutex);
+				drone_mutex.unlock();
 
 				output_sstr << "land recieved";
 			}
-			else if(msl::starts_with(request, "uav/0/videoframe"))
-			{
-				msl::file_to_string(web_root+"/"+request,file);
-			}
 			else if(msl::starts_with(request, "uav/0/status"))
 			{
-				output_sstr << make_json();
+				//output_sstr << make_json();
 			}
 			else
 			{
@@ -334,7 +336,10 @@ void service_client(msl::socket& client, std::string& message)
 
 		if(loaded)
 		{
-			client<<msl::http_pack_string(file,mime_type);
+			//std::cout<<"BYTES SENT:\t"<<client.write((void*)msl::http_pack_string(file,mime_type).c_str(),msl::http_pack_string(file,mime_type).size())<<std::endl;
+			//pthread_mutex_lock(&image_mutex);
+			client.write((void*)msl::http_pack_string(file,mime_type).c_str(),msl::http_pack_string(file,mime_type).size());
+			//pthread_mutex_unlock(&image_mutex);
 		}
 
 		//not_found.html Not Found?!
@@ -352,22 +357,15 @@ void service_client(msl::socket& client, std::string& message)
 	}
 }
 
+//Create Server
+msl::socket server("0.0.0.0:80");
+
+//Vectors for Clients
+std::vector<msl::socket> clients;
+std::vector<std::string> client_messages;
+
 void* server_thread_function(void*)
 {
-	//Create Server
-	msl::socket server("0.0.0.0:80");
-	server.create();
-
-	//Check Server
-	if(server)
-		std::cout<<"Server started =)"<<std::endl;
-	else
-		std::cout<<"Server failed =("<<std::endl;
-
-	//Vectors for Clients
-	std::vector<msl::socket> clients;
-	std::vector<std::string> client_messages;
-
 	//Check for a Connecting Client
 	msl::socket client=server.accept();
 
@@ -438,6 +436,8 @@ int main(int argc,char* argv[])
 	//global_argc = argc;
 	//global_argv = argv;
 
+	test.connect();
+
 	heli=new CHeli();
 
 	image=new CRawImage(640,368);
@@ -453,7 +453,15 @@ int main(int argc,char* argv[])
 
 void setup()
 {
-	glGenTextures(1,&camTexture);
+		server.create_tcp();
+
+		//Check Server
+	if(server)
+		std::cout<<"Server started =)"<<std::endl;
+	else
+		std::cout<<"Server failed =("<<std::endl;
+
+		glGenTextures(1,&camTexture);
 
 	float myTheta = helidata.theta;
 	std::cout << myTheta << std::endl;
@@ -477,8 +485,8 @@ void setup()
 
 void loop(const double dt)
 {
-
-	pthread_mutex_lock(&drone_command_mutex);
+	//server_thread_function(NULL);
+	//pthread_mutex_lock(&drone_command_mutex);
 
 	if(msl::input_check_pressed(kb_escape)||exit_button_pressed)
 	{
@@ -513,7 +521,7 @@ void loop(const double dt)
 	if(msl::input_check_pressed(kb_v))
 		heli->switchCamera(3);
 
-	pthread_mutex_unlock(&drone_command_mutex);
+	//pthread_mutex_unlock(&drone_command_mutex);
 
 
 	float speed=20000.0;
@@ -545,24 +553,26 @@ void loop(const double dt)
 	if(msl::input_check_pressed(kb_enter)||auto_button_pressed)
 		autonomous=!autonomous;
 
-	pthread_mutex_lock(&drone_command_mutex);
+	//pthread_mutex_lock(&drone_command_mutex);
 	if(autonomous&&heli->is_landed())
 		autonomous=false;
-	pthread_mutex_unlock(&drone_command_mutex);
+	//pthread_mutex_unlock(&drone_command_mutex);
 
 	drone.drone_autonomous();
 
-	pthread_mutex_lock(&drone_command_mutex);
+	//pthread_mutex_lock(&drone_command_mutex);
 	heli->setAngles(drone.pitch,drone.roll,drone.yaw,drone.height);
-	pthread_mutex_unlock(&drone_command_mutex);
+	//pthread_mutex_unlock(&drone_command_mutex);
 
-	pthread_mutex_lock(&drone_command_mutex);
-	heli->renewImage(image);
-	pthread_mutex_unlock(&drone_command_mutex);
+	//pthread_mutex_lock(&drone_command_mutex);
+	//heli->renewImage(image);
+	test.video_update();
+	image->data=test.video_data();
+	//pthread_mutex_unlock(&drone_command_mutex);
 
-	pthread_mutex_lock(&image_mutex);
+	//pthread_mutex_lock(&image_mutex);
 	image->saveJPEG(web_root+"/"+"photo.jpeg");
-	pthread_mutex_unlock(&image_mutex);
+	//pthread_mutex_unlock(&image_mutex);
 
 	drone.zero_out_values();
 

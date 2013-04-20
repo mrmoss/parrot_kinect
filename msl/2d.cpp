@@ -287,9 +287,8 @@ void msl::draw_triangle(const double x1,const double y1,const double x2,const do
 	glDisable(GL_BLEND);
 }
 
-//Draw Quad Function
-void msl::draw_quad(const double x1,const double y1,const double x2,const double y2,const double x3,const double y3,
-	const double x4,const double y4,const msl::color& color)
+//Draw Rectangle Function
+void msl::draw_rectangle(const double x,const double y,const double width,const double height,const msl::color& color)
 {
 	//Enable Transparency
 	glEnable(GL_BLEND);
@@ -301,12 +300,12 @@ void msl::draw_quad(const double x1,const double y1,const double x2,const double
 	//Set Color
 	glColor4d(color.r,color.g,color.b,color.a);
 
-	//Draw Quad
-	glBegin(GL_QUADS);
-		glVertex2d(x1,y1);
-		glVertex2d(x2,y2);
-		glVertex2d(x3,y3);
-		glVertex2d(x4,y4);
+	//Draw Rectangle
+    glBegin(GL_QUADS);
+		glVertex2d(x-width/2.0,y+height/2.0);
+		glVertex2d(x+width/2.0,y+height/2.0);
+		glVertex2d(x+width/2.0,y-height/2.0);
+		glVertex2d(x-width/2.0,y-height/2.0);
 	glEnd();
 
 	//Disable Transparency
@@ -394,11 +393,11 @@ void msl::draw_text(const double x,const double y,const std::string& text,const 
 			//Get Current Line Width
 			unsigned int line_width=0;
 
-			for(unsigned int jj=ii-1;text[jj]!='\t'&&text[jj]!='\n'&&jj>=0;--jj)
+			for(int jj=ii-1;jj>=0&&text[jj]!='\t'&&text[jj]!='\n';--jj)
 				++line_width;
 
 			//Add Indents
-			for(unsigned int jj=line_width%5;jj<5;++jj)
+			for(unsigned int jj=line_width%4;jj<4;++jj)
 				glutBitmapCharacter(GLUT_BITMAP_8_BY_13,' ');
 		}
 

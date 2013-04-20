@@ -1,0 +1,1214 @@
+AT commands thread starting (thread=140600228046592)...
+NAVDATA thread starting (thread=170252032)...
+Send 4 SuccessReady to receive
+at_write:bind: Cannot assign requested address
+Server started =)
+Connecting to 192.168.1.1:5555 
+-1026
+Kinect camera test
+Number of devices found: 1
+theta-> -1026
+ phi-> -982
+ psi-> 9554
+theta-> -1028
+ phi-> -979
+ psi-> 9556
+theta-> -1028
+ phi-> -979
+ psi-> 9556
+theta-> -1028
+ phi-> -979
+ psi-> 9556
+theta-> -1028
+ phi-> -979
+ psi-> 9556
+theta-> -1028
+ phi-> -980
+ psi-> 9557
+theta-> -1028
+ phi-> -980
+ psi-> 9557
+theta-> -1028
+ phi-> -980
+ psi-> 9557
+theta-> -1029
+ phi-> -980
+ psi-> 9560
+theta-> -1029
+ phi-> -980
+ psi-> 9560
+theta-> -1029
+ phi-> -980
+ psi-> 9560
+theta-> -1029
+ phi-> -980
+ psi-> 9560
+theta-> -1029
+ phi-> -979
+ psi-> 9562
+theta-> -1029
+ phi-> -979
+ psi-> 9562
+theta-> -1029
+ phi-> -979
+ psi-> 9562
+theta-> -1029
+ phi-> -979
+ psi-> 9562
+theta-> -1027
+ phi-> -978
+ psi-> 9565
+theta-> -1027
+ phi-> -978
+ psi-> 9565
+theta-> -1027
+ phi-> -978
+ psi-> 9565
+theta-> -1027
+ phi-> -978
+ psi-> 9569
+theta-> -1027
+ phi-> -978
+ psi-> 9569
+theta-> -1027
+ phi-> -978
+ psi-> 9569
+theta-> -1027
+ phi-> -978
+ psi-> 9569
+theta-> -1027
+ phi-> -978
+ psi-> 9569
+theta-> -1025
+ phi-> -979
+ psi-> 9572
+theta-> -1025
+ phi-> -979
+ psi-> 9572
+theta-> -1025
+ phi-> -977
+ psi-> 9574
+theta-> -1025
+ phi-> -977
+ psi-> 9574
+theta-> -1025
+ phi-> -977
+ psi-> 9574
+theta-> -1025
+ phi-> -977
+ psi-> 9574
+theta-> -1022
+ phi-> -976
+ psi-> 9575
+theta-> -1022
+ phi-> -976
+ psi-> 9575
+theta-> -1022
+ phi-> -976
+ psi-> 9575
+theta-> -1023
+ phi-> -977
+ psi-> 9577
+theta-> -1023
+ phi-> -977
+ psi-> 9577
+theta-> -1023
+ phi-> -977
+ psi-> 9577
+theta-> -1023
+ phi-> -977
+ psi-> 9577
+theta-> -1023
+ phi-> -977
+ psi-> 9577
+theta-> -1024
+ phi-> -979
+ psi-> 9579
+theta-> -1024
+ phi-> -979
+ psi-> 9579
+theta-> -1024
+ phi-> -979
+ psi-> 9579
+theta-> -1023
+ phi-> -976
+ psi-> 9582
+theta-> -1023
+ phi-> -976
+ psi-> 9582
+theta-> -1023
+ phi-> -976
+ psi-> 9582
+theta-> -1023
+ phi-> -976
+ psi-> 9582
+theta-> -1023
+ phi-> -976
+ psi-> 9582
+theta-> -1023
+ phi-> -975
+ psi-> 9585
+theta-> -1023
+ phi-> -975
+ psi-> 9585
+theta-> -1023
+ phi-> -975
+ psi-> 9585
+theta-> -1021
+ phi-> -975
+ psi-> 9588
+theta-> -1021
+ phi-> -975
+ psi-> 9588
+theta-> -1021
+ phi-> -975
+ psi-> 9588
+theta-> -1021
+ phi-> -975
+ psi-> 9588
+theta-> -1020
+ phi-> -974
+ psi-> 9589
+theta-> -1020
+ phi-> -974
+ psi-> 9589
+theta-> -1021
+ phi-> -970
+ psi-> 9592
+theta-> -1021
+ phi-> -970
+ psi-> 9592
+theta-> -1021
+ phi-> -970
+ psi-> 9592
+theta-> -1021
+ phi-> -970
+ psi-> 9592
+theta-> -1022
+ phi-> -970
+ psi-> 9591
+theta-> -1022
+ phi-> -970
+ psi-> 9591
+theta-> -1022
+ phi-> -970
+ psi-> 9591
+theta-> -1022
+ phi-> -970
+ psi-> 9591
+theta-> -1021
+ phi-> -972
+ psi-> 9594
+theta-> -1021
+ phi-> -972
+ psi-> 9594
+theta-> -1021
+ phi-> -972
+ psi-> 9594
+theta-> -1021
+ phi-> -972
+ psi-> 9594
+theta-> -1021
+ phi-> -974
+ psi-> 9595
+theta-> -1021
+ phi-> -974
+ psi-> 9595
+theta-> -1021
+ phi-> -974
+ psi-> 9595
+theta-> -1020
+ phi-> -974
+ psi-> 9596
+theta-> -1020
+ phi-> -974
+ psi-> 9596
+theta-> -1020
+ phi-> -974
+ psi-> 9596
+theta-> -1020
+ phi-> -974
+ psi-> 9596
+theta-> -1016
+ phi-> -974
+ psi-> 9597
+theta-> -1016
+ phi-> -974
+ psi-> 9597
+theta-> -1016
+ phi-> -974
+ psi-> 9597
+theta-> -1016
+ phi-> -974
+ psi-> 9597
+theta-> -1017
+ phi-> -974
+ psi-> 9600
+theta-> -1017
+ phi-> -974
+ psi-> 9600
+theta-> -1018
+ phi-> -971
+ psi-> 9601
+theta-> -1018
+ phi-> -971
+ psi-> 9601
+theta-> -1018
+ phi-> -971
+ psi-> 9601
+theta-> -1016
+ phi-> -970
+ psi-> 9603
+theta-> -1016
+ phi-> -970
+ psi-> 9603
+theta-> -1016
+ phi-> -970
+ psi-> 9603
+theta-> -1015
+ phi-> -970
+ psi-> 9605
+theta-> -1015
+ phi-> -970
+ psi-> 9605
+theta-> -1015
+ phi-> -970
+ psi-> 9605
+theta-> -1015
+ phi-> -970
+ psi-> 9605
+theta-> -1015
+ phi-> -971
+ psi-> 9606
+theta-> -1015
+ phi-> -971
+ psi-> 9606
+theta-> -1015
+ phi-> -971
+ psi-> 9606
+theta-> -1015
+ phi-> -971
+ psi-> 9606
+theta-> -1015
+ phi-> -971
+ psi-> 9608
+theta-> -1015
+ phi-> -971
+ psi-> 9608
+theta-> -1015
+ phi-> -971
+ psi-> 9608
+theta-> -1015
+ phi-> -971
+ psi-> 9608
+theta-> -1014
+ phi-> -971
+ psi-> 9611
+theta-> -1014
+ phi-> -971
+ psi-> 9611
+theta-> -1014
+ phi-> -971
+ psi-> 9611
+theta-> -1012
+ phi-> -970
+ psi-> 9613
+theta-> -1012
+ phi-> -970
+ psi-> 9613
+theta-> -1012
+ phi-> -970
+ psi-> 9613
+theta-> -1012
+ phi-> -970
+ psi-> 9613
+theta-> -1012
+ phi-> -969
+ psi-> 9616
+theta-> -1012
+ phi-> -969
+ psi-> 9616
+theta-> -1010
+ phi-> -967
+ psi-> 9619
+theta-> -1010
+ phi-> -967
+ psi-> 9619
+theta-> -1010
+ phi-> -967
+ psi-> 9619
+theta-> -1010
+ phi-> -970
+ psi-> 9619
+theta-> -1010
+ phi-> -970
+ psi-> 9619
+theta-> -1010
+ phi-> -970
+ psi-> 9619
+theta-> -1009
+ phi-> -972
+ psi-> 9622
+theta-> -1009
+ phi-> -972
+ psi-> 9622
+theta-> -1009
+ phi-> -972
+ psi-> 9622
+theta-> -1008
+ phi-> -971
+ psi-> 9624
+theta-> -1008
+ phi-> -971
+ psi-> 9624
+theta-> -1008
+ phi-> -971
+ psi-> 9624
+theta-> -1009
+ phi-> -971
+ psi-> 9628
+theta-> -1009
+ phi-> -971
+ psi-> 9628
+theta-> -1009
+ phi-> -971
+ psi-> 9628
+theta-> -1009
+ phi-> -971
+ psi-> 9628
+theta-> -1008
+ phi-> -969
+ psi-> 9630
+theta-> -1008
+ phi-> -969
+ psi-> 9630
+theta-> -1008
+ phi-> -969
+ psi-> 9630
+theta-> -1008
+ phi-> -971
+ psi-> 9631
+theta-> -1008
+ phi-> -971
+ psi-> 9631
+theta-> -1008
+ phi-> -971
+ psi-> 9631
+theta-> -1008
+ phi-> -971
+ psi-> 9631
+theta-> -1008
+ phi-> -970
+ psi-> 9632
+theta-> -1008
+ phi-> -970
+ psi-> 9632
+theta-> -1009
+ phi-> -971
+ psi-> 9633
+theta-> -1009
+ phi-> -971
+ psi-> 9633
+theta-> -1009
+ phi-> -971
+ psi-> 9633
+theta-> -1009
+ phi-> -971
+ psi-> 9633
+theta-> -1008
+ phi-> -969
+ psi-> 9634
+theta-> -1008
+ phi-> -969
+ psi-> 9634
+theta-> -1008
+ phi-> -969
+ psi-> 9634
+theta-> -1009
+ phi-> -967
+ psi-> 9637
+theta-> -1009
+ phi-> -967
+ psi-> 9637
+theta-> -1009
+ phi-> -967
+ psi-> 9637
+theta-> -1009
+ phi-> -967
+ psi-> 9637
+theta-> -1009
+ phi-> -967
+ psi-> 9637
+theta-> -1010
+ phi-> -967
+ psi-> 9639
+theta-> -1010
+ phi-> -967
+ psi-> 9639
+theta-> -1010
+ phi-> -967
+ psi-> 9639
+theta-> -1010
+ phi-> -967
+ psi-> 9639
+theta-> -1010
+ phi-> -967
+ psi-> 9641
+theta-> -1010
+ phi-> -967
+ psi-> 9641
+theta-> -1010
+ phi-> -967
+ psi-> 9641
+theta-> -1010
+ phi-> -967
+ psi-> 9641
+theta-> -1010
+ phi-> -963
+ psi-> 9643
+theta-> -1010
+ phi-> -963
+ psi-> 9643
+theta-> -1010
+ phi-> -963
+ psi-> 9643
+theta-> -1009
+ phi-> -963
+ psi-> 9645
+theta-> -1009
+ phi-> -963
+ psi-> 9645
+theta-> -1009
+ phi-> -963
+ psi-> 9645
+theta-> -1009
+ phi-> -963
+ psi-> 9645
+theta-> -1009
+ phi-> -964
+ psi-> 9647
+theta-> -1009
+ phi-> -964
+ psi-> 9647
+theta-> -1008
+ phi-> -962
+ psi-> 9649
+theta-> -1008
+ phi-> -962
+ psi-> 9649
+theta-> -1008
+ phi-> -962
+ psi-> 9649
+theta-> -1009
+ phi-> -965
+ psi-> 9652
+theta-> -1009
+ phi-> -965
+ psi-> 9652
+theta-> -1009
+ phi-> -965
+ psi-> 9652
+theta-> -1009
+ phi-> -965
+ psi-> 9652
+theta-> -1012
+ phi-> -965
+ psi-> 9656
+theta-> -1012
+ phi-> -965
+ psi-> 9656
+theta-> -1012
+ phi-> -965
+ psi-> 9656
+theta-> -1014
+ phi-> -965
+ psi-> 9659
+theta-> -1014
+ phi-> -965
+ psi-> 9659
+theta-> -1014
+ phi-> -965
+ psi-> 9659
+theta-> -1015
+ phi-> -966
+ psi-> 9663
+theta-> -1015
+ phi-> -966
+ psi-> 9663
+theta-> -1015
+ phi-> -966
+ psi-> 9663
+theta-> -1015
+ phi-> -966
+ psi-> 9663
+theta-> -1015
+ phi-> -966
+ psi-> 9663
+theta-> -1018
+ phi-> -967
+ psi-> 9666
+theta-> -1018
+ phi-> -967
+ psi-> 9666
+theta-> -1018
+ phi-> -967
+ psi-> 9666
+theta-> -1018
+ phi-> -966
+ psi-> 9669
+theta-> -1018
+ phi-> -966
+ psi-> 9669
+theta-> -1018
+ phi-> -966
+ psi-> 9669
+theta-> -1018
+ phi-> -966
+ psi-> 9669
+theta-> -1017
+ phi-> -965
+ psi-> 9673
+theta-> -1018
+ phi-> -964
+ psi-> 9675
+theta-> -1018
+ phi-> -964
+ psi-> 9675
+theta-> -1018
+ phi-> -964
+ psi-> 9675
+theta-> -1015
+ phi-> -965
+ psi-> 9677
+theta-> -1015
+ phi-> -965
+ psi-> 9677
+theta-> -1015
+ phi-> -965
+ psi-> 9677
+theta-> -1016
+ phi-> -968
+ psi-> 9681
+theta-> -1016
+ phi-> -968
+ psi-> 9681
+theta-> -1016
+ phi-> -968
+ psi-> 9681
+theta-> -1016
+ phi-> -968
+ psi-> 9681
+theta-> -1018
+ phi-> -969
+ psi-> 9684
+theta-> -1018
+ phi-> -969
+ psi-> 9684
+theta-> -1018
+ phi-> -969
+ psi-> 9684
+theta-> -1018
+ phi-> -970
+ psi-> 9690
+theta-> -1018
+ phi-> -970
+ psi-> 9690
+theta-> -1018
+ phi-> -970
+ psi-> 9690
+theta-> -1018
+ phi-> -969
+ psi-> 9694
+theta-> -1018
+ phi-> -969
+ psi-> 9694
+theta-> -1018
+ phi-> -969
+ psi-> 9694
+theta-> -1018
+ phi-> -969
+ psi-> 9694
+theta-> -1018
+ phi-> -969
+ psi-> 9695
+theta-> -1018
+ phi-> -969
+ psi-> 9695
+theta-> -1018
+ phi-> -969
+ psi-> 9695
+theta-> -1018
+ phi-> -969
+ psi-> 9695
+theta-> -1018
+ phi-> -969
+ psi-> 9698
+theta-> -1017
+ phi-> -970
+ psi-> 9700
+theta-> -1017
+ phi-> -970
+ psi-> 9700
+theta-> -1017
+ phi-> -970
+ psi-> 9700
+theta-> -1017
+ phi-> -970
+ psi-> 9700
+theta-> -1018
+ phi-> -967
+ psi-> 9704
+theta-> -1018
+ phi-> -967
+ psi-> 9704
+theta-> -1018
+ phi-> -967
+ psi-> 9704
+theta-> -1018
+ phi-> -967
+ psi-> 9704
+theta-> -1018
+ phi-> -967
+ psi-> 9704
+theta-> -1017
+ phi-> -968
+ psi-> 9708
+theta-> -1017
+ phi-> -968
+ psi-> 9708
+theta-> -1020
+ phi-> -969
+ psi-> 9711
+theta-> -1020
+ phi-> -969
+ psi-> 9711
+theta-> -1019
+ phi-> -971
+ psi-> 9712
+theta-> -1019
+ phi-> -971
+ psi-> 9712
+theta-> -1019
+ phi-> -970
+ psi-> 9716
+theta-> -1019
+ phi-> -970
+ psi-> 9716
+theta-> -1019
+ phi-> -970
+ psi-> 9716
+theta-> -1019
+ phi-> -970
+ psi-> 9716
+theta-> -1019
+ phi-> -970
+ psi-> 9720
+theta-> -1019
+ phi-> -970
+ psi-> 9720
+theta-> -1019
+ phi-> -970
+ psi-> 9720
+theta-> -1019
+ phi-> -970
+ psi-> 9720
+theta-> -1019
+ phi-> -972
+ psi-> 9722
+theta-> -1019
+ phi-> -972
+ psi-> 9722
+theta-> -1017
+ phi-> -971
+ psi-> 9723
+theta-> -1017
+ phi-> -971
+ psi-> 9723
+theta-> -1017
+ phi-> -971
+ psi-> 9723
+theta-> -1017
+ phi-> -971
+ psi-> 9723
+theta-> -1015
+ phi-> -971
+ psi-> 9726
+theta-> -1015
+ phi-> -971
+ psi-> 9726
+theta-> -1015
+ phi-> -971
+ psi-> 9726
+theta-> -1015
+ phi-> -971
+ psi-> 9726
+theta-> -1015
+ phi-> -971
+ psi-> 9726
+theta-> -1016
+ phi-> -971
+ psi-> 9727
+theta-> -1016
+ phi-> -971
+ psi-> 9727
+theta-> -1016
+ phi-> -971
+ psi-> 9727
+theta-> -1014
+ phi-> -973
+ psi-> 9730
+theta-> -1014
+ phi-> -973
+ psi-> 9730
+theta-> -1014
+ phi-> -973
+ psi-> 9730
+theta-> -1014
+ phi-> -973
+ psi-> 9730
+theta-> -1014
+ phi-> -973
+ psi-> 9730
+theta-> -1015
+ phi-> -975
+ psi-> 9733
+theta-> -1015
+ phi-> -975
+ psi-> 9733
+theta-> -1015
+ phi-> -975
+ psi-> 9733
+theta-> -1013
+ phi-> -974
+ psi-> 9736
+theta-> -1013
+ phi-> -974
+ psi-> 9736
+theta-> -1013
+ phi-> -974
+ psi-> 9736
+theta-> -1013
+ phi-> -974
+ psi-> 9736
+theta-> -1013
+ phi-> -974
+ psi-> 9736
+theta-> -1013
+ phi-> -974
+ psi-> 9736
+theta-> -1013
+ phi-> -976
+ psi-> 9742
+theta-> -1013
+ phi-> -976
+ psi-> 9742
+theta-> -1010
+ phi-> -978
+ psi-> 9744
+theta-> -1010
+ phi-> -978
+ psi-> 9744
+theta-> -1013
+ phi-> -979
+ psi-> 9747
+theta-> -1013
+ phi-> -979
+ psi-> 9747
+theta-> -1013
+ phi-> -979
+ psi-> 9747
+theta-> -1013
+ phi-> -977
+ psi-> 9748
+theta-> -1013
+ phi-> -977
+ psi-> 9748
+theta-> -1013
+ phi-> -977
+ psi-> 9748
+theta-> -1013
+ phi-> -977
+ psi-> 9748
+theta-> -1013
+ phi-> -978
+ psi-> 9752
+theta-> -1013
+ phi-> -978
+ psi-> 9752
+theta-> -1013
+ phi-> -978
+ psi-> 9752
+theta-> -1013
+ phi-> -977
+ psi-> 9754
+theta-> -1013
+ phi-> -977
+ psi-> 9754
+theta-> -1013
+ phi-> -977
+ psi-> 9754
+theta-> -1011
+ phi-> -974
+ psi-> 9755
+theta-> -1011
+ phi-> -974
+ psi-> 9755
+theta-> -1011
+ phi-> -974
+ psi-> 9755
+theta-> -1010
+ phi-> -972
+ psi-> 9756
+theta-> -1010
+ phi-> -972
+ psi-> 9756
+theta-> -1010
+ phi-> -972
+ psi-> 9756
+theta-> -1010
+ phi-> -971
+ psi-> 9757
+theta-> -1010
+ phi-> -971
+ psi-> 9757
+theta-> -1010
+ phi-> -971
+ psi-> 9757
+theta-> -1012
+ phi-> -972
+ psi-> 9759
+theta-> -1012
+ phi-> -972
+ psi-> 9759
+theta-> -1011
+ phi-> -972
+ psi-> 9762
+theta-> -1011
+ phi-> -972
+ psi-> 9762
+theta-> -1011
+ phi-> -972
+ psi-> 9762
+theta-> -1011
+ phi-> -972
+ psi-> 9762
+theta-> -1011
+ phi-> -972
+ psi-> 9762
+theta-> -1010
+ phi-> -972
+ psi-> 9765
+theta-> -1010
+ phi-> -972
+ psi-> 9765
+theta-> -1010
+ phi-> -972
+ psi-> 9765
+theta-> -1010
+ phi-> -972
+ psi-> 9765
+theta-> -1010
+ phi-> -974
+ psi-> 9768
+theta-> -1010
+ phi-> -974
+ psi-> 9768
+theta-> -1010
+ phi-> -974
+ psi-> 9768
+theta-> -1012
+ phi-> -974
+ psi-> 9770
+theta-> -1012
+ phi-> -974
+ psi-> 9770
+theta-> -1012
+ phi-> -974
+ psi-> 9770
+theta-> -1013
+ phi-> -975
+ psi-> 9772
+theta-> -1013
+ phi-> -975
+ psi-> 9772
+theta-> -1013
+ phi-> -975
+ psi-> 9772
+theta-> -1013
+ phi-> -975
+ psi-> 9772
+theta-> -1013
+ phi-> -975
+ psi-> 9772
+theta-> -1013
+ phi-> -975
+ psi-> 9772
+theta-> -1011
+ phi-> -975
+ psi-> 9776
+theta-> -1011
+ phi-> -975
+ psi-> 9776
+theta-> -1010
+ phi-> -974
+ psi-> 9779
+theta-> -1010
+ phi-> -974
+ psi-> 9779
+theta-> -1010
+ phi-> -974
+ psi-> 9779
+theta-> -1010
+ phi-> -976
+ psi-> 9781
+theta-> -1010
+ phi-> -976
+ psi-> 9781
+theta-> -1010
+ phi-> -977
+ psi-> 9784
+theta-> -1010
+ phi-> -977
+ psi-> 9784
+theta-> -1010
+ phi-> -977
+ psi-> 9784
+theta-> -1010
+ phi-> -977
+ psi-> 9784
+theta-> -1008
+ phi-> -980
+ psi-> 9787
+theta-> -1008
+ phi-> -980
+ psi-> 9787
+theta-> -1008
+ phi-> -980
+ psi-> 9787
+theta-> -1008
+ phi-> -980
+ psi-> 9787
+theta-> -1006
+ phi-> -983
+ psi-> 9788
+theta-> -1006
+ phi-> -983
+ psi-> 9788
+theta-> -1006
+ phi-> -983
+ psi-> 9788
+theta-> -1006
+ phi-> -983
+ psi-> 9788
+theta-> -1008
+ phi-> -982
+ psi-> 9792
+theta-> -1008
+ phi-> -982
+ psi-> 9792
+theta-> -1008
+ phi-> -982
+ psi-> 9792
+theta-> -1009
+ phi-> -983
+ psi-> 9794
+theta-> -1009
+ phi-> -983
+ psi-> 9794
+theta-> -1009
+ phi-> -983
+ psi-> 9794
+theta-> -1009
+ phi-> -983
+ psi-> 9794
+theta-> -1008
+ phi-> -984
+ psi-> 9795
+theta-> -1008
+ phi-> -984
+ psi-> 9795
+theta-> -1008
+ phi-> -984
+ psi-> 9795
+theta-> -1008
+ phi-> -984
+ psi-> 9795
+theta-> -1008
+ phi-> -984
+ psi-> 9797
+theta-> -1008
+ phi-> -984
+ psi-> 9797
+theta-> -1007
+ phi-> -984
+ psi-> 9796
+theta-> -1007
+ phi-> -984
+ psi-> 9796
+theta-> -1007
+ phi-> -984
+ psi-> 9796
+theta-> -1008
+ phi-> -984
+ psi-> 9800
+theta-> -1008
+ phi-> -984
+ psi-> 9800
+theta-> -1008
+ phi-> -984
+ psi-> 9800
+theta-> -1008
+ phi-> -984
+ psi-> 9800
+theta-> -1008
+ phi-> -987
+ psi-> 9802
+theta-> -1008
+ phi-> -987
+ psi-> 9802
+theta-> -1007
+ phi-> -985
+ psi-> 9803
+theta-> -1007
+ phi-> -985
+ psi-> 9803
+theta-> -1007
+ phi-> -985
+ psi-> 9803
+theta-> -1007
+ phi-> -986
+ psi-> 9805
+theta-> -1007
+ phi-> -986
+ psi-> 9805
+theta-> -1007
+ phi-> -986
+ psi-> 9805
+theta-> -1008
+ phi-> -987
+ psi-> 9808
+theta-> -1008
+ phi-> -987
+ psi-> 9808
+theta-> -1008
+ phi-> -988
+ psi-> 9811
+theta-> -1008
+ phi-> -988
+ psi-> 9811
+theta-> -1009
+ phi-> -988
+ psi-> 9814
+theta-> -1009
+ phi-> -988
+ psi-> 9814
+theta-> -1009
+ phi-> -988
+ psi-> 9814
+theta-> -1007
+ phi-> -986
+ psi-> 9816
+theta-> -1007
+ phi-> -986
+ psi-> 9816
+theta-> -1007
+ phi-> -986
+ psi-> 9816
+theta-> -1007
+ phi-> -986
+ psi-> 9816
+theta-> -1005
+ phi-> -985
+ psi-> 9818
+theta-> -1005
+ phi-> -985
+ psi-> 9818
+theta-> -1005
+ phi-> -985
+ psi-> 9818
+theta-> -1005
+ phi-> -985
+ psi-> 9818
+theta-> -1004
+ phi-> -984
+ psi-> 9821
+theta-> -1004
+ phi-> -984
+ psi-> 9821
+theta-> -1004
+ phi-> -984
+ psi-> 9821
+theta-> -1004
+ phi-> -984
+ psi-> 9821
+theta-> -1003
+ phi-> -984
+ psi-> 9824
+theta-> -1003
+ phi-> -984
+ psi-> 9824
+theta-> -1003
+ phi-> -984
+ psi-> 9824
+theta-> -1002
+ phi-> -984
+ psi-> 9825
+theta-> -1002
+ phi-> -984
+ psi-> 9825
+theta-> -1002
+ phi-> -984
+ psi-> 9825
+theta-> -1002
+ phi-> -984
+ psi-> 9825
+theta-> -1000
+ phi-> -981
+ psi-> 9829
+theta-> -1000
+ phi-> -981
+ psi-> 9829
+theta-> -1000
+ phi-> -981
+ psi-> 9829
+theta-> -1000
+ phi-> -981
+ psi-> 9829
+theta-> -996
+ phi-> -983
+ psi-> 9833
+theta-> -996
+ phi-> -983
+ psi-> 9833
+theta-> -996
+ phi-> -983
+ psi-> 9833
+theta-> -996
+ phi-> -983
+ psi-> 9833
+theta-> -998
+ phi-> -982
+ psi-> 9835
+theta-> -998
+ phi-> -982
+ psi-> 9835
+theta-> -998
+ phi-> -982
+ psi-> 9835
+theta-> -1001
+ phi-> -982
+ psi-> 9838
+theta-> -1001
+ phi-> -982
+ psi-> 9838
+theta-> -1001
+ phi-> -982
+ psi-> 9838
+theta-> -1001
+ phi-> -982
+ psi-> 9838
+theta-> -1000
+ phi-> -984
+ psi-> 9841
+shutting down application...
+application was cleanly exited

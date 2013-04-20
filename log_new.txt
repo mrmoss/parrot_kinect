@@ -1,0 +1,1 @@
+0 battery 40 theta 721 phi 616 psi -24854 vx 0 vy -0 vz 0

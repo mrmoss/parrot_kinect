@@ -29,6 +29,7 @@
 #include <vector>
 
 #include <thread>
+#include <algorithm>
 
 #include "raw_to_jpeg.h"
 
@@ -137,8 +138,10 @@ void server_update()
 				//End Byte (Not really...but it works for what we're doing...)
 				if(byte=='\n')
 				{
-					service_client(clients[ii],client_messages[ii]);
-					client_messages[ii].clear();
+				service_client( clients[ii], client_messages[ii]);
+
+				client_messages[ii].clear();
+
 				}
 
 				//Other Bytes
@@ -152,7 +155,7 @@ void server_update()
 		//Disconnect Bad Clients
 		else
 		{
-			clients[ii].close();
+			//clients[ii].close();
 			clients.erase(clients.begin()+ii);
 			client_messages.erase(client_messages.begin()+ii);
 			--ii;
@@ -340,12 +343,31 @@ void service_client(msl::socket& client,const std::string& message)
 			if(request.size()>0)
 				request.erase(request.end()-1);
 
-		if(msl::starts_with(request,"BYTES?"))
+		int pos=request.find('?');
+
+		if(pos!=-1)
+			request=request.substr(0,pos);
+
+		std::cout << request << std::endl;
+
+		if(msl::starts_with(request,"uav/0/video"))
 		{
+			std::cout << "I sending message" << std::endl;
 			std::string response="BYTES?";
 
-			for(unsigned int ii=0;ii<640*360*3;++ii)
-				response+=static_cast<char>(a.video_data()[ii]);
+			for( unsigned int jj = 0; jj < 360; jj+=2)
+				{
+					for(unsigned int ii=0;ii < 640*3; ii+=6)
+					{
+						response+=static_cast<char>(a.video_data()[ jj*640*3 + ii + 0 ]);
+						response+=static_cast<char>(a.video_data()[ jj*640*3 + ii + 1 ]);
+						response+=static_cast<char>(a.video_data()[ jj*640*3 + ii + 2 ]);
+					}
+				}
+			//for(unsigned int ii=0; ii < 640; ii+=2)
+				//for(unsigned int jj = 0; jj < 360; jj +=2)
+					//for( unsigned int kk = 0; kk < 3; ++kk)
+						//response+=static_cast<char>(a.video_data()[ (ii + jj * 640)*3 + kk] );
 
 			response+='?';
 
@@ -353,17 +375,13 @@ void service_client(msl::socket& client,const std::string& message)
 		}
 		else
 		{
-			int pos=request.find('?');
-
-			if(pos!=-1)
-				request=request.substr(0,pos);
 
 			//Web Root Variable (Where your web files are)
 			std::string web_root="web";
 
 			//Check for Index
 			if(request=="")
-				request="index.html";
+				request="index2.html";
 
 			//Mime Type Variable (Default plain text)
 			std::string mime_type="text/plain";
@@ -453,6 +471,7 @@ void service_client(msl::socket& client,const std::string& message)
 			else
 				client.close();
 		}
+
 	}
 
 	//Other Requests (Just kill connection...it's either hackers or idiots...)
@@ -460,4 +479,5 @@ void service_client(msl::socket& client,const std::string& message)
 	{
 		client.close();
 	}
+
 }

@@ -33,11 +33,11 @@ struct parrot_video_encapsulation_t
 	uint8_t reserved3[12];					/* Padding to align on 64 bytes */
 };
 
-ardrone::ardrone(const std::string ip):_count(1),_control_socket(ip+":5556"),_navdata_socket(ip+":5554"),_video_socket(ip+":5555"),
+ardrone::ardrone(const std::string ip):_count(1),/*_control_socket(ip+":5556"),_navdata_socket(ip+":5554"),*/_video_socket(ip+":5555"),
 	_battery_percent(0),_landed(true),_emergency_mode(false),_low_battery(false),_ultrasonic_enabled(false),_video_enabled(false),
 	_motors_good(false),_pitch(0),_roll(0),_yaw(0),_altitude(0),_found_codec(true)
 {
-	av_log_set_level(AV_LOG_QUIET);
+	//av_log_set_level(AV_LOG_QUIET);
 
 	_camera_data=new uint8_t[640*368*3];
 
@@ -74,7 +74,7 @@ ardrone::~ardrone()
 
 ardrone::operator bool() const
 {
-	return (_control_socket&&_navdata_socket&&_video_socket&&_found_codec);
+	return _video_socket&&_found_codec;
 }
 
 bool ardrone::connect(unsigned int time_out)
@@ -83,12 +83,26 @@ bool ardrone::connect(unsigned int time_out)
 
 	if(!*this)
 	{
-		_control_socket.connect_udp();
-		_navdata_socket.connect_udp();
+		//_control_socket.connect_udp();
+		//_navdata_socket.connect_udp();
 		_video_socket.connect_tcp();
+
+		unsigned int time_start=time(0);
+		char redirect_navdata_command[14]={1,0,0,0,0,0,0,0,0,0,0,0,0,0};
+		char video_wakeup_command[1]={1};
+
+		do
+		{
+			_navdata_socket.write(redirect_navdata_command,14);
+			_video_socket.write(video_wakeup_command,1);
+		}
+		while(time(0)-time_start<time_out&&_video_socket.check()<=0);
+
+		if(_video_socket.check()>0)
+			connected=true;
 	}
 
-	if(*this)
+	/*if(*this)
 	{
 		_count=1;
 
@@ -127,21 +141,7 @@ bool ardrone::connect(unsigned int time_out)
 		std::string altitude_max_command="AT*CONFIG="+msl::to_string(_count)+",\"control:altitude_max\",\"4000\"\r";
 		++_count;
 		_control_socket<<altitude_max_command;
-
-		unsigned int time_start=time(0);
-		char redirect_navdata_command[14]={1,0,0,0,0,0,0,0,0,0,0,0,0,0};
-		char video_wakeup_command[1]={1};
-
-		do
-		{
-			_navdata_socket.write(redirect_navdata_command,14);
-			_video_socket.write(video_wakeup_command,1);
-		}
-		while(time(0)-time_start<time_out&&(_navdata_socket.check()<=0||_video_socket.check()<=0));
-
-		if(_navdata_socket.check()>0&&_video_socket.check()>0)
-			connected=true;
-	}
+	}*/
 
 	return (connected&&*this);
 }
@@ -205,7 +205,7 @@ void ardrone::video_update()
 		if(avcodec_decode_video2(_av_context,_av_camera_cmyk,&frame_decoded,&_av_packet)>0&&frame_decoded>0)
 		{
 			SwsContext* _sws_context=sws_getContext(video_packet.encoded_stream_width,video_packet.encoded_stream_height,PIX_FMT_YUV420P,video_packet.encoded_stream_width,
-				video_packet.encoded_stream_height,PIX_FMT_RGB24,SWS_BICUBIC,NULL,NULL,NULL);
+				video_packet.encoded_stream_height,PIX_FMT_BGR24,SWS_BICUBIC,NULL,NULL,NULL);
 			avpicture_fill(reinterpret_cast<AVPicture*>(_av_camera_rgb),_camera_data,PIX_FMT_BGR24,video_packet.encoded_stream_width,video_packet.encoded_stream_height);
 			sws_scale(_sws_context,_av_camera_cmyk->data,_av_camera_cmyk->linesize,0,video_packet.display_height,_av_camera_rgb->data,_av_camera_rgb->linesize);
 			sws_freeContext(_sws_context);

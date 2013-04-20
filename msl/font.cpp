@@ -97,13 +97,13 @@ void msl::font::draw(const double x,const double y,const std::string& text,const
 			//Handle Unsupported Characters (Draw Spaces)
 			if(sub_strings[ii][jj]<32||sub_strings[ii][jj]>126)
 			{
-				_sprite.draw(x+x_offset+_sprite.width()*jj,y+y_offset-_sprite.height()*ii,0,0,1,1,color,false);
+				_sprite.draw(x+x_offset+_sprite.width()*jj,y+y_offset-_sprite.height()*ii,0,0,1,1,color,true);
 			}
 
 			//Handle Supported Characters
 			else
 			{
-				_sprite.draw(x+x_offset+_sprite.width()*jj,y+y_offset-_sprite.height()*ii,0,sub_strings[ii][jj]-32,1,1,color,false);
+				_sprite.draw(x+x_offset+_sprite.width()*jj,y+y_offset-_sprite.height()*ii,0,sub_strings[ii][jj]-32,1,1,color,true);
 			}
 		}
 	}

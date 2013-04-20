@@ -15,7 +15,7 @@ LIBS=	-pthread \
 	-lSOIL \
 	-lglui
 
-OPTS=-O2
+OPTS=-O2 -std=c++0x
 CFLAGS= -Wall -Wno-strict-aliasing $(OPTS)
 COMPILE=g++
 
@@ -23,8 +23,8 @@ all: drone kinect
 
 
 
-drone: $(SRC) drone.cpp helisimple/*.cpp msl/*.cpp
-	$(COMPILE) $(CFLAGS) $(SRC) drone.cpp helisimple/*.cpp msl/*.cpp $(LIBS) -o $@
+drone: $(SRC) drone.cpp helisimple/*.cpp msl/*.cpp falconer.cpp
+	$(COMPILE) $(CFLAGS) $(SRC) drone.cpp helisimple/*.cpp falconer.cpp msl/*.cpp $(LIBS) -o $@
 
 kinect:  $(SRC) kinect.cpp
 	$(COMPILE) $(CFLAGS) $(SRC) kinect.cpp $(LIBS) -o $@

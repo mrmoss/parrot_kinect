@@ -9,7 +9,7 @@
 #include <sstream>
 
 //HTTP Create Header Function
-std::string msl::http_create_header(const unsigned int message_size,const std::string mime_type)
+std::string msl::http_create_header(const unsigned int message_size,const std::string & mime_type)
 {
 	//Create HTML Header
 	std::ostringstream header;
@@ -81,7 +81,7 @@ std::string msl::http_to_ascii(std::string symbols)
 }
 
 //HTTP Pack String Function (Packages a string for http travel)
-std::string msl::http_pack_string(const std::string message,const std::string mime_type)
+std::string msl::http_pack_string(const std::string & message,const std::string & mime_type)
 {
 	return msl::http_create_header(message.size(),mime_type)+message;
 }

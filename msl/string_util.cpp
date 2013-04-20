@@ -90,7 +90,7 @@ bool msl::ends_with(const std::string& str,const std::string& end)
 	if(end.size()<=str.size())
 	{
 		//Check Each Character
-		for(unsigned int ii=0;ii<end.size();++ii)
+		for(unsigned int ii=1;ii<end.size();++ii)
 			if(str[str.size()-ii]!=end[end.size()-ii])
 				return false;
 

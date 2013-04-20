@@ -11,26 +11,26 @@ CImageClient::CImageClient(sem_t *im)
 
 void CImageClient::run(CRawImage *im)
 {
-	image  = im;
+	/*(image  = im;
 	codec = new CDecoder(imageSem,im);
-	thread = SDL_CreateThread(StartThread,static_cast<void*>(this));
+	thread = SDL_CreateThread(StartThread,static_cast<void*>(this));*/
 }
 
 CImageClient::~CImageClient()
 {
-	stop = true;
+	/*stop = true;
 	int wait = 10;
 	while (stopped == false && wait > 0){
 	       	usleep(100000);
 		wait--;
 	}
 	close(socketNumber);
-	delete codec;
+	delete codec;*/
 }
 
 int CImageClient::connectServer(const char * ip,const char* port)
 {
-  int result = -1;
+  /*int result = -1;
   socketNumber = socket(AF_INET, SOCK_STREAM, 0);
   if (socketNumber <0 )
   {
@@ -56,17 +56,18 @@ int CImageClient::connectServer(const char * ip,const char* port)
       fprintf(stderr,"Connect error is %s \n",strerror(errno));
     }
   }
-  return result;
+  return result;*/
+  return -1;
 }
 
 int CImageClient::DoExecute()
 {
-	unsigned char buf[100000];
+	/*unsigned char buf[100000];
 	parrot_video_encapsulation_t pave;
 	int lengthReceived;
-	int i=0;
+	int i=0;*/
 	int numRuns = 0;
-	while (stop == false){
+	/*while (stop == false){
 		bool pavedetected = false;
 		lengthReceived = recv(socketNumber,&buf,64,NETWORK_BLOCK);
 		if (memcmp(buf,"PaVE",4)!=0){
@@ -87,7 +88,7 @@ int CImageClient::DoExecute()
 		codec->decode(buf,lengthReceived,pave.frame_type);
 		numRuns++;
 	}
-	stopped = true;
+	stopped = true;*/
 	return numRuns;
 }
 
