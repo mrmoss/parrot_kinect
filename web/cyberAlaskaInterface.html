@@ -8,12 +8,7 @@
     td {margin: 0px; padding: 0px;}
     tr {margin: 0px; padding: 0px;}
     body {margin: 0px; padding: 0px;}
-    #if_container {
-      border-style: outset;
-      border-color: black;
-      border-width: 1px;
-    }
-    #video_container {
+    #if_container, #video_container {
       border-style: outset;
       border-color: black;
       border-width: 1px;
@@ -70,14 +65,17 @@ var arrow, arrowTex, currentFrame, totalFrames;
 var clock, elapsedTime = 0;
 
 var request = new XMLHttpRequest();
+var timer = new Date();
+var sentTime;
+var frameNumber = 0;
 var message_count = 0;
-
-var paused = false;
 
 var video;
 var data_array;
 var videoWidth  = 640 /2;
 var videoHeight = 360 /2;
+
+var paused = false;
 
 var IF_ASPECT_RATIO  = 1.0;
 var IF_HEIGHT = $(window).height() * 0.7;
@@ -176,15 +174,6 @@ function init()
   mainLoop();
 }
 
-function drawFrame(){
-  try {
-    video_context.drawImage(video, 0, 0);
-  } catch(err) {
-    console.log(err);
-    console.trace();
-  }
-}
-
 function mainLoop()
 {
   if(!paused)
@@ -269,7 +258,9 @@ function getStatus()
 
 function getVideoFrame()
 {
+  sentTime = timer.getTime();
   sendMessage("/uav/0/video?number="+message_count, videoResponse, true);
+  frameNumber += 1;
   if(!paused)
   {
     setTimeout(getVideoFrame, 100);
@@ -308,6 +299,10 @@ function statusResponse(data)
 
 function videoResponse(data, status, xmlHttp)
 {
+  var responseTime = timer.getTime() - sentTime;
+  videoResponse.average *= (frameNumber-1) / frameNumber;
+  videoResponse.average += responseTime / frameNumber;
+  showMessage("normalMsg", "response: "+responseTime+"mils");
   showMessage("normalMsg", status);
   if(xmlHttp.readyState==4 && xmlHttp.status==200)
   {
