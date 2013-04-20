@@ -66,7 +66,6 @@ var clock, elapsedTime = 0;
 
 var request = new XMLHttpRequest();
 var sentTime;
-var frameNumber = 0;
 var message_count = 0;
 
 var video;
@@ -257,9 +256,8 @@ function getStatus()
 
 function getVideoFrame()
 {
-  sentTime = new Date.getTime();
+  sentTime = new Date().getTime();
   sendMessage("/uav/0/video?number="+message_count, videoResponse, true);
-  frameNumber += 1;
   if(!paused)
   {
     setTimeout(getVideoFrame, 100);
@@ -298,12 +296,16 @@ function statusResponse(data)
 
 function videoResponse(data, status, xmlHttp)
 {
-  var responseTime = new Date.getTime() - sentTime;
+  if(videoResponse.frameNumber == undefined){
+    videoResponse.frameNumber = 0;
+    videoResponse.average = 0;
+  }
+  
+  videoResponse.frameNumber += 1;
+  var responseTime = new Date().getTime() - sentTime;
   videoResponse.average *= (frameNumber-1) / frameNumber;
   videoResponse.average += responseTime / frameNumber;
-  showMessage("normalMsg", "time: "+timer.getTime());
-  showMessage("normalMsg", "response: "+responseTime+"mils");
-  showMessage("normalMsg", status);
+  showMessage("normalMsg", "average: "+videoResponse.average+"mils");
   if(xmlHttp.readyState==4 && xmlHttp.status==200)
   {
     //Extract Command
