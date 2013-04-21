@@ -4,10 +4,7 @@
   <title>CyberAlaska UAV Interface</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <style type="text/css"><!--
-    table {margin: 0px; padding: 0px;}
-    td {margin: 0px; padding: 0px;}
-    tr {margin: 0px; padding: 0px;}
-    body {margin: 0px; padding: 0px;}
+    table, td, tr, body {margin: 0px; padding: 0px;}
     #if_container, #video_container {
       border-style: outset;
       border-color: black;
@@ -21,6 +18,11 @@
     } -->
 
   </style>
+
+<script src="js/three.js"></script>
+<script src="js/Detector.js"></script>
+<script src="js/jquery-1.9.1.min.js"></script>
+
 </head>
 
 <body onload="init()">
@@ -50,10 +52,6 @@
 
 </body>
 
-
-<script src="js/three.js"></script>
-<script src="js/Detector.js"></script>
-<script src="js/jquery-1.9.1.min.js"></script>
 
 <script type = text/javascript>
 
@@ -315,8 +313,9 @@ function videoResponse(data, status, xmlHttp)
   averageResponse += responseTime / videoResponse.frameNumber;
 
   // Add a little to ensure it is not too fast
-  averageResponse = Math.floor(averageResponse * 1.2);
-
+//  averageResponse = Math.floor(averageResponse * 1.2);
+  showMessage("normalMsg", "Average: "+averageResponse);
+  
   if(xmlHttp.readyState==4 && xmlHttp.status==200)
   {
     //Extract Command
@@ -329,7 +328,6 @@ function videoResponse(data, status, xmlHttp)
 	}
 
 	--response.length;
-
 
     for(var ii=0;ii<response.length;++ii)
       data_array[ii]=response.charCodeAt(ii);
