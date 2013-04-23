@@ -6,7 +6,7 @@
 class Kinect
 {
 public:
-	Kinect(double x_field_size = 3, double y_field_size = 1, double z_field_size = 3, double distance_from_kinect = 1.5, bool openGL_on = false);
+	Kinect(double x_field_size = 3, double y_field_size = 1, double z_field_size = 2, double distance_from_kinect = 1.5, bool openGL_on = false);
 
 	int start_thread();
 

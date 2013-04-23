@@ -24,6 +24,23 @@ std::string msl::http_create_header(const unsigned int message_size,const std::s
 	return header.str();
 }
 
+//HTTP Create Header Function
+std::string msl::http_create_header_compressed(const unsigned int message_size,const std::string mime_type)
+{
+	//Create HTML Header
+	std::ostringstream header;
+	header<<"HTTP/1.1 200 OK\n";
+	header<<"Server: Super Lightning Automatic Systematic Wisdomatic Server 3000 v6.54.33.2.1a-177b-c Stable Beta\n";
+	header<<"Last-Modified: From the future\n";
+	header<<"Content-Length: "<<message_size<<'\n';
+	header<<"Content-Type: "<<mime_type<<"; charset=UTF-8\n";
+	header<< "Content-Encoding: gzip \n";
+	header<<"Connection: close\n\n";
+
+	//Return HTML Header
+	return header.str();
+}
+
 //HTTP to ASCII Function (Converts a string with http symbols to ascii symbols)
 std::string msl::http_to_ascii(std::string symbols)
 {
@@ -84,4 +101,10 @@ std::string msl::http_to_ascii(std::string symbols)
 std::string msl::http_pack_string(const std::string message,const std::string mime_type)
 {
 	return msl::http_create_header(message.size(),mime_type)+message;
+}
+
+//HTTP Pack String Function (Packages a string for http travel)
+std::string msl::http_pack_compressed_string(const std::string message,const std::string mime_type)
+{
+	return msl::http_create_header_compressed(message.size(),mime_type)+message;
 }

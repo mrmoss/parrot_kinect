@@ -30,10 +30,10 @@
 <table>
 <tr>
   <td>
-    <div id="if_container" onclick="getCoords(event)"></div>
+    <div id="if_container" onclick="getCoords(event)" width="640" height="360"></div>
   </td>
   <td>
-    <div id="video_container"></div>
+    <canvas id="canvas" width="640" height="360"> </canvas>
   </td>
 </tr>
 <tr>
@@ -67,24 +67,34 @@ var sentTime;
 var averageResponse = 100;	// This will be overwritten when we start recieving data.
 var message_count = 0;
 
-var video;
-var data_array;
-var videoWidth  = 640 /2;
-var videoHeight = 360 /2;
-
 var paused = false;
 
 var IF_ASPECT_RATIO  = 1.0;
 var IF_HEIGHT = $(window).height() * 0.7;
 var IF_WIDTH = IF_HEIGHT * IF_ASPECT_RATIO;
 
-var VIDEO_ASPECT_RATIO  = videoWidth / videoHeight;
-var VIDEO_HEIGHT = $(window).height() * 0.7;
-var VIDEO_WIDTH = VIDEO_HEIGHT * VIDEO_ASPECT_RATIO;
+var ctx;
+var img = new Image();
 
+function get_image()
+{
+	img.src = 'photo.jpeg?' + new Date().getTime();
+	img.onError = function () {img.height = 1 }
+
+	if(img.height==368)
+	{
+		ctx.drawImage(img, 0, 0);
+	}
+}
 
 function init()
 {
+
+	var canvas = document.getElementById('canvas');
+	ctx = canvas.getContext("2d");
+
+	setInterval(get_image,100);
+
   // Chech for webgl implementation
   if(!Detector.webgl)
   {
@@ -104,15 +114,9 @@ function init()
   camera1.position.set(0,0,10.4);
   camera1.lookAt(scene1.position);
 
-  // Setup video camera
-  camera2 = new THREE.PerspectiveCamera(VIEW_ANGLE, VIDEO_ASPECT_RATIO, NEAR_CLIP, FAR_CLIP);
-  scene2.add(camera2);
-  camera2.position.set(0,0,10.4);
-  camera2.lookAt(scene2.position);
-
   // Setup Renderer
   if_renderer    = new THREE.WebGLRenderer( {antialias:true} );
-  video_renderer = new THREE.WebGLRenderer( {antialias:true} );
+  //video_renderer = new THREE.WebGLRenderer( {antialias:true} );
 
   // setup layout based on browser window size
   resizeFunc();
@@ -121,8 +125,6 @@ function init()
   // create a div elements to contain the renderers
   container = document.getElementById( "if_container" );
   container.appendChild( if_renderer.domElement );
-  v_container = document.getElementById("video_container");
-  v_container.appendChild( video_renderer.domElement );
 
   // create the map of the challenge arena
   var mapWidth = mapHeight = 12; // In feet
@@ -133,25 +135,6 @@ function init()
     { map: THREE.ImageUtils.loadTexture("images/SampleMap.jpg") } );
   var arenaMap = new THREE.Mesh(mapGeometry, mapMaterial);
   scene1.add(arenaMap);
-
-  // create the viewing plane for the video feed
-  data_array=new Uint8Array(videoWidth*videoHeight*3);
-
-  for(var ii=0;ii<videoWidth*videoHeight;++ii)
-  {
-    data_array[ii*3+0]=255;
-    data_array[ii*3+1]=0;
-    data_array[ii*3+2]=0;
-  }
-
-  mapWidth  = mapHeight * VIDEO_ASPECT_RATIO;
-  var videoGeometry = new THREE.PlaneGeometry(mapWidth, mapHeight, wIncrement, hIncrement);
-  var map = new THREE.DataTexture(data_array, videoWidth, videoHeight, THREE.RGBFormat );
-  map.needsUpdate = true;
-  var videoMaterial = new THREE.MeshBasicMaterial(
-    { map: map } );
-  video = new THREE.Mesh(videoGeometry, videoMaterial);
-  scene2.add(video);
 
   // create object to display arrow animation
   var arrowWidth = arrowHeight = 1;
@@ -166,8 +149,6 @@ function init()
   scene1.add(arrow);
   currentFrame = totalFrames-1;
 
-//  setInterval(getStatus, 1000);
-  getVideoFrame();
   mainLoop();
 }
 
@@ -177,7 +158,6 @@ function mainLoop()
   {
     updateAnimations();
     if_renderer.render(scene1, camera1);
-    video_renderer.render(scene2, camera2);
     requestAnimationFrame(mainLoop);
   }
 }
@@ -205,15 +185,11 @@ function resizeFunc()
   var height = $(window).height();
   IF_HEIGHT = VIDEO_HEIGHT = height * 0.7;
   IF_WIDTH  = IF_HEIGHT * IF_ASPECT_RATIO;
-  VIDEO_WIDTH  = VIDEO_HEIGHT * VIDEO_ASPECT_RATIO;
   $("#if_container").width(IF_WIDTH);
   $("#if_container").height(IF_HEIGHT);
-  $("#video_container").width(VIDEO_WIDTH);
-  $("#video_container").height(VIDEO_HEIGHT);
   $("[type=button]").height(height * 0.05);
   $("#messages").height(height * 0.2);
   if_renderer.setSize(IF_WIDTH, IF_HEIGHT);
-  video_renderer.setSize(VIDEO_WIDTH, VIDEO_HEIGHT);
 }
 
 function getCoords(event)
@@ -240,9 +216,9 @@ function getCoords(event)
 
   // Convert coordinates to meters and send to drone
   var METERS_PER_FOOT = 0.3048;
-  x = x * METERS_PER_FOOT;
+  x = x /6; //METERS_PER_FOOT;
   y = 1.0;
-  z = z * METERS_PER_FOOT;
+  z = z /6; // METERS_PER_FOOT;
 
   sendMessage("/uav/0/goto?x="+x+"&y="+y+"&z="+z+"&number="+message_count, gotoResponse, false );
   showMessage("normalMsg","X: "+ x.toFixed(4) +" Y: "+ y.toFixed(4) +" Z: "+ z.toFixed(4));
@@ -251,16 +227,6 @@ function getCoords(event)
 function getStatus()
 {
   sendMessage("/uav/0/status?number="+message_count, statusResponse, false);
-}
-
-function getVideoFrame()
-{
-  sentTime = new Date().getTime();
-  sendMessage("/uav/0/video?number="+message_count, videoResponse, true);
-  if(!paused)
-  {
-    setTimeout(getVideoFrame, averageResponse);
-  }
 }
 
 function takeOff()
@@ -289,53 +255,10 @@ function sendMessage(url, callBackFunc, binaryData)
   message_count+=1;
 }
 
+var my_json = {};
 function statusResponse(data)
 {
-}
-
-function videoResponse(data, status, xmlHttp)
-{
-  if(videoResponse.frameNumber == undefined){
-    videoResponse.frameNumber = 0;
-  }
-
-  // Calculate average response time of all successful responses.
-  videoResponse.frameNumber += 1;
-  var responseTime = new Date().getTime() - sentTime;	// Of this request
-
-  // Cap it for extreme cases
-  if(responseTime > 1000)
-    responseTime = 1000;
-  if(responseTime < 50)
-    responseTime = 50;
-
-  averageResponse *= (videoResponse.frameNumber-1) / videoResponse.frameNumber;
-  averageResponse += responseTime / videoResponse.frameNumber;
-
-  // Add a little to ensure it is not too fast
-//  averageResponse = Math.floor(averageResponse * 1.2);
-  showMessage("normalMsg", "Average: "+averageResponse);
-  
-  if(xmlHttp.readyState==4 && xmlHttp.status==200)
-  {
-    //Extract Command
-    var response=xmlHttp.responseText.substr(6,xmlHttp.responseText.length-6);
-
-	//Remove End Whitespace
-	while(response.length > 0 && response[response.length-1]!="?")
-	{
-		response=response.substr(0,response.length-1);
-	}
-
-	--response.length;
-
-    for(var ii=0;ii<response.length;++ii)
-      data_array[ii]=response.charCodeAt(ii);
-
-    var map = new THREE.DataTexture(data_array, videoWidth, videoHeight, THREE.RGBFormat );
-    map.needsUpdate = true;
-    video.material.map=map;
-  }
+	my_json = JSON.parse(data);
 }
 
 function takeOffResponse(data)
@@ -367,7 +290,7 @@ function timeOut()
 
 function showMessage(msgType, message)
 {
-  if(msgType == "errorMsg")
+  /*if(msgType == "errorMsg")
   {
     if(errorCount.val == undefined)
     {
@@ -378,7 +301,8 @@ function showMessage(msgType, message)
   else
   {
     $("#messages").append("<div class='"+msgType+"'>"+message+"</div>");
-  }
+  }*/
+  document.getElementById("messages").innerHTML=message + my_json.x;
 }
 
 function togglePause()

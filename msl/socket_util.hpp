@@ -15,11 +15,17 @@ namespace msl
 	//HTTP Create Header Function (Creates a header for sending
 	std::string http_create_header(const unsigned int message_size,const std::string mime_type="text/html");
 
+		//HTTP Create Header Function (Creates a header for sending
+	std::string http_create_header_compressed(const unsigned int message_size,const std::string mime_type="text/html");
+
 	//HTTP to ASCII Function (Converts a string with http symbols to ascii symbols)
 	std::string http_to_ascii(std::string symbols);
 
 	//HTTP Pack String Function (Packages a string for http travel)
 	std::string http_pack_string(const std::string message,const std::string mime_type="text/html");
+
+	//HTTP Pack String Function (Packages a string for http travel)
+	std::string http_pack_compressed_string(const std::string message,const std::string mime_type="text/html");
 }
 
 //End Define Guards

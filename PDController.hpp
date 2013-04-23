@@ -8,16 +8,16 @@
 class PDController
 {
 public:
-	PDController(Kinect & kinect, ardrone & drone, vec3 desired = vec3(0,0,1), vec3 gain_p = vec3(1,1,1), vec3 gain_d = vec3(-50,10,-50));
+	PDController(vec3 desired = vec3(0,0,1), vec3 gain_p = vec3(.2,.2,.2), vec3 gain_d = vec3(-50,10,-50));
 
 	void set_desired_location(vec3 new_location);
 
-	void autonomous_flight(float altitude, float pitch, float roll, float yaw);
+	void autonomous_flight( ardrone & drone, Kinect & kinect);
 
 
 private:
-	Kinect _kinect;
-	ardrone _drone;
+	Kinect* _kinect;
+	ardrone* _drone;
 
 	vec3 _desired_location;
 

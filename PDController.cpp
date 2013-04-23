@@ -1,11 +1,9 @@
 #include "PDController.hpp"
+#include <iostream>
 
-	PDController::PDController(Kinect & kinect, ardrone & drone, vec3 desired, vec3 gain_p , vec3 gain_d ):
+	PDController::PDController(vec3 desired, vec3 gain_p , vec3 gain_d ):
 		_desired_location(desired), _gain_p(gain_p), _gain_d(gain_d)
 	{
-		_kinect = kinect;
-
-		_drone = drone;
 	}
 
 template <typename T>
@@ -23,16 +21,22 @@ void PDController::set_desired_location(vec3 new_location)
 	_desired_location = new_location;
 }
 
-void PDController::autonomous_flight(float altitude, float pitch, float roll, float yaw)
+void PDController::autonomous_flight(ardrone & drone, Kinect & kinect)
 {
-	if(_kinect.get_location().z!=-1)
+	double roll = 0;
+	double pitch = 0;
+	double yaw = 0;
+	double altitude = 0;
+
+	if(kinect.get_location().z!=-1)
 	{
-		double x_error_new = _kinect.get_location().x - _desired_location.x;
-		double y_error_new = _kinect.get_location().y - _desired_location.y;
-		double z_error_new = _kinect.get_location().z - _desired_location.z;
+		double x_error_new = kinect.get_location().x - _desired_location.x;
+		double y_error_new = kinect.get_location().y - _desired_location.y;
+		double z_error_new = kinect.get_location().z - _desired_location.z;
 
 		roll = ( _gain_p.x * x_error_new + _gain_d.x * ( _error_old.x - x_error_new) );
 		pitch = - ( _gain_p.z * z_error_new + _gain_d.z * ( _error_old.z - z_error_new ));
+		std::cout << "in here gain is: " << roll << " " << pitch << " "  << std::endl;
 
 		_error_old.x = x_error_new;
 		_error_old.y = y_error_new;
@@ -43,5 +47,5 @@ void PDController::autonomous_flight(float altitude, float pitch, float roll, fl
 		clamp(pitch,-max,max);
 	}
 
-	_drone.manuever(altitude,pitch,roll,yaw);
+	drone.manuever(altitude,pitch,roll,yaw);
 }

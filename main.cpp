@@ -36,7 +36,7 @@
 #include <sstream>
 
 //Kinect
-Kinect kinect;
+Kinect kinect(2.5);
 
 //Drone
 ardrone a;
@@ -60,7 +60,7 @@ uint8_t decoded_bytes[640*360*3];
 std::mutex photo_mutex;
 std::mutex drone_mutex;
 
-PDController pdcontroller(kinect, a, desired_location);
+PDController pdcontroller(desired_location);
 
 //Service Client Function Declaration
 void service_client(msl::socket& client,const std::string& message);
@@ -171,7 +171,7 @@ void loop(const double dt)
 
 	bool moved=false;
 
-	float speed=0.8;
+	float speed=-0.8;
 	float pitch=0;
 	float roll=0;
 	float altitude=0;
@@ -183,7 +183,7 @@ void loop(const double dt)
 	if(msl::input_check_pressed(kb_r))
 		a.emergency_mode_toggle();
 
-	if(msl::input_check_pressed(kb_enter))
+	if(msl::input_check_pressed(kb_o))
 	{
 		drone_autonomous = !drone_autonomous;
 	}
@@ -245,16 +245,16 @@ void loop(const double dt)
 	}
 
 	if(drone_autonomous)
-		pdcontroller.autonomous_flight(altitude,pitch,roll,yaw);
+		pdcontroller.autonomous_flight(a, kinect);
 	else if(moved)
 		a.manuever(altitude,pitch,roll,yaw);
-	else
-		a.hover();
+	//else
+		//a.hover();
 
 	a.video_update();
 
 	//photo_mutex.lock();
-	//raw_to_jpeg("web/photo.jpeg", a.video_data(), 640, 368, 3, JCS_RGB);
+	//raw_to_jpeg_array(a.video_data(), 640, 368, 3, JCS_RGB);
 	//photo_mutex.unlock();
 
 	glBindTexture(GL_TEXTURE_2D,textureId);
@@ -317,11 +317,22 @@ void draw()
 	data+="Server:\t"+msl::to_string((bool)server)+"\n";
 
 	double width=180;
-	double height=120;
+	double height=160;
 	if(drone_autonomous)
 		height += 40;
 	msl::draw_rectangle(-320+width/2.0, 180-height/2.0, width, height,msl::color(0,0,0,0.7));
 	msl::draw_text(-msl::window_width/2.0,msl::window_height/2.0,data);
+}
+
+std::string make_json()
+{
+	std::stringstream sstr;
+
+	sstr << "{ \n";
+	sstr << "\"x\":" << 2;
+	sstr << "\n }";
+
+	return sstr.str();
 }
 
 //Service Client Function Definition
@@ -346,7 +357,7 @@ void service_client(msl::socket& client,const std::string& message)
 		//std::cout << request << std::endl;
 
 		if(msl::starts_with(request,"uav/0/video"))
-		{
+		{/*
 			//std::cout << "hello " << std::endl;
 			std::string response="BYTES?";
 
@@ -362,7 +373,7 @@ void service_client(msl::socket& client,const std::string& message)
 
 			response+='?';
 
-			client<<msl::http_pack_string(response,"text/plain; charset=x-user-defined");
+			client<<msl::http_pack_string(response,"text/plain; charset=x-user-defined");*/
 		}
 		else
 		{
@@ -378,8 +389,10 @@ void service_client(msl::socket& client,const std::string& message)
 
 			//Check for Code Mime Type
 			if(msl::ends_with(request,".js"))
+			{
+				request += ".gz";
 				mime_type="application/x-javascript";
-
+			}
 			//Check for Images Mime Type
 			else if(msl::ends_with(request,".gif"))
 				mime_type="image/gif";
@@ -407,10 +420,25 @@ void service_client(msl::socket& client,const std::string& message)
 			//File Data Variable
 			std::string file;
 
+			std::stringstream jpeg;
+
 			//Load File
-			if(mime_type != "drone/command" && msl::file_to_string(web_root+"/"+request,file))
+			if(msl::starts_with(request,"photo.jpeg"))
 			{
-					client<<msl::http_pack_string(file,mime_type);
+				jpegDestBuffer jpeg_image = raw_to_jpeg_array(a.video_data(), 640, 368, 3, JCS_RGB);
+				jpeg.write((char *)&jpeg_image.output[0], jpeg_image.output.size());
+				client<<msl::http_pack_string(jpeg.str(),"image/jpeg");
+
+				//msl::file_to_string("out.jpg",file);
+				//client<<msl::http_pack_string(file,"image/jpeg");
+			}
+			else if(mime_type == "application/x-javascript" && msl::file_to_string(web_root+"/"+request,file))
+			{
+				client<<msl::http_pack_compressed_string(file,mime_type);
+			}
+			else if(mime_type != "drone/command" && msl::file_to_string(web_root+"/"+request,file))
+			{
+				client<<msl::http_pack_string(file,mime_type);
 			}
 			else if (mime_type == "drone/command")
 			{
@@ -428,15 +456,22 @@ void service_client(msl::socket& client,const std::string& message)
 
 					parse_sstr << request;
 
-					parse_sstr.ignore(request.size(), '=');
-					parse_sstr >> desired_location.x;
+					//temps for math
+					double x = 0;
+					double y = 0;
+					double z = 0;
 
 					parse_sstr.ignore(request.size(), '=');
-					parse_sstr >> desired_location.y;
+					parse_sstr >> x;
+					desired_location.x = x * kinect._x_field_size;
 
 					parse_sstr.ignore(request.size(), '=');
-					parse_sstr >> desired_location.z;
-					desired_location.z += kinect._z_field_size / 2;
+					parse_sstr >> y;
+					desired_location.y = y * kinect._y_field_size;
+
+					parse_sstr.ignore(request.size(), '=');
+					parse_sstr >> z;
+					desired_location.z = z * kinect._z_field_size + kinect._distance_from_kinect;
 
 					pdcontroller.set_desired_location(desired_location);
 
@@ -449,6 +484,10 @@ void service_client(msl::socket& client,const std::string& message)
 				else if(msl::starts_with(request,"uav/0/takeoff"))
 				{
 					a.takeoff();
+				}
+				else if(msl::starts_with(request,"uav/0/status"))
+				{
+					client<<msl::http_pack_string(make_json(), "application/json");
 				}
 			}
 

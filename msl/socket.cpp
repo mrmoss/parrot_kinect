@@ -560,7 +560,7 @@ int socket_write(const SOCKET socket,void* buffer,const unsigned int size,const 
 	unsigned int bytes_unsent=size;
 
 	//While Socket is Good and There are Bytes to Write
-	while(bytes_unsent>0&&socket!=static_cast<unsigned int>(SOCKET_ERROR))
+	while(bytes_unsent > 0 && socket!=static_cast<unsigned int>(SOCKET_ERROR))
 	{
 		//Send Bytes into Write Buffer
 		socket_ignore_sigpipe=true;
