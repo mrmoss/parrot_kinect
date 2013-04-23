@@ -390,8 +390,12 @@ void service_client(msl::socket& client,const std::string& message)
 			//Check for Code Mime Type
 			if(msl::ends_with(request,".js"))
 			{
-				request += ".gz";
-				mime_type="application/x-javascript";
+				mime_type="application/x-gzip";
+			}
+			//Check for Compressed Mime Type
+			else if(msl::ends_with(request,".gz"))
+			{
+				mime_type="application/x-gzip";
 			}
 			//Check for Images Mime Type
 			else if(msl::ends_with(request,".gif"))
@@ -434,7 +438,7 @@ void service_client(msl::socket& client,const std::string& message)
 			}
 			else if(mime_type == "application/x-javascript" && msl::file_to_string(web_root+"/"+request,file))
 			{
-				client<<msl::http_pack_compressed_string(file,mime_type);
+				client<<msl::http_pack_string(file,mime_type);
 			}
 			else if(mime_type != "drone/command" && msl::file_to_string(web_root+"/"+request,file))
 			{
