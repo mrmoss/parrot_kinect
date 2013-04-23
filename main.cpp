@@ -119,6 +119,7 @@ void server_update()
 	//If Client Connected
 	if(client)
 	{
+		client.set_timeout(2000);
 		clients.push_back(client);
 		client_messages.push_back("");
 	}
@@ -387,15 +388,19 @@ void service_client(msl::socket& client,const std::string& message)
 			//Mime Type Variable (Default plain text)
 			std::string mime_type="text/plain";
 
+			//Compressed Variable
+			bool compressed=false;
+
 			//Check for Code Mime Type
 			if(msl::ends_with(request,".js"))
 			{
-				mime_type="application/x-gzip";
+				mime_type="application/x-javascript";
 			}
 			//Check for Compressed Mime Type
 			else if(msl::ends_with(request,".gz"))
 			{
-				mime_type="application/x-gzip";
+				mime_type="application/x-javascript";
+				compressed=true;
 			}
 			//Check for Images Mime Type
 			else if(msl::ends_with(request,".gif"))
@@ -435,14 +440,6 @@ void service_client(msl::socket& client,const std::string& message)
 
 				//msl::file_to_string("out.jpg",file);
 				//client<<msl::http_pack_string(file,"image/jpeg");
-			}
-			else if(mime_type == "application/x-javascript" && msl::file_to_string(web_root+"/"+request,file))
-			{
-				client<<msl::http_pack_string(file,mime_type);
-			}
-			else if(mime_type != "drone/command" && msl::file_to_string(web_root+"/"+request,file))
-			{
-				client<<msl::http_pack_string(file,mime_type);
 			}
 			else if (mime_type == "drone/command")
 			{
@@ -493,6 +490,12 @@ void service_client(msl::socket& client,const std::string& message)
 				{
 					client<<msl::http_pack_string(make_json(), "application/json");
 				}
+			}
+
+			//File Request
+			else if(msl::file_to_string(web_root+"/"+request,file))
+			{
+				client<<msl::http_pack_string(file,mime_type,compressed);
 			}
 
 			//Bad File
