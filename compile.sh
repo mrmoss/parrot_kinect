@@ -1,0 +1,1 @@
+g++ main.cpp msl/*.cpp falconer.cpp raw_to_jpeg.cpp kinect/libfree/*.cpp kinect/Kinect.cpp PDController.cpp -o parrot_kinect -O -lGL -lGLU -lGLEW -lglui -lglut -lSOIL -lavcodec -lswscale -ljpeg -lfreenect -std=c++0x

@@ -1,0 +1,48 @@
+<!DOCTYPE  html>
+<html>
+	<head>
+		<script type="application/javascript">
+		var ctx;
+		var img = new Image();
+
+		function setup_canvas()
+		{
+			var canvas = document.getElementById('canvas');
+			ctx = canvas.getContext("2d");
+
+			setInterval(get_image,100);
+		}
+
+		function get_image()
+		{
+			img.src = 'photo.jpeg?' + new Date().getTime();
+			img.onError = function () {img.height = 1 }
+
+			if(img.height==368)
+			{
+				ctx.drawImage(img, 0, 0);
+			}
+		}
+		</script>
+	</head>
+	<body onload='setup_canvas()'>
+		<center>
+			<table>
+				<tr>
+					<td>
+						<center><h1>Parrot Drone</h1></center>
+						<canvas id="canvas" width="640" height="368"> </canvas>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<center>
+							<input type="button" value="Land"/>
+							<input type="button" value="Takeoff"/>
+						</center>
+					</td>
+				</tr>
+			</table>
+		</center>
+	</body>
+</html>
