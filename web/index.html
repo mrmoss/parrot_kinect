@@ -41,6 +41,7 @@
     <input type="button" id="take-off" value="Take off" onclick="takeOff()" />
     <input type="button" id="land" value="Land" onclick="land()" />
     <input type="button" id="pause" value="Pause" onclick="togglePause()" />
+    <input type="button" id="goto" value="Goto" onclick="toggleGoto()" />
   </td>
 </tr>
 <tr>
@@ -227,6 +228,11 @@ function getCoords(event)
 function getStatus()
 {
   sendMessage("/uav/0/status?number="+message_count, statusResponse, false);
+}
+
+function toggleGoto()
+{
+  sendMessage("/uav/0/control?number="+message_count, statusResponse, false);
 }
 
 function takeOff()

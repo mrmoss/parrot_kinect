@@ -24,7 +24,7 @@ std::string make_json();
 
 Kinect kinect;
 bool drone_autonomous = false;
-vec3 desired_location = vec3(0,0,2);
+vec3 desired_location = vec3(0,0,3);
 PDController pdcontroller(desired_location);
 PIDController pidcontroller(desired_location);
 
@@ -318,14 +318,21 @@ void service_client(msl::socket& client,const std::string& message)
 		else if(msl::starts_with(request,"/uav/0/land"))
 		{
 			a.land();
+			client<<msl::http_pack_string("Take off","text/plain");
 		}
 		else if(msl::starts_with(request,"/uav/0/takeoff"))
 		{
 			a.takeoff();
+			client<<msl::http_pack_string("land","text/plain");
 		}
 		else if(msl::starts_with(request,"/uav/0/status"))
 		{
 			client<<msl::http_pack_string(make_json(), "application/json");
+		}
+		else if(msl::starts_with(request,"/uav/0/control"))
+		{
+			drone_autonomous = !drone_autonomous;
+			client<<msl::http_pack_string("changing control","text/plain");
 		}
 		else
 		{
