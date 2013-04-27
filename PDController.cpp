@@ -36,7 +36,6 @@ void PDController::autonomous_flight(ardrone & drone, Kinect & kinect)
 
 		roll = ( _gain_p.x * x_error_new + _gain_d.x * ( _error_old.x - x_error_new) );
 		pitch = - ( _gain_p.z * z_error_new + _gain_d.z * ( _error_old.z - z_error_new ));
-		std::cout << "in here gain is: " << roll << " " << pitch << " "  << std::endl;
 
 		_error_old.x = x_error_new;
 		_error_old.y = y_error_new;
@@ -48,4 +47,5 @@ void PDController::autonomous_flight(ardrone & drone, Kinect & kinect)
 	}
 
 	drone.manuever(altitude,pitch,roll,yaw);
+	//std::cout << "PD :" << pitch << " " << roll << std::endl;
 }

@@ -11,6 +11,7 @@
 #include <thread>
 #include "kinect/Kinect.hpp"
 #include "PDController.hpp"
+#include "PIDController.hpp"
 #include "kinect/coordinate_system.hpp"
 
 ardrone a;
@@ -25,6 +26,7 @@ Kinect kinect;
 bool drone_autonomous = false;
 vec3 desired_location = vec3(0,0,2);
 PDController pdcontroller(desired_location);
+PIDController pidcontroller(desired_location);
 
 jpegDestBuffer last_image;
 
@@ -108,7 +110,10 @@ void loop(const double dt)
 		drone_autonomous = !drone_autonomous;
 
 	if(drone_autonomous)
+	{
 		pdcontroller.autonomous_flight(a, kinect);
+		//pidcontroller.autonomous_flight(a, kinect);
+	}
 	else
 		a.manuever(altitude,pitch,roll,yaw);
 
