@@ -20,7 +20,7 @@ void web_server_thread_function();
 void service_client(msl::socket& client,const std::string& message);
 std::string make_json();
 
-Kinect kinect(2.5);
+Kinect kinect(2.5,1,3);
 bool drone_autonomous = false;
 vec3 desired_location = vec3(0,0,2);
 PDController pdcontroller(desired_location);
