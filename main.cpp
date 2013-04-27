@@ -26,6 +26,8 @@ bool drone_autonomous = false;
 vec3 desired_location = vec3(0,0,2);
 PDController pdcontroller(desired_location);
 
+jpegDestBuffer last_image;
+
 int main()
 {
 	server.create_tcp();
@@ -188,6 +190,9 @@ void web_server_thread_function()
 
 	while(true)
 	{
+		//Update last_image that will be sent to clients
+		last_image = raw_to_jpeg_array(a.video_data(), 640, 368, 3, JCS_RGB);
+
 		//Check for a Connecting Client
 		msl::socket client=server.accept();
 
@@ -265,8 +270,7 @@ void service_client(msl::socket& client,const std::string& message)
 		if(msl::starts_with(request,"/photo.jpeg"))
 		{
 			std::stringstream jpeg;
-			jpegDestBuffer jpeg_image = raw_to_jpeg_array(a.video_data(), 640, 368, 3, JCS_RGB);
-			jpeg.write((char *)&jpeg_image.output[0], jpeg_image.output.size());
+			jpeg.write((char *)&last_image.output[0], last_image.output.size());
 			client<<msl::http_pack_string(jpeg.str(),"image/jpeg");
 		}
 		else if(msl::starts_with(request,"/uav/0/goto"))
