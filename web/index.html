@@ -78,13 +78,13 @@ var img = new Image();
 
 function get_image()
 {
-	img.src = 'photo.jpeg?' + new Date().getTime();
-	img.onError = function () {img.height = 1 }
-
-	if(img.height==368)
+	try
 	{
+		img.src = 'photo.jpeg?' + new Date().getTime();
 		ctx.drawImage(img, 0, 0);
 	}
+	catch(e)
+	{}
 }
 
 function init()
