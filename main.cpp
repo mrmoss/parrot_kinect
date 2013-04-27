@@ -11,6 +11,7 @@
 #include <thread>
 #include "kinect/Kinect.hpp"
 #include "PDController.hpp"
+#include "kinect/coordinate_system.hpp"
 
 ardrone a;
 unsigned int textureId;
@@ -20,7 +21,7 @@ void web_server_thread_function();
 void service_client(msl::socket& client,const std::string& message);
 std::string make_json();
 
-Kinect kinect(2.5,1,3);
+Kinect kinect;
 bool drone_autonomous = false;
 vec3 desired_location = vec3(0,0,2);
 PDController pdcontroller(desired_location);
@@ -57,7 +58,7 @@ void loop(const double dt)
 {
 	a.navdata_update();
 
-	float speed=0.8;
+	float speed=-0.8;
 	float pitch=0;
 	float roll=0;
 	float altitude=0;
@@ -82,16 +83,16 @@ void loop(const double dt)
 		roll=speed;
 
 	if(msl::input_check(kb_q))
-		yaw=-speed;
-
-	if(msl::input_check(kb_e))
 		yaw=speed;
 
+	if(msl::input_check(kb_e))
+		yaw=-speed;
+
 	if(msl::input_check(kb_up))
-		altitude=speed;
+		altitude=-speed;
 
 	if(msl::input_check(kb_down))
-		altitude=-speed;
+		altitude=speed;
 
 	if(msl::input_check_pressed(kb_space))
 	{
@@ -233,6 +234,17 @@ void web_server_thread_function()
 	}
 }
 
+template <typename T> void clamp(const T& min,const T& max,T& value)
+{
+	if(value<min)
+		value=min;
+
+	if(value>max)
+		value=max;
+
+	return value;
+}
+
 //Service Client Function Definition
 void service_client(msl::socket& client,const std::string& message)
 {
@@ -276,15 +288,19 @@ void service_client(msl::socket& client,const std::string& message)
 
 			parse_sstr.ignore(request.size(), '=');
 			parse_sstr >> x;
-			desired_location.x = x * kinect._x_field_size;
+			desired_location.x = x * kcs_x_field_size/2;
 
 			parse_sstr.ignore(request.size(), '=');
 			parse_sstr >> y;
-			desired_location.y = y * kinect._y_field_size;
+			desired_location.y = y * kcs_y_field_size/2;
 
 			parse_sstr.ignore(request.size(), '=');
 			parse_sstr >> z;
-			desired_location.z = z * kinect._z_field_size + kinect._distance_from_kinect;
+			desired_location.z = kcs_distance_to_origin+z*kcs_z_field_size/2;
+
+			clamp(-kcs_x_field_size/2,kcs_x_field_size/2,desired_location.x);
+			clamp(-kcs_y_field_size/2,kcs_y_field_size/2,desired_location.y);
+			clamp(kcs_distance_from_kinect,kcs_distance_from_kinect+kcs_z_field_size,desired_location.z);
 
 			pdcontroller.set_desired_location(desired_location);
 

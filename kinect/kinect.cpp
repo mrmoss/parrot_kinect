@@ -15,15 +15,14 @@
 //Vector Header
 #include <vector>
 
-double x_size = 2.5;
-double y_size = 1;
-double z_size = 3;
+#include "coordinate_system.hpp"
+
 int main(int argc,char* argv[])
 {
-    startKinectThread(argc, argv, x_size, y_size, z_size, z_size/2+1.5);
+	startKinectThread(argc, argv, kcs_x_field_size, kcs_y_field_size, kcs_z_field_size, kcs_distance_to_origin);
 
-    while (true)
-    {}
+	while (true)
+	{}
 
-    return 0;
+	return 0;
 }

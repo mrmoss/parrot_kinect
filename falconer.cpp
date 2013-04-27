@@ -34,7 +34,7 @@ struct parrot_video_encapsulation_t
 };
 
 ardrone::ardrone(const std::string ip):_count(1),_control_socket(ip+":5556"),_navdata_socket(ip+":5554"),_video_socket(ip+":5555"),
-	_battery_percent(0),_landed(true),_emergency_mode(false),_low_battery(false),_ultrasonic_enabled(false),_video_enabled(false),
+	_battery_percent(2000),_landed(true),_emergency_mode(false),_low_battery(false),_ultrasonic_enabled(false),_video_enabled(false),
 	_motors_good(false),_pitch(0),_roll(0),_yaw(0),_altitude(0),_found_codec(true)
 {
 	av_log_set_level(AV_LOG_QUIET);
@@ -132,8 +132,8 @@ bool ardrone::connect(unsigned int time_out)
 		_control_socket<<altitude_max_command;
 
 		unsigned int time_start=time(0);
-		char redirect_navdata_command[14]={1,0,0,0,0,0,0,0,0,0,0,0,0,0};
-		char video_wakeup_command[1]={1};
+		uint8_t redirect_navdata_command[14]={1,0,0,0,0,0,0,0,0,0,0,0,0,0};
+		uint8_t video_wakeup_command[1]={1};
 
 		do
 		{

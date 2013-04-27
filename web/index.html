@@ -194,8 +194,8 @@ function resizeFunc()
 
 function getCoords(event)
 {
-  mouseX = event.clientX;
-  mouseY = event.clientY;
+  mouseX = event.pageX-document.getElementById("if_container").offsetLeft;
+  mouseY = event.pageY-document.getElementById("if_container").offsetTop;
 
   // Convert mouseX and mouseY to the range -.5*range,+.5*range
   var x= mouseX-IF_WIDTH/2;
@@ -302,7 +302,7 @@ function showMessage(msgType, message)
   {
     $("#messages").append("<div class='"+msgType+"'>"+message+"</div>");
   }*/
-  document.getElementById("messages").innerHTML=message + my_json.x;
+  document.getElementById("messages").innerHTML=message;// + my_json.x;
 }
 
 function togglePause()
