@@ -8,7 +8,7 @@
 class PDController
 {
 public:
-	PDController(vec3 desired = vec3(0,0,1), vec3 gain_p = vec3(.2,.2,.2), vec3 gain_d = vec3(-50,10,-50));
+	PDController(vec3 desired = vec3(0,0,1), vec3 gain_p = vec3(.2,.2,.2), vec3 gain_d = vec3(-5,10,-5));
 
 	void set_desired_location(vec3 new_location);
 

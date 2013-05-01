@@ -67,6 +67,7 @@ void loop(const double dt)
 	float roll=0;
 	float altitude=0;
 	float yaw=0;
+	bool moved=false;
 
 	if(msl::input_check(kb_escape))
 		exit(0);
@@ -75,28 +76,58 @@ void loop(const double dt)
 		a.emergency_mode_toggle();
 
 	if(msl::input_check(kb_w))
+	{
 		pitch=-speed;
+		moved=true;
+	}
 
 	if(msl::input_check(kb_s))
+	{
 		pitch=speed;
+		moved=true;
+	}
 
 	if(msl::input_check(kb_a))
+	{
 		roll=-speed;
+		moved=true;
+	}
 
 	if(msl::input_check(kb_d))
+	{
 		roll=speed;
+		moved=true;
+	}
 
 	if(msl::input_check(kb_q))
+	{
 		yaw=speed;
+		moved=true;
+	}
 
 	if(msl::input_check(kb_e))
+	{
 		yaw=-speed;
+		moved=true;
+	}
 
 	if(msl::input_check(kb_up))
+	{
 		altitude=-speed;
+		moved=true;
+	}
 
 	if(msl::input_check(kb_down))
+	{
 		altitude=speed;
+		moved=true;
+	}
+
+	if(msl::input_check_pressed(kb_1))
+		a.set_video_feed_front();
+
+	if(msl::input_check_pressed(kb_2))
+		a.set_video_feed_bottom();
 
 	if(msl::input_check_pressed(kb_space))
 	{
@@ -109,13 +140,15 @@ void loop(const double dt)
 	if(msl::input_check_pressed(kb_o))
 		drone_autonomous = !drone_autonomous;
 
-	if(drone_autonomous)
+	if(moved)
+	{
+		a.manuever(altitude,pitch,roll,yaw);
+	}
+	else if(drone_autonomous)
 	{
 		pdcontroller.autonomous_flight(a, kinect);
 		//pidcontroller.autonomous_flight(a, kinect);
 	}
-	else
-		a.manuever(altitude,pitch,roll,yaw);
 
 	a.video_update();
 
