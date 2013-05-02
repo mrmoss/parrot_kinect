@@ -154,7 +154,7 @@ function init()
   currentFrame = totalFrames-1;
 
   // create object to display parrot drone
-  var parrotWidth = parrotHeight = 1;
+  var parrotWidth = parrotHeight = 2;
   parrotTex = THREE.ImageUtils.loadTexture("images/parrot_drone.gif");
   parrotTex.wrapS = parrotTex.wrapT = THREE.RepeatWrapping;
   var parrotGeometry = new THREE.PlaneGeometry(parrotWidth, parrotHeight, wIncrement, hIncrement);
