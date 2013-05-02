@@ -356,7 +356,7 @@ void depth_cb(freenect_device *dev, void *v_depth, uint32_t timestamp)
     }
   }
 
-  if (sumW>=200)
+  if (sumW>=100)
   {	// Take the average location of all pixels inside box and draw it
     pthread_mutex_lock(&location_mutex);
     loc = sum/sumW;

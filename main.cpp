@@ -24,7 +24,7 @@ std::string make_json();
 
 Kinect kinect;
 bool drone_autonomous = false;
-vec3 desired_location = vec3(0,0,3);
+vec3 desired_location = vec3(0,0.1,kcs_distance_to_origin);
 PDController pdcontroller(desired_location);
 PIDController pidcontroller(desired_location);
 
@@ -34,7 +34,7 @@ int main()
 {
 	server.create_tcp();
 
-	if(server&&a.connect())
+	if(server&&a.connect(5))
 	{
 		std::cout<<":)"<<std::endl;
 	}
@@ -62,7 +62,7 @@ void loop(const double dt)
 {
 	a.navdata_update();
 
-	float speed=-0.8;
+	float speed=0.6;
 	float pitch=0;
 	float roll=0;
 	float altitude=0;
@@ -101,25 +101,25 @@ void loop(const double dt)
 
 	if(msl::input_check(kb_q))
 	{
-		yaw=speed;
+		yaw=-speed;
 		moved=true;
 	}
 
 	if(msl::input_check(kb_e))
 	{
-		yaw=-speed;
+		yaw=speed;
 		moved=true;
 	}
 
 	if(msl::input_check(kb_up))
 	{
-		altitude=-speed;
+		altitude=speed;
 		moved=true;
 	}
 
 	if(msl::input_check(kb_down))
 	{
-		altitude=speed;
+		altitude=-speed;
 		moved=true;
 	}
 
@@ -130,12 +130,9 @@ void loop(const double dt)
 		a.set_video_feed_bottom();
 
 	if(msl::input_check_pressed(kb_space))
-	{
-		if(a.flying())
-			a.land();
-		else
-			a.takeoff();
-	}
+		a.land();
+	if(msl::input_check_pressed(kb_0))
+		a.takeoff();
 
 	if(msl::input_check_pressed(kb_o))
 		drone_autonomous = !drone_autonomous;
@@ -330,18 +327,18 @@ void service_client(msl::socket& client,const std::string& message)
 
 			parse_sstr.ignore(request.size(), '=');
 			parse_sstr >> x;
-			desired_location.x = x * kcs_x_field_size/2;
+			desired_location.x = x * (kcs_x_field_size/2.0-kcs_buffer);
 
 			parse_sstr.ignore(request.size(), '=');
 			parse_sstr >> y;
-			desired_location.y = y * kcs_y_field_size/2;
+			//desired_location.y = y * kcs_y_field_size/2;
 
 			parse_sstr.ignore(request.size(), '=');
 			parse_sstr >> z;
-			desired_location.z = kcs_distance_to_origin+z*kcs_z_field_size/2;
+			desired_location.z = kcs_distance_to_origin+z*(kcs_z_field_size/2.0-kcs_buffer);
 
-			clamp(-kcs_x_field_size/2,kcs_x_field_size/2,desired_location.x);
-			clamp(-kcs_y_field_size/2,kcs_y_field_size/2,desired_location.y);
+			clamp(-kcs_x_field_size/2.0,kcs_x_field_size/2.0,desired_location.x);
+			clamp(-kcs_y_field_size/2.0,kcs_y_field_size/2.0,desired_location.y);
 			clamp(kcs_distance_from_kinect,kcs_distance_from_kinect+kcs_z_field_size,desired_location.z);
 
 			pdcontroller.set_desired_location(desired_location);
