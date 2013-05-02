@@ -160,8 +160,8 @@ function init()
   var parrotGeometry = new THREE.PlaneGeometry(parrotWidth, parrotHeight, wIncrement, hIncrement);
   var parrotMaterial = new THREE.MeshBasicMaterial( { map: parrotTex, transparent: true } );
   parrot = new THREE.Mesh(parrotGeometry, parrotMaterial);
-  parrot.position.x = 0;
-  parrot.position.y = 0;
+  parrot.position.x = 0.5;
+  parrot.position.y = 0.5;
   parrot.position.z = .01;
   scene1.add(parrot);
 

@@ -418,7 +418,7 @@ std::string make_json()
 {
 	std::stringstream sstr;
 
-	sstr << "{\"x\":\""+msl::to_string(kinect.get_location().x/kcs_x_field_size)+"\",\"y\":\""+msl::to_string(kinect.get_location().y/kcs_y_field_size)+"\",\"z\":\""+msl::to_string(kinect.get_location().z/kcs_z_field_size)+"\"}";
+	sstr << "{\"x\":\""+msl::to_string(kinect.get_location().x/kcs_x_field_size*2.0)+"\",\"y\":\""+msl::to_string(kinect.get_location().y/kcs_y_field_size*2.0)+"\",\"z\":\""+msl::to_string((kinect.get_location().z-kcs_distance_to_origin)/kcs_z_field_size*2.0)+"\"}";
 
 	return sstr.str();
 }
