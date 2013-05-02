@@ -41,7 +41,7 @@
     <input type="button" id="take-off" value="Take off" onclick="takeOff()" />
     <input type="button" id="land" value="Land" onclick="land()" />
     <input type="button" id="pause" value="Pause" onclick="togglePause()" />
-    <input type="button" id="goto" value="Goto" onclick="toggleGoto()" />
+    <!--<input type="button" id="goto" value="Goto" onclick="toggleGoto()" /> -->
   </td>
 </tr>
 <tr>
@@ -61,6 +61,7 @@ var container, v_container, camera1, camera2, scene1, scene2, if_renderer, video
 
 // for the arrow animation
 var arrow, arrowTex, currentFrame, totalFrames;
+var arrow2, arrowTex2, currentFrame2, totalFrames2;
 var clock, elapsedTime = 0;
 
 var request = new XMLHttpRequest();
@@ -76,6 +77,8 @@ var IF_WIDTH = IF_HEIGHT * IF_ASPECT_RATIO;
 
 var ctx;
 var img = new Image();
+var x = 0;
+var y = 0;
 
 function get_image()
 {
@@ -150,6 +153,8 @@ function init()
   scene1.add(arrow);
   currentFrame = totalFrames-1;
 
+  setInterval(getStatus, 100);
+
   mainLoop();
 }
 
@@ -176,6 +181,10 @@ function updateAnimations()
       elapsedTime = 0;
       currentFrame += 1;
     }
+  }
+  else
+  {
+	  currentFrame = 0;
   }
 
   arrowTex.offset.x = currentFrame/totalFrames;
@@ -230,11 +239,6 @@ function getStatus()
   sendMessage("/uav/0/status?number="+message_count, statusResponse, false);
 }
 
-function toggleGoto()
-{
-  sendMessage("/uav/0/control?number="+message_count, statusResponse, false);
-}
-
 function takeOff()
 {
   sendMessage("/uav/0/takeoff?number="+message_count, takeOffResponse, false);
@@ -261,10 +265,11 @@ function sendMessage(url, callBackFunc, binaryData)
   message_count+=1;
 }
 
-var my_json = {};
 function statusResponse(data)
 {
-	my_json = JSON.parse(data);
+	var my_json = JSON.parse(data);
+	arrow2.position.x = my_json.x;
+	arrow2.position.y = my_json.z;
 }
 
 function takeOffResponse(data)
@@ -274,6 +279,7 @@ function takeOffResponse(data)
 function landResponse(data)
 {
 }
+
 
 function gotoResponse(data)
 {
@@ -308,7 +314,7 @@ function showMessage(msgType, message)
   {
     $("#messages").append("<div class='"+msgType+"'>"+message+"</div>");
   }*/
-  document.getElementById("messages").innerHTML=message;// + my_json.x;
+  document.getElementById("messages").innerHTML = message;
 }
 
 function togglePause()

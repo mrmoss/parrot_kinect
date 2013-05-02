@@ -421,9 +421,7 @@ std::string make_json()
 {
 	std::stringstream sstr;
 
-	sstr << "{ \n";
-	sstr << "\"x\":" << 2;
-	sstr << "\n }";
+	sstr << "{\"x\":\""+msl::to_string(kinect.get_location().x/kcs_x_field_size)+"\",\"y\":\""+msl::to_string(kinect.get_location().y/kcs_y_field_size)+"\",\"z\":\""+msl::to_string(kinect.get_location().z/kcs_z_field_size)+"\"}";
 
 	return sstr.str();
 }

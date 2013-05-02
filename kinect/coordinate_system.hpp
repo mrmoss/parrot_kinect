@@ -1,7 +1,8 @@
 #ifndef KINECT_COORDINATE_SYSTEM
 #define KINECT_COORDINATE_SYSTE
 
-#define kcs_angle 90
+//desired hieght with 0 being level with kinect
+#define kcs_desired_height 0
 
 //Size of viewable field (full size of field, not 1/2 or 1/4 or distance+1/2 of...)
 #define kcs_x_field_size 1.5
