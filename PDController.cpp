@@ -43,6 +43,8 @@ void PDController::autonomous_flight(ardrone & drone, Kinect & kinect)
 		_error_old.x = x_error_new;
 		_error_old.y = y_error_new;
 		_error_old.z = z_error_new;
+		
+		//std::cout<<altitude<<"\t\t"<<y_error_new<<std::endl;
 
 		double max=1;
 		clamp(roll,-max,max);

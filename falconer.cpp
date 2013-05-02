@@ -103,7 +103,7 @@ bool ardrone::connect(unsigned int time_out)
 		++_count;
 		_control_socket<<outdoor_hull_command;
 
-		std::string shell_is_on_command="AT*CONFIG="+msl::to_string(_count)+",\"control:flight_without_shell\",\"TRUE\"\r";
+		std::string shell_is_on_command="AT*CONFIG="+msl::to_string(_count)+",\"control:flight_without_shell\",\"FALSE\"\r";
 		++_count;
 		_control_socket<<shell_is_on_command;
 
@@ -134,13 +134,18 @@ bool ardrone::connect(unsigned int time_out)
 		unsigned int time_start=time(0);
 		uint8_t redirect_navdata_command[14]={1,0,0,0,0,0,0,0,0,0,0,0,0,0};
 		uint8_t video_wakeup_command[1]={1};
-
+		
 		do
 		{
 			_navdata_socket.write(redirect_navdata_command,14);
+		}
+		while(time(0)-time_start<time_out&&_navdata_socket.check()<=0);
+		
+		do
+		{
 			_video_socket.write(video_wakeup_command,1);
 		}
-		while(time(0)-time_start<time_out&&(_navdata_socket.check()<=0||_video_socket.check()<=0));
+		while(time(0)-time_start<time_out&&_video_socket.check()<=0);
 
 		if(_navdata_socket.check()>0&&_video_socket.check()>0)
 			connected=true;
@@ -153,12 +158,21 @@ void ardrone::navdata_update()
 {
 	if(*this)
 	{
-		const int packet_size=548;			//nav-data-full packet size=548, nav-data-demo packet size=24
+		const int packet_size=500;			//nav-data-full packet size=500, nav-data-demo packet size=24
 		uint8_t byte[packet_size];
 
-		if(_navdata_socket.check()>0&&_navdata_socket.read(byte,packet_size)==packet_size)
+		if(_navdata_socket.check()>0)
 		{
-			if(byte[0]==0x88&&byte[1]==0x77&&byte[2]==0x66&&byte[3]==0x55)
+			unsigned int bytes_read=_navdata_socket.read(byte,packet_size);
+			
+			if(bytes_read==24)
+			{
+				std::string navdata_enable_command="AT*CONFIG="+msl::to_string(_count)+",\"general:navdata_demo\",\"FALSE\"\r";
+				++_count;
+				_control_socket<<navdata_enable_command;
+			}
+
+			if(bytes_read==500&&byte[0]==0x88&&byte[1]==0x77&&byte[2]==0x66&&byte[3]==0x55)
 			{
 				unsigned int states=byte[7]<<24|byte[6]<<16|byte[5]<<8|byte[4]<<0;
 				_landed=!static_cast<bool>(states&(1<<0));
