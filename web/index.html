@@ -61,7 +61,7 @@ var container, v_container, camera1, camera2, scene1, scene2, if_renderer, video
 
 // for the arrow animation
 var arrow, arrowTex, currentFrame, totalFrames;
-var arrow2, arrowTex2, currentFrame2, totalFrames2;
+var parrot, parrotTex;
 var clock, elapsedTime = 0;
 
 var request = new XMLHttpRequest();
@@ -152,6 +152,18 @@ function init()
   arrow.position.z = .01;
   scene1.add(arrow);
   currentFrame = totalFrames-1;
+
+  // create object to display parrot drone
+  var parrotWidth = parrotHeight = 1;
+  parrotTex = THREE.ImageUtils.loadTexture("images/parrot_drone.gif");
+  parrotTex.wrapS = parrotTex.wrapT = THREE.RepeatWrapping;
+  var parrotGeometry = new THREE.PlaneGeometry(parrotWidth, parrotHeight, wIncrement, hIncrement);
+  var parrotMaterial = new THREE.MeshBasicMaterial( { map: parrotTex, transparent: true } );
+  parrot = new THREE.Mesh(parrotGeometry, parrotMaterial);
+  parrot.position.x = 0;
+  parrot.position.y = 0;
+  parrot.position.z = .01;
+  scene1.add(parrot);
 
   setInterval(getStatus, 100);
 
@@ -268,8 +280,8 @@ function sendMessage(url, callBackFunc, binaryData)
 function statusResponse(data)
 {
 	var my_json = JSON.parse(data);
-	arrow2.position.x = my_json.x;
-	arrow2.position.y = my_json.z;
+	parrot.position.x = my_json.x*6;
+	parrot.position.y = my_json.z*6;
 }
 
 function takeOffResponse(data)
