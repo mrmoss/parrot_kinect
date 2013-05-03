@@ -204,7 +204,6 @@ function sendMessage(url, callBackFunc, binaryData)
     url: url,
     timeout: 5000,
     success: callBackFunc,
-    error: timeOut,
     beforeSend: function(xhr, binaryData) {
 		if(binaryData)
 			xhr.overrideMimeType("text/plain; charset=x-user-defined");
