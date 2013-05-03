@@ -32,6 +32,7 @@ jpegDestBuffer last_image;
 
 int main()
 {
+	a.set_video_feed_bottom();
 	server.create_tcp();
 
 	if(server&&a.connect(5))
@@ -99,13 +100,13 @@ void loop(const double dt)
 		moved=true;
 	}
 
-	if(msl::input_check(kb_q))
+	if(msl::input_check(kb_e))
 	{
 		yaw=-speed;
 		moved=true;
 	}
 
-	if(msl::input_check(kb_e))
+	if(msl::input_check(kb_q))
 	{
 		yaw=speed;
 		moved=true;
