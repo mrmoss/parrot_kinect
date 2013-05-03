@@ -100,13 +100,13 @@ void loop(const double dt)
 		moved=true;
 	}
 
-	if(msl::input_check(kb_e))
+	if(msl::input_check(kb_left))
 	{
 		yaw=-speed;
 		moved=true;
 	}
 
-	if(msl::input_check(kb_q))
+	if(msl::input_check(kb_right))
 	{
 		yaw=speed;
 		moved=true;
