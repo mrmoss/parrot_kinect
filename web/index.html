@@ -38,8 +38,8 @@
     <div id="if_container" width="640" height="360"></div>
   </td>
   <td>
-	  <img id="video0" style="position:absolute;left:500px;top:0px;" width="640" height="360"> </img>
-	  <img id="video1" style="position:absolute;left:500px;top:0px;" width="640" height="360"> </img>
+	  <img id="video0" style="position:absolute;left:500px;top:0px;" onload="swapBuffer()" width="640" height="360"> </img>
+	  <img id="video1" style="position:absolute;left:500px;top:0px;" onload="swapBuffer()" width="640" height="360"> </img>
     <!--<canvas id="canvas" width="640" height="360"> </canvas>-->
   </td>
 </tr>
@@ -88,21 +88,33 @@ function get_image()
     if(buffer_index==0)
     {
       document.getElementById("video0").src = 'photo.jpeg?' + new Date().getTime();
-      document.getElementById("video1").style.zIndex="0";
-      document.getElementById("video0").style.zIndex="-1";
-      buffer_index=1;
     }
     else
     {
       document.getElementById("video1").src = 'photo.jpeg?' + new Date().getTime();
-      document.getElementById("video0").style.zIndex="0";
-      document.getElementById("video1").style.zIndex="-1";
-      buffer_index=0;
     }
     //ctx.drawImage(img, 0, 0);
   }
   catch(e)
   {}
+}
+
+function swapBuffer()
+{
+  v1 = document.getElementById("video1"); 
+  v0 = document.getElementById("video0");
+  if(buffer_index==0)
+  {
+    v1.style.zIndex="0";
+    v0.style.zIndex="-1";
+    buffer_index=1;
+  }
+  else
+  {
+    v0.style.zIndex="0";
+    v1.style.zIndex="-1";
+    buffer_index=0;
+  }
 }
 
 function init()
