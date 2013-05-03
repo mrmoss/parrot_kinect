@@ -35,12 +35,20 @@
 </tr>
 <tr>
   <td>
-    <div id="if_container" width="640" height="360"></div>
+    <div id="if_container" onclick="getCoords(event)" width="640" height="360"></div>
   </td>
   <td>
 	  <img id="video0" style="position:absolute;left:500px;top:0px;" width="640" height="360"> </img>
 	  <img id="video1" style="position:absolute;left:500px;top:0px;" width="640" height="360"> </img>
     <!--<canvas id="canvas" width="640" height="360"> </canvas>-->
+  </td>
+</tr>
+<tr>
+  <td colspan="2">
+    <input type="button" id="take-off" value="Take off" onclick="takeOff()" />
+    <input type="button" id="land" value="Land" onclick="land()" />
+    <input type="button" id="pause" value="Pause" onclick="togglePause()" />
+    <!--<input type="button" id="goto" value="Goto" onclick="toggleGoto()" /> -->
   </td>
 </tr>
 <tr>
@@ -59,6 +67,7 @@ var mouseX, mouseY;
 var container, v_container, camera1, camera2, scene1, scene2, if_renderer, video_renderer;
 
 // for the arrow animation
+var arrow, arrowTex, currentFrame, totalFrames;
 var parrot, parrotTex;
 var clock, elapsedTime = 0;
 
@@ -83,37 +92,38 @@ var buffer_index=0;
 
 function get_image()
 {
-  try
-  {
-    if(buffer_index==0)
-    {
-      document.getElementById("video0").src = 'photo.jpeg?' + new Date().getTime();
-      document.getElementById("video1").style.zIndex="0";
-      document.getElementById("video0").style.zIndex="-1";
-      buffer_index=1;
-    }
-    else
-    {
-      document.getElementById("video1").src = 'photo.jpeg?' + new Date().getTime();
-      document.getElementById("video0").style.zIndex="0";
-      document.getElementById("video1").style.zIndex="-1";
-      buffer_index=0;
-    }
-    //ctx.drawImage(img, 0, 0);
-  }
-  catch(e)
-  {}
+	try
+	{
+		if(buffer_index==0)
+		{
+			document.getElementById("video0").src = 'photo.jpeg?' + new Date().getTime();
+			document.getElementById("video1").style.zIndex="0";
+			document.getElementById("video0").style.zIndex="-1";
+			
+			buffer_index=1;
+		}
+		else
+		{
+			document.getElementById("video1").src = 'photo.jpeg?' + new Date().getTime();
+			document.getElementById("video0").style.zIndex="0";
+			document.getElementById("video1").style.zIndex="-1";
+			buffer_index=0;
+		}
+		//ctx.drawImage(img, 0, 0);
+	}
+	catch(e)
+	{}
 }
 
 function init()
 {
 
-  document.getElementById("bar").style.backgroundColor = "#ff00ff";
+	document.getElementById("bar").style.backgroundColor = "#ff00ff"; 
+	
+	//var canvas = document.getElementById('canvas');
+	//ctx = canvas.getContext("2d");
 
-  //var canvas = document.getElementById('canvas');
-  //ctx = canvas.getContext("2d");
-
-  setInterval(get_image,100);
+	setInterval(get_image,100);
 
   // Chech for webgl implementation
   if(!Detector.webgl)
@@ -156,6 +166,21 @@ function init()
   var arenaMap = new THREE.Mesh(mapGeometry, mapMaterial);
   scene1.add(arenaMap);
 
+  // create object to display arrow animation
+  var arrowWidth = arrowHeight = 1;
+  totalFrames = 10;
+  arrowTex = THREE.ImageUtils.loadTexture("images/ArrowAnimation.gif");
+  arrowTex.wrapS = arrowTex.wrapT = THREE.RepeatWrapping;
+  arrowTex.repeat.set(1/totalFrames, 1);
+  var arrowGeometry = new THREE.PlaneGeometry(arrowWidth, arrowHeight, wIncrement, hIncrement);
+  var arrowMaterial = new THREE.MeshBasicMaterial( { map: arrowTex, transparent: true } );
+  arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
+  arrow.position.x = .5;
+  arrow.position.y = .5;
+  arrow.position.z = .01;
+  scene1.add(arrow);
+  currentFrame = totalFrames-1;
+
   // create object to display parrot drone
   var parrotWidth = parrotHeight = 1;
   parrotTex = THREE.ImageUtils.loadTexture("images/parrot_drone.gif");
@@ -177,11 +202,33 @@ function mainLoop()
 {
   if(!paused)
   {
+    updateAnimations();
     if_renderer.render(scene1, camera1);
     requestAnimationFrame(mainLoop);
   }
 }
 
+function updateAnimations()
+{
+  dt = clock.getDelta();
+
+  // If the animation has not finished, advance the frame at a controlled rate.
+  if(currentFrame<(totalFrames-1))
+  {
+    elapsedTime += dt;
+    if( elapsedTime > .05)
+    {
+      elapsedTime = 0;
+      currentFrame += 1;
+    }
+  }
+  else
+  {
+	  currentFrame = 0;
+  }
+
+  arrowTex.offset.x = currentFrame/totalFrames;
+}
 
 function resizeFunc()
 {
@@ -198,6 +245,53 @@ function resizeFunc()
   document.getElementById("video1").style.left=left_position+"px";
 }
 
+function getCoords(event)
+{
+  mouseX = event.pageX-document.getElementById("if_container").offsetLeft;
+  mouseY = event.pageY-document.getElementById("if_container").offsetTop;
+
+  // Convert mouseX and mouseY to the range -.5*range,+.5*range
+  var x= mouseX-IF_WIDTH/2;
+  var z=-mouseY+IF_HEIGHT/2;
+
+  // Convert x and y to the range -6,+6 feet
+  x = x/(IF_WIDTH/2) * 6;
+  z = z/(IF_HEIGHT/2)* 6;
+
+  // Round to the nearest .5 foot
+  x = Math.floor(x) + 0.5;
+  z = Math.floor(z) + 0.5;
+
+  // Place the arrow animation and set it to the first frame
+  arrow.position.x = x;
+  arrow.position.y = z;
+  currentFrame = 0;
+
+  // Convert coordinates to meters and send to drone
+  var METERS_PER_FOOT = 0.3048;
+  x = x /6; //METERS_PER_FOOT;
+  y = 1.0;
+  z = z /6; // METERS_PER_FOOT;
+
+  sendMessage("/uav/0/goto?x="+x+"&y="+y+"&z="+z+"&number="+message_count, gotoResponse, false );
+  showMessage("normalMsg","X: "+ x.toFixed(4) +" Y: "+ y.toFixed(4) +" Z: "+ z.toFixed(4));
+}
+
+function getStatus()
+{
+  sendMessage("/uav/0/status?number="+message_count, statusResponse, false);
+}
+
+function takeOff()
+{
+  sendMessage("/uav/0/takeoff?number="+message_count, takeOffResponse, false);
+}
+
+function land()
+{
+  sendMessage("/uav/0/land?number="+message_count, landResponse, false);
+}
+
 function sendMessage(url, callBackFunc, binaryData)
 {
   $.ajax({
@@ -210,13 +304,8 @@ function sendMessage(url, callBackFunc, binaryData)
 			xhr.overrideMimeType("text/plain; charset=x-user-defined");
 		}
 
-    });
+		});
   message_count+=1;
-}
-
-function getStatus()
-{
-  sendMessage("/uav/0/status?number="+message_count, statusResponse, false);
 }
 
 function statusResponse(data)
@@ -225,6 +314,66 @@ function statusResponse(data)
 	parrot.position.x = my_json.x*6;
 	parrot.position.y = my_json.z*6;
 	robot_mode = my_json.robot; 
+}
+
+function takeOffResponse(data)
+{
+}
+
+function landResponse(data)
+{
+}
+
+
+function gotoResponse(data)
+{
+}
+
+function errorCount()
+{
+  if(errorCount.val == undefined)
+    errorCount.val=1;
+  else
+    errorCount.val += 1;
+
+  return errorCount.val;
+}
+
+function timeOut()
+{
+  showMessage("errorMsg", "Error: No response from server.");
+}
+
+function showMessage(msgType, message)
+{
+  /*if(msgType == "errorMsg")
+  {
+    if(errorCount.val == undefined)
+    {
+      $("#messages").append("<div  class='errorMsg' id='timeOut'></div>");
+    }
+    $("#timeOut").html("("+errorCount()+")"+message);
+  }
+  else
+  {
+    $("#messages").append("<div class='"+msgType+"'>"+message+"</div>");
+  }*/
+  document.getElementById("messages").innerHTML = message;
+}
+
+function togglePause()
+{
+  paused = !paused;
+  if(!paused)
+  {
+    setTimeout(getVideoFrame, 1000);
+    $("#pause").val("Pause");
+    requestAnimationFrame(mainLoop);
+  }
+  else
+  {
+    $("#pause").val("Resume");
+  }
 }
 
 </script>
