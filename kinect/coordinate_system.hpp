@@ -3,12 +3,15 @@
 
 //ALL MEASUREMENTS ARE IN METERS
 
-//desired hieght with 0 being level with kinect
+//desired height with 0 being level with kinect
 #define kcs_desired_height 0.0
 
+//offset from kinect to the center of box
+#define kcs_kinect_offset vec3(0.0,0.5,0.0)
+
 //Size of viewable field (full size of field, not 1/2 or 1/4 or distance+1/2 of...)
-#define kcs_x_field_size 3.0
-#define kcs_y_field_size 1.5
+#define kcs_x_field_size 3.1
+#define kcs_y_field_size 1.75
 #define kcs_z_field_size 3.5
 #define kcs_buffer 0.3
 

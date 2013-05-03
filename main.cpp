@@ -17,7 +17,7 @@
 ardrone a;
 unsigned int textureId;
 
-msl::socket server("0.0.0.0:80");
+msl::socket server("0.0.0.0:8080");
 void web_server_thread_function();
 void service_client(msl::socket& client,const std::string& message);
 std::string make_json();
@@ -418,7 +418,7 @@ std::string make_json()
 {
 	std::stringstream sstr;
 
-	sstr << "{\"x\":\""+msl::to_string(kinect.get_location().x/kcs_x_field_size*2.0)+"\",\"y\":\""+msl::to_string(kinect.get_location().y/kcs_y_field_size*2.0)+"\",\"z\":\""+msl::to_string((kinect.get_location().z-kcs_distance_to_origin)/kcs_z_field_size*2.0)+"\"}";
+	sstr << "{\"x\":\""+msl::to_string(kinect.get_location().x/kcs_x_field_size*2.0)+"\",\"y\":\""+msl::to_string(kinect.get_location().y/kcs_y_field_size*2.0)+"\",\"z\":\""+msl::to_string((kinect.get_location().z-kcs_distance_to_origin)/kcs_z_field_size*2.0)+"\",\"robot\":\""+msl::to_string((int)drone_autonomous)+"\"}";
 
 	return sstr.str();
 }

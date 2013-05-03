@@ -54,6 +54,8 @@ using std::endl;
 
 #include <math.h>
 
+#include "coordinate_system.hpp"
+
 
 
 /************ GLOBALS **************/
@@ -339,6 +341,7 @@ void depth_cb(freenect_device *dev, void *v_depth, uint32_t timestamp)
     }
 
     vec3 pixel_loc = img.loc(x,y);	//Get 3d coordinates of pixel in meters
+    pixel_loc+=kcs_kinect_offset;
     if(pixel_loc.x > (-.5 * box_x) && pixel_loc.x < (.5 * box_x) &&
         pixel_loc.y > (-.5 * box_y) && pixel_loc.y < (.5 * box_y) &&
         pixel_loc.z > (box_dist - .5 * box_z) && pixel_loc.z < (box_dist + .5 * box_z))
