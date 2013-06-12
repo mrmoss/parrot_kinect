@@ -14,6 +14,14 @@
 #include "PIDController.hpp"
 #include "kinect/coordinate_system.hpp"
 
+#ifndef __APPLE__
+	#include <GL/glew.h>
+	#include <GL/glut.h>
+#else
+	#include <GLUT/glew.h>
+	#include <GLUT/glut.h>
+#endif
+
 ardrone a;
 unsigned int textureId;
 
@@ -35,7 +43,7 @@ int main()
 	a.set_video_feed_bottom();
 	server.create_tcp();
 
-	if(server&&a.connect(5))
+	if(server.good()&&a.connect(5))
 	{
 		std::cout<<":)"<<std::endl;
 	}
@@ -249,7 +257,7 @@ void web_server_thread_function()
 				char byte='\n';
 
 				//Get a Byte
-				while(clients[ii].check()>0&&clients[ii].read(&byte,1)==1)
+				while(clients[ii].available()>0&&clients[ii].read(&byte,1)==1)
 				{
 					//Add the Byte to Client Buffer
 					client_messages[ii]+=byte;

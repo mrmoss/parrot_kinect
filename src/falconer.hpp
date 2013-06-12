@@ -17,6 +17,10 @@ class ardrone
 		ardrone(const std::string ip="192.168.1.1");
 		~ardrone();
 		operator bool() const;
+		bool good() const;
+		bool control_good() const;
+		bool navdata_good() const;
+		bool video_good() const;
 		bool connect(unsigned int time_out=1);
 		void navdata_update();
 		void video_update();
@@ -53,10 +57,10 @@ class ardrone
 		bool _ultrasonic_enabled;
 		bool _video_enabled;
 		bool _motors_good;
-		int _altitude;
 		float _pitch;
 		float _roll;
 		float _yaw;
+		int _altitude;
 		bool _found_codec;
 		uint8_t* _camera_data;
 		AVPacket _av_packet;
