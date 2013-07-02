@@ -1,0 +1,5 @@
+#!/c/473/x32-473-posix-dwarf-r0/mingw32/opt/bin\python2.7.exe
+import sys
+from lib2to3.main import main
+
+sys.exit(main("lib2to3.fixes"))

@@ -410,7 +410,7 @@ void service_client(msl::socket& client,const std::string& message)
 			std::string file;
 
 			//Load File
-			if(msl::file_to_string(web_root+request,file))
+			if(msl::file_to_string(web_root+request,file,true))
 				client<<msl::http_pack_string(file,mime_type);
 
 			//Bad File

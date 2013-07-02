@@ -168,21 +168,7 @@ bool msl::socket::good() const
 		return false;
 
 	//Check Reading Error
-	if(available()<0)
-		return false;
-
-	//Check Client Errors
-	if(!_hosting&&available()>0)
-	{
-		char temp;
-
-		//Try Reading
-		if(!socket_peek(_socket,&temp,1))
-			return false;
-	}
-
-	//Else Socket is Good
-	return true;
+	return (available()>=0);
 }
 
 //Create Function (Hosts a Socket Locally) (TCP)
@@ -379,7 +365,7 @@ SOCKET socket_connect(const msl::ipv4 ip,const long time_out,const bool UDP)
 		ret=socket(AF_INET,type,0);
 
 		//Connect and Check for Good Socket
-		if(connect(ret,reinterpret_cast<sockaddr*>(&address),sizeof(address))!=SOCKET_ERROR)
+		if(connect(ret,reinterpret_cast<sockaddr*>(&address),sizeof(address))==0)
 			return ret;
 	}
 	while(msl::millis()-time_start<time_out);

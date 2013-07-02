@@ -38,6 +38,23 @@ namespace msl
 		return ostr.str();
 	}
 
+	//String Write Function (Writes the bytes of an object to a string)
+	template<typename T> std::string string_write(const T& item)
+	{
+		std::string return_str="";
+
+		for(unsigned int ii=0;ii<sizeof(T);++ii)
+			return_str+=((char*)&item)[ii];
+
+		return return_str;
+	}
+
+	//String Read Function (Reads the bytes of an object from a string)
+	template<typename T> T string_read(const std::string& str)
+	{
+		return *(T*)str.c_str();
+	}
+
 	//Starts With Function (Checks if string starts with another string)
 	bool starts_with(const std::string& str,const std::string& start);
 

@@ -17,11 +17,16 @@
 	#define DELTA_EPOCH_IN_MICROSECS 11644473600000000ULL
 
 	//Define the Unix Timezone Struct
-	struct timezone
-	{
-			int tz_minuteswest;
-			int tz_dsttime;
-	};
+	#ifndef _TIMEZONE_DEFINED
+	#define _TIMEZONE_DEFINED
+
+		struct timezone
+		{
+				int tz_minuteswest;
+				int tz_dsttime;
+		};
+
+	#endif
 
 	//Unix Get Time of Day Function (http://www.suacommunity.com/dictionary/gettimeofday-entry.php)
 	int gettimeofday(struct timeval* time_value,struct timezone* time_zone)

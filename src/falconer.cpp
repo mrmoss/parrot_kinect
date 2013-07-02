@@ -1,7 +1,7 @@
 #include "falconer.hpp"
 
 #include "msl/string_util.hpp"
-#include <time.h>
+#include "msl/time_util.hpp"
 
 //https://github.com/elliotwoods/ARDrone-GStreamer-test/blob/master/plugin/src/pave.h
 struct parrot_video_encapsulation_t
@@ -149,11 +149,11 @@ bool ardrone::connect(unsigned int time_out)
 		++_count;
 		_control_socket<<altitude_max_command;
 
-		unsigned int time_start=time(0)/1000;
+		long timer=msl::millis()+1000;
 		char redirect_navdata_command[14]={1,0,0,0,0,0,0,0,0,0,0,0,0,0};
 		char video_wakeup_command[1]={1};
 
-		do
+		while(msl::millis()<timer&&!good());
 		{
 			if(_navdata_socket.available()<=0)
 				_navdata_socket.write(redirect_navdata_command,14);
@@ -161,7 +161,6 @@ bool ardrone::connect(unsigned int time_out)
 			if(_video_socket.available()<=0)
 				_video_socket.write(video_wakeup_command,1);
 		}
-		while(time(0)/1000-time_start<time_out&&!good());
 	}
 
 	return good();
@@ -212,9 +211,9 @@ void ardrone::video_update()
 		_video_socket<<video_keepalive_command;
 
 		parrot_video_encapsulation_t video_packet;
-		_av_packet.size=_video_socket.read(_av_packet.data,sizeof(parrot_video_encapsulation_t),MSG_WAITALL);
+		_av_packet.size=_video_socket.read(_av_packet.data,sizeof(parrot_video_encapsulation_t));
 		memcpy(&video_packet,_av_packet.data,_av_packet.size);
-		_av_packet.size=_video_socket.read(_av_packet.data,video_packet.payload_size,MSG_WAITALL);
+		_av_packet.size=_video_socket.read(_av_packet.data,video_packet.payload_size);
 
 		_av_packet.flags=0;
 

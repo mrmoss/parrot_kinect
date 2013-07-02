@@ -1,0 +1,170 @@
+
+# **************************************************************************
+
+!!!!: MinGW-builds-1.0.0
+user: niXman
+date: 04.13.2013-02:29:19
+args: gcc-4.7.3 --rev=0 --buildroot=/c/473 --mingw-compress --threads=posix --exceptions=dwarf
+PATH: .:/usr/local/bin:/mingw/bin:/bin:/c/Program Files (x86)/NVIDIA Corporation/PhysX/Common:/c/Windows/system32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0/
+
+# **************************************************************************
+
+host gcc 32-bit:
+Using built-in specs.
+COLLECT_GCC=D:\msys\home\niXman\mingw-builds\toolchains\mingw32\bin\gcc.exe
+COLLECT_LTO_WRAPPER=d:/msys/home/nixman/mingw-builds/toolchains/mingw32/bin/../libexec/gcc/i686-w64-mingw32/4.7.2/lto-wrapper.exe
+Target: i686-w64-mingw32
+Configured with: ../../../src/gcc-4.7.2/configure --host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/mingw32 --with-sysroot=/c/472/x32-472-posix-sjlj-r11/mingw32 --enable-shared --enable-static --enable-targets=all --enable-multilib --enable-languages=c,c++,fortran,lto --enable-libstdcxx-time=yes --enable-threads=posix --enable-libgomp --enable-lto --enable-graphite --enable-cloog-backend=isl --enable-checking=release --enable-fully-dynamic-string --enable-version-specific-runtime-libs --enable-sjlj-exceptions --disable-ppl-version-check --disable-cloog-version-check --disable-libstdcxx-pch --disable-libstdcxx-debug --disable-bootstrap --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-gnu-as --with-gnu-ld --with-arch-32=i686 --with-arch-64=nocona --with-tune-32=generic --with-tune-64=core2 --with-host-libstdcxx='-static -lstdc++' --with-libiconv --with-system-zlib --with-gmp=/c/472/mingw-prereq/i686-w64-mingw32-static --with-mpfr=/c/472/mingw-prereq/i686-w64-mingw32-static --with-mpc=/c/472/mingw-prereq/i686-w64-mingw32-static --with-ppl=/c/472/mingw-prereq/i686-w64-mingw32-static --with-cloog=/c/472/mingw-prereq/i686-w64-mingw32-static --with-pkgversion='rev11, Built by MinGW-builds project' --with-bugurl=http://sourceforge.net/projects/mingwbuilds/ CFLAGS='-O2 -pipe -I/c/472/x32-472-posix-sjlj-r11/libs/include -I/c/472/mingw-prereq/x32-zlib/include -I/c/472/mingw-prereq/i686-w64-mingw32-static/include' CXXFLAGS='-O2 -pipe -I/c/472/x32-472-posix-sjlj-r11/libs/include -I/c/472/mingw-prereq/x32-zlib/include -I/c/472/mingw-prereq/i686-w64-mingw32-static/include' CPPFLAGS= LDFLAGS='-pipe -L/c/472/x32-472-posix-sjlj-r11/libs/lib -L/c/472/mingw-prereq/x32-zlib/lib -L/c/472/mingw-prereq/i686-w64-mingw32-static/lib -L/c/472/x32-472-posix-sjlj-r11/mingw32/opt/lib'
+Thread model: posix
+gcc version 4.7.2 (rev11, Built by MinGW-builds project) 
+
+# **************************************************************************
+
+host ld:
+GNU ld (GNU Binutils) 2.23.1
+  Supported emulations:
+   i386pe
+   i386pep
+
+# **************************************************************************
+
+libiconv-x32-static configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/mingw-prereq/libiconv-x32-static --enable-static --disable-shared CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+zlib-1.2.7 configuration:
+
+
+# **************************************************************************
+
+x32-gmp-5.1.1-static configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/mingw-prereq/i686-w64-mingw32-static --enable-static --disable-shared --enable-cxx CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+x32-mpfr-3.1.2-static configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/mingw-prereq/i686-w64-mingw32-static --enable-static --disable-shared --with-gmp=/c/473/mingw-prereq/i686-w64-mingw32-static CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+x32-mpc-1.0.1-static configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/mingw-prereq/i686-w64-mingw32-static --enable-static --disable-shared --with-gmp=/c/473/mingw-prereq/i686-w64-mingw32-static --with-mpfr=/c/473/mingw-prereq/i686-w64-mingw32-static CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+x32-ppl-1.0-static configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/mingw-prereq/i686-w64-mingw32-static --enable-static --disable-shared --with-gmp=/c/473/mingw-prereq/i686-w64-mingw32-static --disable-documentation --disable-ppl_lcdd --disable-ppl_lpsol --disable-ppl_pips CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+x32-isl-0.11.1-static configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/mingw-prereq/i686-w64-mingw32-static --enable-static --disable-shared --with-gmp-prefix=/c/473/mingw-prereq/i686-w64-mingw32-static CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+x32-cloog-0.18.0-static configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/mingw-prereq/i686-w64-mingw32-static --enable-static --disable-shared --with-gmp-prefix=/c/473/mingw-prereq/i686-w64-mingw32-static --with-bits=gmp --with-isl=system --with-isl-prefix=/c/473/mingw-prereq/i686-w64-mingw32-static CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+x32-mingw-w64-headers-nomulti configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/mingw-runtime/x32-mingw-w64-nomulti --enable-sdk=all --enable-secure-api CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+x32-mingw-w64-crt-nomulti configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/mingw-runtime/x32-mingw-w64-nomulti --with-sysroot=/c/473/mingw-runtime/x32-mingw-w64-nomulti --enable-lib32 --disable-lib64 --enable-wildcard CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+winpthreads-x32 configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/mingw-runtime/winpthreads-x32 --enable-shared --enable-static CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+x32-binutils-2.23.2-nomulti configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/mingw-prereq/x32-binutils-nomulti --with-sysroot=/c/473/mingw-runtime/x32-mingw-w64-nomulti --disable-multilib --enable-lto --with-libiconv-prefix=/c/473/mingw-prereq/libiconv-x32 --disable-nls --enable-shared --enable-static CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib -Wl,--large-address-aware"
+
+# **************************************************************************
+
+gcc-4.7.3 configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/mingw32 --with-sysroot=/c/473/x32-473-posix-dwarf-r0/mingw32 --enable-shared --enable-static --disable-multilib --enable-languages=c,c++,fortran,lto --enable-libstdcxx-time=yes --enable-threads=posix --enable-libgomp --enable-lto --enable-graphite --enable-cloog-backend=isl --enable-checking=release --enable-fully-dynamic-string --enable-version-specific-runtime-libs --disable-sjlj-exceptions --with-dwarf2 --disable-ppl-version-check --disable-cloog-version-check --disable-libstdcxx-pch --disable-libstdcxx-debug --disable-bootstrap --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-gnu-as --with-gnu-ld --with-arch=i686 --with-tune=generic --with-host-libstdcxx='-static -lstdc++' --with-libiconv --with-system-zlib --with-gmp=/c/473/mingw-prereq/i686-w64-mingw32-static --with-mpfr=/c/473/mingw-prereq/i686-w64-mingw32-static --with-mpc=/c/473/mingw-prereq/i686-w64-mingw32-static --with-ppl=/c/473/mingw-prereq/i686-w64-mingw32-static --with-cloog=/c/473/mingw-prereq/i686-w64-mingw32-static --with-pkgversion="rev0, Built by MinGW-builds project" --with-bugurl=http://sourceforge.net/projects/mingwbuilds/ CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+libmangle configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/x32-473-posix-dwarf-r0/mingw32 CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+gendef configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/x32-473-posix-dwarf-r0/mingw32 --with-mangle=/c/473/x32-473-posix-dwarf-r0/mingw32 CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+genidl configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/x32-473-posix-dwarf-r0/mingw32 CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+genpeimg configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/x32-473-posix-dwarf-r0/mingw32 CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+widl configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/x32-473-posix-dwarf-r0/mingw32 CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+libgnurx-2.5.1 configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/x32-473-posix-dwarf-r0/libs --enable-static --disable-shared CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+bzip2-1.0.6 configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/x32-473-posix-dwarf-r0/libs --enable-shared --disable-static CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+libffi-3.0.13 configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/x32-473-posix-dwarf-r0/libs --enable-static --disable-shared CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+expat-2.1.0 configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/x32-473-posix-dwarf-r0/libs --enable-static --disable-shared CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+sqlite-3071601 configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/x32-473-posix-dwarf-r0/libs --enable-shared --disable-static CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS=" -DSQLITE_ENABLE_COLUMN_METADATA -DSQLITE_ENABLE_RTREE" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+ncurses-5.9 configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/x32-473-posix-dwarf-r0/libs --without-ada --with-cxx --without-pthread --enable-pc-files --disable-rpath --enable-colorfgbg --disable-symlinks --enable-warnings --enable-assertions --disable-home-terminfo --enable-database --enable-sp-funcs --enable-term-driver --enable-interop --disable-widec --without-trace CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include -D__USE_MINGW_ANSI_STDIO=1" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+readline-6.2 configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --target=i686-w64-mingw32 --prefix=/c/473/x32-473-posix-dwarf-r0/libs --enable-shared --disable-static CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include -D__USE_MINGW_ANSI_STDIO=1" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib"
+
+# **************************************************************************
+
+Python-2.7.3 configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --prefix=/c/473/x32-473-posix-dwarf-r0/mingw32/opt --enable-shared --disable-ipv6 --without-pydebug --with-system-expat --with-system-ffi CXX=i686-w64-mingw32-g++ LIBFFI_INCLUDEDIR=c:/473/x32-473-posix-dwarf-r0/libs/lib/libffi-3.0.13/include OPT= CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include -fwrapv -DNDEBUG -D__USE_MINGW_ANSI_STDIO=1" CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include -fwrapv -DNDEBUG -D__USE_MINGW_ANSI_STDIO=1 -Ic:/473/x32-473-posix-dwarf-r0/libs/include -Ic:/473/x32-473-posix-dwarf-r0/libs/include/ncurses -Ic:/473/mingw-prereq/x32-zlib/include -Ic:/473/x32-473-posix-dwarf-r0/mingw32/opt/include" CPPFLAGS=" -Ic:/473/x32-473-posix-dwarf-r0/libs/include -Ic:/473/x32-473-posix-dwarf-r0/libs/include/ncurses -Ic:/473/mingw-prereq/x32-zlib/include -Ic:/473/x32-473-posix-dwarf-r0/mingw32/opt/include" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib -Lc:/473/mingw-prereq/x32-zlib/lib -Lc:/473/x32-473-posix-dwarf-r0/mingw32/opt/lib -Lc:/473/x32-473-posix-dwarf-r0/libs/lib"
+
+# **************************************************************************
+
+gdb-7.5.1 configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --prefix=/c/473/x32-473-posix-dwarf-r0/mingw32 --enable-targets=i686-w64-mingw32 --enable-64-bit-bfd --disable-nls --disable-werror --disable-win32-registry --disable-rpath --with-system-gdbinit=/c/473/x32-473-posix-dwarf-r0/mingw32/etc/gdbinit --with-python --with-expat --with-libiconv --with-zlib --disable-tui --disable-gdbtk CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include -D__USE_MINGW_ANSI_STDIO=1 -I/c/473/x32-473-posix-dwarf-r0/mingw32/opt/include/python2.7 " CXXFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" CPPFLAGS="" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib/python2.7/config"
+
+# **************************************************************************
+
+make configuration:
+--host=i686-w64-mingw32 --build=i686-w64-mingw32 --prefix=/c/473/x32-473-posix-dwarf-r0/mingw32 --enable-case-insensitive-file-system --program-prefix=mingw32- --enable-job-server --without-guile CFLAGS="-O2 -pipe -I/c/473/x32-473-posix-dwarf-r0/libs/include -I/c/473/mingw-prereq/x32-zlib/include -I/c/473/mingw-prereq/i686-w64-mingw32-static/include" LDFLAGS="-pipe -L/c/473/x32-473-posix-dwarf-r0/libs/lib -L/c/473/mingw-prereq/x32-zlib/lib -L/c/473/mingw-prereq/i686-w64-mingw32-static/lib -L/c/473/x32-473-posix-dwarf-r0/mingw32/opt/lib -L/c/473/x32-473-posix-dwarf-r0/libs/lib"
+
+# **************************************************************************
+

@@ -12,7 +12,7 @@
 #if(defined(_WIN32)&&!defined(__CYGWIN__))
 
 	//Windows Read Function (Unix-like replacement)
-	ssize_t read(SERIAL fd,void* buf,size_t count)
+	SSIZE_T read(SERIAL fd,void* buf,size_t count)
 	{
 		//Return Value
 		DWORD bytes_read=-1;
@@ -26,7 +26,7 @@
 	}
 
 	//Windows Write Function (Unix-like replacement)
-	ssize_t write(SERIAL fd,void* buf,size_t count)
+	SSIZE_T write(SERIAL fd,void* buf,size_t count)
 	{
 		//Return Value
 		DWORD bytes_sent=-1;

@@ -99,10 +99,30 @@ msl::json::json(const std::string& json_string)
 	}
 }
 
+unsigned int msl::json::size() const
+{
+	return _data.size();
+}
+
 //Get Operator (Returns the value of a variable)
 std::string msl::json::get(const std::string& index)
 {
 	return _data[index];
+}
+
+std::string msl::json::get(const unsigned int index)
+{
+	unsigned int count=0;
+
+	for(std::map<std::string,std::string>::const_iterator ii=_data.begin();ii!=_data.end();++ii)
+	{
+		if(count==index)
+			return ii->first;
+
+		++count;
+	}
+
+	return "";
 }
 
 //String Function (Returns the JSON string)
