@@ -477,7 +477,8 @@ vec3 getLocation()
 }
 
 
-// main, need I say more?
+// Main
+// Initializes kinect device and video buffers and begins thread to process video frames.
 int startKinectThread(int argc, char **argv, float x, float y, float z, float dist, bool opengl)
 {
   using_open_gl = opengl;
