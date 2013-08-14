@@ -21,3 +21,26 @@ Installation:
 
 	On Windows:
 		Run make.bat.
+
+Controls:
+	Cameras:
+		1 - forward camera
+		2 - bottom camera
+
+	Motion:
+		w - forward
+		s - backward
+		a - left
+		d - right
+		UP_ARROW   - ascend
+		DOWN_ARROW - descend
+
+	Rotation:
+		RIGHT_ARROW - clockwise
+		LEFT_ARROW  - counter clockwise
+
+	Misc:
+		0 - take off
+		SPACE - land
+		r - reset parrot
+		o - toggle autonomous mode
