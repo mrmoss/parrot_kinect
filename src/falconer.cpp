@@ -121,7 +121,7 @@ bool ardrone::connect(unsigned int time_out)
 		++_count;
 		_control_socket<<outdoor_hull_command;
 
-		std::string shell_is_on_command="AT*CONFIG="+msl::to_string(_count)+",\"control:flight_without_shell\",\"TRUE\"\r";
+		std::string shell_is_on_command="AT*CONFIG="+msl::to_string(_count)+",\"control:flight_without_shell\",\"FALSE\"\r";
 		++_count;
 		_control_socket<<shell_is_on_command;
 
