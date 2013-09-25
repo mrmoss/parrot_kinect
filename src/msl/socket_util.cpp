@@ -1,6 +1,6 @@
 //Socket Utility Source
 //	Created By:		Mike Moss
-//	Modified On:	03/12/2013
+//	Modified On:	09/24/2013
 
 //Definitions for "socket_util.hpp"
 #include "socket_util.hpp"

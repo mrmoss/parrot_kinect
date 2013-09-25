@@ -1,6 +1,6 @@
 //Socket Utility Header
 //	Created By:		Mike Moss
-//	Modified On:	03/12/2013
+//	Modified On:	09/24/2013
 
 //Begin Define Guards
 #ifndef MSL_SOCKET_UTIL_H

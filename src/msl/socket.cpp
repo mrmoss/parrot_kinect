@@ -1,6 +1,6 @@
 //Socket Source
 //	Created By:		Mike Moss
-//	Modified On:	05/20/2013
+//	Modified On:	09/24/2013
 
 //Required Libraries:
 //	wsock32 (windows only)
