@@ -20,9 +20,6 @@
 //String Utility Header
 #include "string_util.hpp"
 
-//Time Utility Header
-#include "time_util.hpp"
-
 //Constructor (Default)
 msl::webserver::webserver(const std::string& address,bool(*user_service_client)(msl::socket& client,const std::string& message),
 	const std::string& web_directory):_user_service_client(user_service_client),_socket(address),_web_directory(web_directory)
