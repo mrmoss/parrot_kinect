@@ -136,11 +136,10 @@ static void client_thread(msl::socket client,const std::string& web_directory,bo
 		//Disconnect Bad Clients
 		if(!client.good()||dead)
 			client.close();
+
+		//Give OS a Break
+		usleep(0);
 	}
-
-
-	//Give OS a Break
-	usleep(0);
 }
 
 //Constructor (Default)
@@ -181,8 +180,13 @@ void msl::Ox::webserver::update()
 	//If Client Connected
 	if(client.good())
 	{
-		_threads.push_back(std::thread(client_thread,client,_web_directory,_user_service_client));
-		_threads.back().join();
+		//Keeping an Array Of Threads Has Been Disabled But Left in Just Incase
+		//	the New Standard Allows for Cancelling Threads...
+		//_threads.push_back(new std::thread(client_thread,client,_web_directory,_user_service_client));
+		//_threads.back()->detach();
+
+		std::thread* new_client_thread=new std::thread(client_thread,client,_web_directory,_user_service_client);
+		new_client_thread->detach();
 	}
 
 	//Give OS a Break
@@ -192,6 +196,10 @@ void msl::Ox::webserver::update()
 //Close Function (Closes Server) (Warning!!!  This doesn't close all the threads, there is no way to kill a running joined thread in C++11...yet...)
 void msl::Ox::webserver::close()
 {
+	//Delete Threads
+	for(auto ii:_threads)
+		delete ii;
+
 	//Close Server
 	_socket.close();
 }

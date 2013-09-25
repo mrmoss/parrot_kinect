@@ -58,7 +58,7 @@ namespace msl
 			private:
 				//Member Variables
 				bool(*_user_service_client)(msl::socket& client,const std::string& message);
-				std::vector<std::thread> _threads;
+				std::vector<std::thread*> _threads;
 				msl::socket _socket;
 				std::string _web_directory;
 		};
