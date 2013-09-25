@@ -513,7 +513,7 @@ int socket_write(const SOCKET socket,void* buffer,const unsigned int size,const 
 				return size;
 		}
 	}
-	while(msl::millis()-time_start<2000);
+	while(msl::millis()-time_start<time_out);
 
 	//Return Bytes Sent
 	return (size-bytes_unsent);

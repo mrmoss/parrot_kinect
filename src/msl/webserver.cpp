@@ -95,6 +95,7 @@ void msl::webserver::update()
 			else
 			{
 				dead=true;
+				break;
 			}
 		}
 
