@@ -1,13 +1,15 @@
-//Web Server Header
+//Web Server Ox Header
 //	Created By:		Mike Moss
 //	Modified On:	09/24/2013
+
+//C++11 Only
 
 //Required Libraries:
 //	wsock32 (windows only)
 
 //Begin Define Guards
-#ifndef MSL_WEBSERVER_H
-#define MSL_WEBSERVER_H
+#ifndef MSL_WEBSERVER_OX_H
+#define MSL_WEBSERVER_OX_H
 
 //Socket Header
 #include "socket.hpp"
@@ -15,47 +17,52 @@
 //String Header
 #include <string>
 
+//Thread Header
+#include <thread>
+
 //Vector Header
 #include <vector>
 
 //MSL Namespace
 namespace msl
 {
-	//Web Server Class Declaration
-	class webserver
+	//Ox Namespace
+	namespace Ox
 	{
-		public:
-			//Constructor (Default)
-			webserver(const std::string& address,bool(*user_service_client)(msl::socket& client,const std::string& message)=NULL,
-				const std::string& web_directory="web");
+		//Web Server Class Declaration
+		class webserver
+		{
+			public:
+				//Constructor (Default)
+				webserver(const std::string& address,bool(*user_service_client)(msl::socket& client,const std::string& message)=NULL,
+					const std::string& web_directory="web");
 
-			//Boolean Operator (Tests if Server is Good)
-			operator bool() const;
+				//Boolean Operator (Tests if Server is Good)
+				operator bool() const;
 
-			//Not Operator (For Boolean Operator)
-			bool operator!() const;
+				//Not Operator (For Boolean Operator)
+				bool operator!() const;
 
-			//Good Function (Tests if Server is Good)
-			bool good() const;
+				//Good Function (Tests if Server is Good)
+				bool good() const;
 
-			//Setup Function (Creates Socket)
-			void setup();
+				//Setup Function (Creates Socket)
+				void setup();
 
-			//Update Function (Connects Clients and Runs Web Server)
-			void update();
+				//Update Function (Connects Clients and Runs Web Server)
+				void update();
 
-			//Close Function (Closes Server) (Warning!!!  This doesn't close all the threads, there is no way to kill a running joined thread in C++11...yet...)
-			void close();
+				//Close Function (Closes Server)
+				void close();
 
-		private:
-			//Member Variables
-			bool(*_user_service_client)(msl::socket& client,const std::string& message);
-			void service_client(msl::socket& client,const std::string& message);
-			msl::socket _socket;
-			std::vector<msl::socket> _clients;
-			std::vector<std::string> _client_messages;
-			std::string _web_directory;
-	};
+			private:
+				//Member Variables
+				bool(*_user_service_client)(msl::socket& client,const std::string& message);
+				std::vector<std::thread> _threads;
+				msl::socket _socket;
+				std::string _web_directory;
+		};
+	}
 }
 
 //End Define Guards
@@ -76,8 +83,8 @@ namespace msl
 //String Stream Header
 #include <sstream>
 
-//Web Server Header
-#include "msl/webserver.hpp"
+//Web Server Ox Header
+#include "msl/webserver_Ox.hpp"
 
 //Our Service Client Function Declaration
 bool service_client(msl::socket& client,const std::string& message);
@@ -93,7 +100,7 @@ int main(int argc,char* argv[])
 		server_port=argv[1];
 
 	//Create Server
-	msl::webserver server("0.0.0.0:"+server_port,service_client);
+	msl::Ox::webserver server("0.0.0.0:"+server_port,service_client);
 	server.setup();
 
 	//Check Server
