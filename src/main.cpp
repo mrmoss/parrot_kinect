@@ -2,6 +2,7 @@
 #include "msl/socket.hpp"
 #include "msl/socket_util.hpp"
 #include "msl/string_util.hpp"
+#include "msl/webserver.hpp"
 #include "msl/2d.hpp"
 #include <string>
 #include "falconer.hpp"
@@ -25,9 +26,9 @@
 ardrone a;
 unsigned int textureId;
 
-msl::socket server("0.0.0.0:8080");
 void web_server_thread_function();
-void service_client(msl::socket& client,const std::string& message);
+bool service_client(msl::socket& client,const std::string& message);
+msl::webserver server("0.0.0.0:8080",service_client);
 std::string make_json();
 
 Kinect kinect;
@@ -41,7 +42,7 @@ jpegDestBuffer last_image;
 int main()
 {
 	a.set_video_feed_bottom();
-	server.create_tcp();
+	server.setup();
 
 	if(server.good()&&a.connect(5))
 	{
@@ -153,7 +154,7 @@ void loop(const double dt)
 	else if(drone_autonomous)
 	{
 		pdcontroller.autonomous_flight(a, kinect);
-		//pidcontroller.autonomous_flight(a, kinect);
+		pidcontroller.autonomous_flight(a, kinect);
 	}
 
 	a.video_update();
@@ -229,57 +230,10 @@ void draw()
 
 void web_server_thread_function()
 {
-	std::vector<msl::socket> clients;
-	std::vector<std::string> client_messages;
-
 	while(true)
 	{
-		//Update last_image that will be sent to clients
-		last_image = raw_to_jpeg_array(a.video_data(), 640, 368, 3, JCS_RGB);
-
-		//Check for a Connecting Client
-		msl::socket client=server.accept();
-
-		//If Client Connected
-		if(client)
-		{
-			clients.push_back(client);
-			client_messages.push_back("");
-		}
-
-		//Handle Clients
-		for(unsigned int ii=0;ii<clients.size();++ii)
-		{
-			//Service Good Clients
-			if(clients[ii])
-			{
-				//Temp
-				char byte='\n';
-
-				//Get a Byte
-				while(clients[ii].available()>0&&clients[ii].read(&byte,1)==1)
-				{
-					//Add the Byte to Client Buffer
-					client_messages[ii]+=byte;
-
-					//Check for an End Byte
-					if(msl::ends_with(client_messages[ii],"\r\n\r\n"))
-					{
-						service_client(clients[ii],client_messages[ii]);
-						client_messages[ii].clear();
-					}
-				}
-			}
-
-			//Disconnect Bad Clients
-			else
-			{
-				clients[ii].close();
-				clients.erase(clients.begin()+ii);
-				client_messages.erase(client_messages.begin()+ii);
-				--ii;
-			}
-		}
+		server.update();
+		usleep(0);
 	}
 }
 
@@ -295,8 +249,10 @@ template <typename T> void clamp(const T& min,const T& max,T& value)
 }
 
 //Service Client Function Definition
-void service_client(msl::socket& client,const std::string& message)
+bool service_client(msl::socket& client,const std::string& message)
 {
+	std::cout<<message<<std::endl;
+
 	//Get Requests
 	if(msl::starts_with(message,"GET"))
 	{
@@ -308,14 +264,15 @@ void service_client(msl::socket& client,const std::string& message)
 		istr>>request;
 		istr>>request;
 
-		//Web Root Variable (Where your web files are)
-		std::string web_root="web";
+		std::cout<<request<<std::endl;
 
 		if(msl::starts_with(request,"/photo.jpeg"))
 		{
+			last_image=raw_to_jpeg_array(a.video_data(),640,368,3,JCS_RGB);
 			std::stringstream jpeg;
 			jpeg.write((char *)&last_image.output[0], last_image.output.size());
 			client<<msl::http_pack_string(jpeg.str(),"image/jpeg");
+			return true;
 		}
 		else if(msl::starts_with(request,"/uav/0/goto"))
 		{
@@ -353,74 +310,34 @@ void service_client(msl::socket& client,const std::string& message)
 			pdcontroller.set_desired_location(desired_location);
 
 			client<<msl::http_pack_string("Location Recieved","text/plain");
+			return true;
 		}
 		else if(msl::starts_with(request,"/uav/0/land"))
 		{
 			a.land();
 			client<<msl::http_pack_string("Take off","text/plain");
+			return true;
 		}
 		else if(msl::starts_with(request,"/uav/0/takeoff"))
 		{
 			a.takeoff();
 			client<<msl::http_pack_string("land","text/plain");
+			return true;
 		}
 		else if(msl::starts_with(request,"/uav/0/status"))
 		{
 			client<<msl::http_pack_string(make_json(), "application/json");
+			return true;
 		}
 		else if(msl::starts_with(request,"/uav/0/control"))
 		{
 			drone_autonomous = !drone_autonomous;
 			client<<msl::http_pack_string("changing control","text/plain");
-		}
-		else
-		{
-			//Check for Index
-			if(request=="/")
-				request="/index.html";
-
-			//Mime Type Variable (Default plain text)
-			std::string mime_type="text/plain";
-
-			//Check for Code Mime Type
-			if(msl::ends_with(request,".js"))
-				mime_type="application/x-javascript";
-
-			//Check for Images Mime Type
-			else if(msl::ends_with(request,".gif"))
-				mime_type="image/gif";
-			else if(msl::ends_with(request,".jpeg"))
-				mime_type="image/jpeg";
-			else if(msl::ends_with(request,".png"))
-				mime_type="image/png";
-			else if(msl::ends_with(request,".tiff"))
-				mime_type="image/tiff";
-			else if(msl::ends_with(request,".svg"))
-				mime_type="image/svg+xml";
-			else if(msl::ends_with(request,".ico"))
-				mime_type="image/vnd.microsoft.icon";
-
-			//Check for Text Mime Type
-			else if(msl::ends_with(request,".css"))
-				mime_type="text/css";
-			else if(msl::ends_with(request,".htm")||msl::ends_with(request,".html"))
-				mime_type="text/html";
-
-			//File Data Variable
-			std::string file;
-
-			//Load File
-			if(msl::file_to_string(web_root+request,file,true))
-				client<<msl::http_pack_string(file,mime_type);
-
-			//Bad File
-			else if(msl::file_to_string(web_root+"/not_found.html",file))
-				client<<msl::http_pack_string(file);
+			return true;
 		}
 	}
 
-	//Close Connection
-	client.close();
+	return false;
 }
 
 std::string make_json()

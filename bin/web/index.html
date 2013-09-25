@@ -78,7 +78,7 @@ var IF_WIDTH = IF_HEIGHT * IF_ASPECT_RATIO;
 var x = 0;
 var y = 0;
 
-var robot_mode = false; 
+var robot_mode = false;
 var buffer_index=0;
 
 function get_image()
@@ -101,7 +101,7 @@ function get_image()
 
 function swapBuffer()
 {
-  v1 = document.getElementById("video1"); 
+  v1 = document.getElementById("video1");
   v0 = document.getElementById("video0");
   if(buffer_index==0)
   {
@@ -180,7 +180,7 @@ function init()
   parrot.position.z = .01;
   scene1.add(parrot);
 
-  setInterval(getStatus, 100);
+  setInterval(getStatus, 1000);
 
   mainLoop();
 }
@@ -235,7 +235,7 @@ function statusResponse(data)
 	var my_json = JSON.parse(data);
 	parrot.position.x = my_json.x*6;
 	parrot.position.y = my_json.z*6;
-	robot_mode = my_json.robot; 
+	robot_mode = my_json.robot;
 }
 
 </script>

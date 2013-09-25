@@ -15,7 +15,6 @@ std::string msl::http_create_header(const unsigned int message_size,const std::s
 	std::ostringstream header;
 	header<<"HTTP/1.1 200 OK\n";
 	header<<"Server: Super Lightning Automatic Systematic Wisdomatic Server 3000 v6.54.33.2.1a-177b-c Stable Beta\n";
-	header<<"Last-Modified: From the future\n";
 	header<<"Content-Length: "<<message_size<<'\n';
 	header<<"Content-Type: "<<mime_type<<"; charset=UTF-8\n";
 
@@ -46,7 +45,6 @@ std::string msl::http_to_ascii(std::string symbols)
 		//Replace Newlines
 		symbols.replace(pos,6,"\n");
 	}
-
 
 	//Parse String
 	for(unsigned int ii=0;ii<symbols.size();++ii)

@@ -142,6 +142,7 @@ int main()
 {
 	//Connect to Serial Port
 	msl::serial port("com5",57600);
+	port.connect();
 
 	//Check Serial Port
 	if(port.good())

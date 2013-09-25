@@ -91,7 +91,7 @@ std::string msl::ipv4::str() const
 }
 
 //Constructor(Default)
-msl::socket::socket(const std::string& address):std::ostream(reinterpret_cast<std::streambuf*>(NULL)),_socket(SOCKET_ERROR),_hosting(false),_time_out(200)
+msl::socket::socket(const std::string& address):std::ostream(reinterpret_cast<std::streambuf*>(NULL)),_socket(SOCKET_ERROR),_hosting(false)
 {
 	//Parsing Variables
 	unsigned char ip[4]={0,0,0,0};
@@ -131,7 +131,7 @@ msl::socket::socket(const std::string& address):std::ostream(reinterpret_cast<st
 
 //Copy Constructor
 msl::socket::socket(const msl::socket& copy):std::ostream(reinterpret_cast<std::streambuf*>(NULL)),
-	_address(copy._address),_socket(copy._socket),_hosting(copy._hosting),_time_out(copy._time_out)
+	_address(copy._address),_socket(copy._socket),_hosting(copy._hosting)
 {}
 
 //Copy Assignment Operator
@@ -142,7 +142,6 @@ msl::socket& msl::socket::operator=(const msl::socket& copy)
 		_address=copy._address;
 		_socket=copy._socket;
 		_hosting=copy._hosting;
-		_time_out=copy._time_out;
 	}
 
 	return *this;
@@ -223,27 +222,15 @@ int msl::socket::available() const
 }
 
 //Read Function (Returns -1 on Error Else Returns Number of Bytes Read)
-int msl::socket::read(void* buffer,const unsigned int size,const int flags) const
+int msl::socket::read(void* buffer,const unsigned int size,const long time_out,const int flags) const
 {
-	return socket_read(_socket,buffer,size,_time_out,flags);
+	return socket_read(_socket,buffer,size,time_out,flags);
 }
 
 //Write Function (Returns -1 on Error Else Returns Number of Bytes Sent)
-int msl::socket::write(void* buffer,const unsigned int size,const int flags) const
+int msl::socket::write(void* buffer,const unsigned int size,const long time_out,const int flags) const
 {
-	return socket_write(_socket,buffer,size,_time_out,flags);
-}
-
-//Connection Timeout Mutator
-void msl::socket::set_timeout(const long time_out)
-{
-	_time_out=time_out;
-}
-
-//Connection Timeout Accessor
-long msl::socket::timeout() const
-{
-	return _time_out;
+	return socket_write(_socket,buffer,size,time_out,flags);
 }
 
 //IP Address Accessor (Read Only)
@@ -442,30 +429,14 @@ int socket_available(const SOCKET socket,const long time_out)
 	//Initialize Sockets
 	socket_init();
 
-	//Return Variable
-	int return_value=-1;
-
 	//Reading Variables
 	timeval temp={0,0};
 	fd_set rfds;
 	FD_ZERO(&rfds);
 	FD_SET(socket,&rfds);
-	long time_start=msl::millis();
-
-	//While Socket is Good
-	do
-	{
-		//Try to Read from Socket
-		return_value=select(1+socket,&rfds,NULL,NULL,&temp);
-
-		//If Bytes Break
-		if(return_value>0)
-			break;
-	}
-	while(msl::millis()-time_start<time_out);
 
 	//Return Bytes Waiting
-	return return_value;
+	return select(1+socket,&rfds,NULL,NULL,&temp);
 }
 
 //Socket Peek Function (Same as socket_read but Leaves Bytes in Socket Buffer)
@@ -542,7 +513,7 @@ int socket_write(const SOCKET socket,void* buffer,const unsigned int size,const 
 				return size;
 		}
 	}
-	while(msl::millis()-time_start<time_out);
+	while(msl::millis()-time_start<2000);
 
 	//Return Bytes Sent
 	return (size-bytes_unsent);

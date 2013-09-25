@@ -13,6 +13,9 @@
 
 	//Micro Second Sleep Function (Used for relinquishing time slices)
 	int usleep(long useconds);
+#else
+	//Header for usleep
+	#include <unistd.h>
 #endif
 
 //MSL Namespace

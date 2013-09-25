@@ -22,9 +22,9 @@
 	#include <GL/glut.h>
 	#include <GL/glui.h>
 #else
-	#include <GLUT/glew.h>
+	#include <GLEW/glew.h>
 	#include <GLUT/glut.h>
-	#include <GLUT/glui.h>
+	#include <GLUI/glui.h>
 #endif
 
 //String Header

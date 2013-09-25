@@ -28,15 +28,17 @@ namespace msl
 			//Constructor (Default)
 			json(const std::string& json_string="");
 
+			//Size Accessor (Returns number of variables)
 			unsigned int size() const;
 
 			//Set Operator (Sets a variable to a value)
 			template<typename T> void set(const std::string& lhs,const T& rhs);
 
+			//Get Operator (Returns variable from an index)
+			std::string get(const unsigned int index);
+
 			//Get Operator (Returns the value of a variable)
 			std::string get(const std::string& index);
-
-			std::string get(const unsigned int index);
 
 			//String Function (Returns the JSON string)
 			std::string str() const;

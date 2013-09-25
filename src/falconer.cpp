@@ -156,10 +156,10 @@ bool ardrone::connect(unsigned int time_out)
 		while(msl::millis()<timer&&!good());
 		{
 			if(_navdata_socket.available()<=0)
-				_navdata_socket.write(redirect_navdata_command,14);
+				_navdata_socket.write(redirect_navdata_command,14,200);
 
 			if(_video_socket.available()<=0)
-				_video_socket.write(video_wakeup_command,1);
+				_video_socket.write(video_wakeup_command,1,200);
 		}
 	}
 
@@ -173,7 +173,7 @@ void ardrone::navdata_update()
 		const int packet_size=500;			//nav-data-full packet size=500, nav-data-demo packet size=24
 		uint8_t byte[packet_size];
 
-		if(_navdata_socket.available()>0&&_navdata_socket.read(byte,packet_size)==packet_size)
+		if(_navdata_socket.available()>0&&_navdata_socket.read(byte,packet_size,200)==packet_size)
 		{
 			if(byte[0]==0x88&&byte[1]==0x77&&byte[2]==0x66&&byte[3]==0x55)
 			{
@@ -211,9 +211,9 @@ void ardrone::video_update()
 		_video_socket<<video_keepalive_command;
 
 		parrot_video_encapsulation_t video_packet;
-		_av_packet.size=_video_socket.read(_av_packet.data,sizeof(parrot_video_encapsulation_t));
+		_av_packet.size=_video_socket.read(_av_packet.data,sizeof(parrot_video_encapsulation_t),200);
 		memcpy(&video_packet,_av_packet.data,_av_packet.size);
-		_av_packet.size=_video_socket.read(_av_packet.data,video_packet.payload_size);
+		_av_packet.size=_video_socket.read(_av_packet.data,video_packet.payload_size,200);
 
 		_av_packet.flags=0;
 
