@@ -133,6 +133,9 @@ bool service_client(msl::socket& client,const std::string& message)
 		//Send Custom Message
 		client<<"custom request detected!";
 
+		//Close Client Connection (Not a Keep-Alive Request)
+		client.close();
+
 		//Return True (We serviced the client)
 		return true;
 	}
