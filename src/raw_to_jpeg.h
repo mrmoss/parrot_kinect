@@ -34,7 +34,7 @@ public:
 bool raw_to_jpeg(const std::string& filename, unsigned char* raw_image, int width, int height,
                  int bytes_per_pixel, int color_space);
 
-jpegDestBuffer raw_to_jpeg_array(unsigned char* raw_image, int width, int height,
+std::vector<unsigned char> raw_to_jpeg_array(unsigned char* raw_image, int width, int height,
                  int bytes_per_pixel, int color_space);
 
 #endif //RAW_TO_JPEG_H_

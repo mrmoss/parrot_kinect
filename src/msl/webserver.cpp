@@ -179,14 +179,24 @@ void msl::webserver::service_client(msl::socket& client,const std::string& messa
 
 			//Load File
 			if(msl::file_to_string(_web_directory+request,file,true))
-				client<<msl::http_pack_string(file,mime_type,false);
+			{
+				std::string response_str=msl::http_pack_string(file,mime_type,false);
+				client.write(response_str.c_str(),response_str.size());
+			}
 
 			//Bad File
 			else if(msl::file_to_string(_web_directory+"/not_found.html",file,true))
-				client<<msl::http_pack_string(file);
+			{
+				std::string response_str=msl::http_pack_string(file);
+				client.write(response_str.c_str(),response_str.size());
+			}
 
+			//No Bad File
 			else
-				client<<msl::http_pack_string("sorry...");
+			{
+				std::string response_str=msl::http_pack_string("sorry...");
+				client.write(response_str.c_str(),response_str.size());
+			}
 		}
 	}
 

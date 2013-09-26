@@ -114,7 +114,7 @@ namespace msl
 			int read(void* buffer,const unsigned int size,const long time_out=0,const int flags=0) const;
 
 			//Write Function (Returns Number of Bytes Sent, -1 on Error)
-			int write(void* buffer,const unsigned int size,const long time_out=0,const int flags=0) const;
+			int write(const void* buffer,const unsigned int size,const long time_out=0,const int flags=0) const;
 
 			//IP Address Accessor (Read Only)
 			msl::ipv4 ip() const;
@@ -171,7 +171,7 @@ int socket_peek(const SOCKET socket,void* buffer,const unsigned int size,const l
 int socket_read(const SOCKET socket,void* buffer,const unsigned int size,const long time_out=0,const int flags=0);
 
 //Socket Write Function (Returns Number of Bytes Sent, -1 on Error)
-int socket_write(const SOCKET socket,void* buffer,const unsigned int size,const long time_out=200,const int flags=0);
+int socket_write(const SOCKET socket,const void* buffer,const unsigned int size,const long time_out=200,const int flags=0);
 
 //End Define Guards
 #endif

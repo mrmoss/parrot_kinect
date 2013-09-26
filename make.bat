@@ -1,6 +1,6 @@
 @ECHO OFF
 
-set MSL=src/msl/2d.cpp src/msl/2d_util.cpp src/msl/file_util.cpp src/msl/font.cpp src/msl/glut_input.cpp src/msl/socket.cpp src/msl/socket_util.cpp src/msl/sprite.cpp src/msl/string_util.cpp src/msl/time_util.cpp
+set MSL=src/msl/2d.cpp src/msl/2d_util.cpp src/msl/file_util.cpp src/msl/font.cpp src/msl/glut_input.cpp src/msl/socket.cpp src/msl/socket_util.cpp src/msl/sprite.cpp src/msl/string_util.cpp src/msl/time_util.cpp src/msl/webserver.cpp src/msl/webserver_Ox.cpp
 set SOIL=windows\mingw\i686-w64-mingw32\include\SOIL\SOIL.c windows\mingw\i686-w64-mingw32\include\SOIL\stb_image_aug.c
 SET SRC_PARROT=%MSL% %SOIL% src/main.cpp src/falconer.cpp src/raw_to_jpeg.cpp src/kinect/libfree/*.cpp src/kinect/Kinect.cpp src/PDController.cpp src/PIDController.cpp
 set SRC_KINECT=src/kinect/main.cpp src/kinect/Kinect.cpp src/kinect/libfree/*.cpp

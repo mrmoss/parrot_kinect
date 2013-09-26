@@ -1,6 +1,9 @@
 #include "falconer.hpp"
 
 #include "msl/string_util.hpp"
+
+#include <string.h>
+
 #include "msl/time_util.hpp"
 
 //https://github.com/elliotwoods/ARDrone-GStreamer-test/blob/master/plugin/src/pave.h
@@ -40,11 +43,14 @@ ardrone::ardrone(const std::string ip):_count(1),_control_socket(ip+":5556"),_na
 	av_log_set_level(AV_LOG_QUIET);
 
 	_camera_data=new uint8_t[640*368*3];
+	memset(_camera_data,0,640*368*3);
 
 	avcodec_register_all();
 
+	memset(&_av_packet,0,sizeof(_av_packet));
 	av_init_packet(&_av_packet);
 	_av_packet.data=new uint8_t[100000];
+	memset(_av_packet.data,0,100000);
 
 	_av_codec=avcodec_find_decoder(CODEC_ID_H264);
 
@@ -208,9 +214,10 @@ void ardrone::video_update()
 	if(good())
 	{
 		char video_keepalive_command[1]={1};
-		_video_socket<<video_keepalive_command;
+		_video_socket.write(&video_keepalive_command,1);
 
 		parrot_video_encapsulation_t video_packet;
+		memset(&video_packet,0,sizeof(video_packet));
 		_av_packet.size=_video_socket.read(_av_packet.data,sizeof(parrot_video_encapsulation_t),200);
 		memcpy(&video_packet,_av_packet.data,_av_packet.size);
 		_av_packet.size=_video_socket.read(_av_packet.data,video_packet.payload_size,200);

@@ -2,7 +2,7 @@
 #include "msl/socket.hpp"
 #include "msl/socket_util.hpp"
 #include "msl/string_util.hpp"
-#include "msl/webserver.hpp"
+#include "msl/webserver_Ox.hpp"
 #include "msl/2d.hpp"
 #include <string>
 #include "falconer.hpp"
@@ -27,8 +27,10 @@ ardrone a;
 unsigned int textureId;
 
 void web_server_thread_function();
+void jpeg_thread_function();
+
 bool service_client(msl::socket& client,const std::string& message);
-msl::webserver server("0.0.0.0:8080",service_client);
+msl::Ox::webserver server("0.0.0.0:8080",service_client);
 std::string make_json();
 
 Kinect kinect;
@@ -37,7 +39,7 @@ vec3 desired_location = vec3(0,0.1,kcs_distance_to_origin);
 PDController pdcontroller(desired_location);
 PIDController pidcontroller(desired_location);
 
-jpegDestBuffer last_image;
+std::vector<unsigned char> last_image;
 
 int main()
 {
@@ -55,6 +57,7 @@ int main()
 	}
 
 	std::thread web_server_thread(web_server_thread_function);
+	web_server_thread.detach();
 
 	kinect.start_thread();
 
@@ -232,6 +235,7 @@ void web_server_thread_function()
 {
 	while(true)
 	{
+		last_image=raw_to_jpeg_array(a.video_data(),640,368,3,JCS_RGB);
 		server.update();
 		usleep(0);
 	}
@@ -268,10 +272,10 @@ bool service_client(msl::socket& client,const std::string& message)
 
 		if(msl::starts_with(request,"/photo.jpeg"))
 		{
-			last_image=raw_to_jpeg_array(a.video_data(),640,368,3,JCS_RGB);
 			std::stringstream jpeg;
-			jpeg.write((char *)&last_image.output[0], last_image.output.size());
-			client<<msl::http_pack_string(jpeg.str(),"image/jpeg");
+			jpeg.write((char *)&last_image[0], last_image.size());
+			std::string response_str=msl::http_pack_string(jpeg.str(),"image/jpeg");
+			client.write(response_str.c_str(),response_str.size());
 			return true;
 		}
 		else if(msl::starts_with(request,"/uav/0/goto"))

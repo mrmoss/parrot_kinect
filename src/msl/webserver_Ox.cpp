@@ -23,7 +23,7 @@
 #include "string_util.hpp"
 
 //Static Global Service Client Function
-void service_client(msl::socket& client,const std::string& message,const std::string& web_directory,bool(*user_service_client)(msl::socket& client,const std::string& message))
+void service_client(msl::socket client,const std::string&message,const std::string web_directory,bool(*user_service_client)(msl::socket& client,const std::string& message))
 {
 	//Get Requests
 	if(msl::starts_with(message,"GET"))
@@ -75,14 +75,24 @@ void service_client(msl::socket& client,const std::string& message,const std::st
 
 			//Load File
 			if(msl::file_to_string(web_directory+request,file,true))
-				client<<msl::http_pack_string(file,mime_type,false);
+			{
+				std::string response_str=msl::http_pack_string(file,mime_type,false);
+				client.write(response_str.c_str(),response_str.size(),120000);
+			}
 
 			//Bad File
 			else if(msl::file_to_string(web_directory+"/not_found.html",file,true))
-				client<<msl::http_pack_string(file);
+			{
+				std::string response_str=msl::http_pack_string(file);
+				client.write(response_str.c_str(),response_str.size(),120000);
+			}
 
+			//No Bad File
 			else
-				client<<msl::http_pack_string("sorry...");
+			{
+				std::string response_str=msl::http_pack_string("sorry...");
+				client.write(response_str.c_str(),response_str.size(),120000);
+			}
 		}
 	}
 
@@ -94,13 +104,13 @@ void service_client(msl::socket& client,const std::string& message,const std::st
 }
 
 //Static Global Client Thread Function
-static void client_thread(msl::socket client,const std::string& web_directory,bool(*user_service_client)(msl::socket& client,const std::string& message))
+static void client_thread(msl::socket client,const std::string web_directory,bool(*user_service_client)(msl::socket& client,const std::string& message))
 {
 	//Client Message Buffer
 	std::string message="";
 
 	//Keep Getting Messages
-	while(client.good())
+	while(true)
 	{
 		//Dead Check Variable
 		bool dead=false;
@@ -135,7 +145,10 @@ static void client_thread(msl::socket client,const std::string& web_directory,bo
 
 		//Disconnect Bad Clients
 		if(!client.good()||dead)
+		{
 			client.close();
+			return;
+		}
 
 		//Give OS a Break
 		usleep(0);

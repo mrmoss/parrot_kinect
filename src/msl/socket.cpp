@@ -228,7 +228,7 @@ int msl::socket::read(void* buffer,const unsigned int size,const long time_out,c
 }
 
 //Write Function (Returns -1 on Error Else Returns Number of Bytes Sent)
-int msl::socket::write(void* buffer,const unsigned int size,const long time_out,const int flags) const
+int msl::socket::write(const void* buffer,const unsigned int size,const long time_out,const int flags) const
 {
 	return socket_write(_socket,buffer,size,time_out,flags);
 }
@@ -483,7 +483,7 @@ int socket_read(const SOCKET socket,void* buffer,const unsigned int size,const l
 }
 
 //Socket Write Function (Writes Bytes to Socket)
-int socket_write(const SOCKET socket,void* buffer,const unsigned int size,const long time_out,const int flags)
+int socket_write(const SOCKET socket,const void* buffer,const unsigned int size,const long time_out,const int flags)
 {
 	//Check for Bad Socket
 	if(socket==static_cast<unsigned int>(SOCKET_ERROR))
@@ -500,7 +500,7 @@ int socket_write(const SOCKET socket,void* buffer,const unsigned int size,const 
 	do
 	{
 		//Get Bytes in Send Buffer
-		unsigned int bytes_sent=send(socket,reinterpret_cast<char*>(buffer)+(size-bytes_unsent),bytes_unsent,flags);
+		unsigned int bytes_sent=send(socket,reinterpret_cast<const char*>(buffer)+(size-bytes_unsent),bytes_unsent,flags);
 
 		//If Bytes Were Sent
 		if(bytes_sent>0)
