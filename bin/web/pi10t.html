@@ -253,14 +253,12 @@ function getCoords(event)
   // Convert mouseX and mouseY to the range -.5*range,+.5*range
   var x= mouseX-IF_WIDTH/2;
   var z=-mouseY+IF_HEIGHT/2;
+  
 
   // Convert x and y to the range -6,+6 feet
   x = x/(IF_WIDTH/2) * 6;
   z = z/(IF_HEIGHT/2)* 6;
 
-  // Round to the nearest .5 foot
-  x = Math.floor(x) + 0.5;
-  z = Math.floor(z) + 0.5;
 
   // Place the arrow animation and set it to the first frame
   arrow.position.x = x;
