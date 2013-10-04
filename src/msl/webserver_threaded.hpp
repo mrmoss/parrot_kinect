@@ -1,15 +1,14 @@
-//Web Server Ox Header
+//Web Server Threaded Header
 //	Created By:		Mike Moss
-//	Modified On:	09/24/2013
-
-//C++11 Only
+//	Modified On:	10/03/2013
 
 //Required Libraries:
+// 	pthread
 //	wsock32 (windows only)
 
 //Begin Define Guards
-#ifndef MSL_WEBSERVER_OX_H
-#define MSL_WEBSERVER_OX_H
+#ifndef MSL_WEBSERVER_THREADED_H
+#define MSL_WEBSERVER_THREADED_H
 
 //Socket Header
 #include "socket.hpp"
@@ -18,7 +17,7 @@
 #include <string>
 
 //Thread Header
-#include <thread>
+#include <pthread.h>
 
 //Vector Header
 #include <vector>
@@ -26,43 +25,38 @@
 //MSL Namespace
 namespace msl
 {
-	//Ox Namespace
-	namespace Ox
+	//Web Server Threaded Class Declaration
+	class webserver_threaded
 	{
-		//Web Server Class Declaration
-		class webserver
-		{
-			public:
-				//Constructor (Default)
-				webserver(const std::string& address,bool(*user_service_client)(msl::socket& client,const std::string& message)=NULL,
-					const std::string& web_directory="web");
+		public:
+			//Constructor (Default)
+			webserver_threaded(const std::string& address,bool(*user_service_client)(msl::socket& client,const std::string& message)=NULL,
+				const std::string& web_directory="web");
 
-				//Boolean Operator (Tests if Server is Good)
-				operator bool() const;
+			//Boolean Operator (Tests if Server is Good)
+			operator bool() const;
 
-				//Not Operator (For Boolean Operator)
-				bool operator!() const;
+			//Not Operator (For Boolean Operator)
+			bool operator!() const;
 
-				//Good Function (Tests if Server is Good)
-				bool good() const;
+			//Good Function (Tests if Server is Good)
+			bool good() const;
 
-				//Setup Function (Creates Socket)
-				void setup();
+			//Setup Function (Creates Socket)
+			void setup();
 
-				//Update Function (Connects Clients and Runs Web Server)
-				void update();
+			//Update Function (Connects Clients and Runs Web Server)
+			void update();
 
-				//Close Function (Closes Server)
-				void close();
+			//Close Function (Closes Server)
+			void close();
 
-			private:
-				//Member Variables
-				bool(*_user_service_client)(msl::socket& client,const std::string& message);
-				std::vector<std::thread*> _threads;
-				msl::socket _socket;
-				std::string _web_directory;
-		};
-	}
+		private:
+			//Member Variables
+			bool(*_user_service_client)(msl::socket& client,const std::string& message);
+			msl::socket _socket;
+			std::string _web_directory;
+	};
 }
 
 //End Define Guards
@@ -70,9 +64,9 @@ namespace msl
 
 //Example (You need to make a folder called web and put index.html and not_found.html, located in comments below this example, in it for this to work)
 /*
-//Basic Web Server Source
+//Threaded Web Server Source
 //	Created By:		Mike Moss
-//	Modified On:	09/24/2013
+//	Modified On:	10/03/2013
 
 //IO Stream Header
 #include <iostream>
@@ -83,8 +77,8 @@ namespace msl
 //String Stream Header
 #include <sstream>
 
-//Web Server Ox Header
-#include "msl/webserver_Ox.hpp"
+//Web Server Threaded Header
+#include "msl/webserver_threaded.hpp"
 
 //Our Service Client Function Declaration
 bool service_client(msl::socket& client,const std::string& message);
@@ -100,7 +94,7 @@ int main(int argc,char* argv[])
 		server_port=argv[1];
 
 	//Create Server
-	msl::Ox::webserver server("0.0.0.0:"+server_port,service_client);
+	msl::webserver_threaded server("0.0.0.0:"+server_port,service_client);
 	server.setup();
 
 	//Check Server

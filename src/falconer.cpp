@@ -117,6 +117,10 @@ bool ardrone::connect(unsigned int time_out)
 
 	if(good())
 	{
+		long timer=msl::millis()+1000;
+		char redirect_navdata_command[14]={1,0,0,0,0,0,0,0,0,0,0,0,0,0};
+		char video_wakeup_command[1]={1};
+
 		_count=1;
 
 		std::string initialize_command="AT*FTRIM="+msl::to_string(_count)+"\r";
@@ -154,10 +158,6 @@ bool ardrone::connect(unsigned int time_out)
 		std::string altitude_max_command="AT*CONFIG="+msl::to_string(_count)+",\"control:altitude_max\",\"4000\"\r";
 		++_count;
 		_control_socket<<altitude_max_command;
-
-		long timer=msl::millis()+1000;
-		char redirect_navdata_command[14]={1,0,0,0,0,0,0,0,0,0,0,0,0,0};
-		char video_wakeup_command[1]={1};
 
 		while(msl::millis()<timer&&!good());
 		{
@@ -219,23 +219,38 @@ void ardrone::video_update()
 		parrot_video_encapsulation_t video_packet;
 		memset(&video_packet,0,sizeof(video_packet));
 		_av_packet.size=_video_socket.read(_av_packet.data,sizeof(parrot_video_encapsulation_t),200);
-		memcpy(&video_packet,_av_packet.data,_av_packet.size);
-		_av_packet.size=_video_socket.read(_av_packet.data,video_packet.payload_size,200);
 
-		_av_packet.flags=0;
-
-		if(video_packet.frame_type==1)
-			_av_packet.flags=AV_PKT_FLAG_KEY;
-
-		int frame_decoded=0;
-
-		if(avcodec_decode_video2(_av_context,_av_camera_cmyk,&frame_decoded,&_av_packet)>0&&frame_decoded>0)
+		if(static_cast<unsigned int>(_av_packet.size)<=sizeof(video_packet))
 		{
-			SwsContext* _sws_context=sws_getContext(video_packet.encoded_stream_width,video_packet.encoded_stream_height,PIX_FMT_YUV420P,video_packet.encoded_stream_width,
-				video_packet.encoded_stream_height,PIX_FMT_RGB24,SWS_BICUBIC,NULL,NULL,NULL);
-			avpicture_fill(reinterpret_cast<AVPicture*>(_av_camera_rgb),_camera_data,PIX_FMT_BGR24,video_packet.encoded_stream_width,video_packet.encoded_stream_height);
-			sws_scale(_sws_context,_av_camera_cmyk->data,_av_camera_cmyk->linesize,0,video_packet.display_height,_av_camera_rgb->data,_av_camera_rgb->linesize);
-			sws_freeContext(_sws_context);
+			memcpy(&video_packet,_av_packet.data,_av_packet.size);
+			_av_packet.size=_video_socket.read(_av_packet.data,video_packet.payload_size,200);
+
+			_av_packet.flags=0;
+
+			if(video_packet.frame_type==1)
+				_av_packet.flags=AV_PKT_FLAG_KEY;
+
+			int frame_decoded=0;
+
+			if(avcodec_decode_video2(_av_context,_av_camera_cmyk,&frame_decoded,&_av_packet)>0&&frame_decoded>0)
+			{
+				if(video_packet.encoded_stream_width==640&&video_packet.encoded_stream_height==368)
+				{
+					SwsContext* _sws_context=sws_getContext(video_packet.encoded_stream_width,video_packet.encoded_stream_height,PIX_FMT_YUV420P,video_packet.encoded_stream_width,
+						video_packet.encoded_stream_height,PIX_FMT_RGB24,SWS_BICUBIC,NULL,NULL,NULL);
+
+					if(_sws_context!=NULL)
+					{
+						if(_av_camera_rgb!=NULL&&_camera_data!=NULL)
+							avpicture_fill(reinterpret_cast<AVPicture*>(_av_camera_rgb),_camera_data,PIX_FMT_BGR24,video_packet.encoded_stream_width,video_packet.encoded_stream_height);
+
+						if(_av_camera_cmyk->data!=NULL&&video_packet.display_width==640&&video_packet.display_height==360)
+							sws_scale(_sws_context,_av_camera_cmyk->data,_av_camera_cmyk->linesize,0,video_packet.display_height,_av_camera_rgb->data,_av_camera_rgb->linesize);
+
+						sws_freeContext(_sws_context);
+					}
+				}
+			}
 		}
 	}
 }

@@ -1,14 +1,13 @@
-//Web Server Ox Source
+//Web Server Threaded Source
 //	Created By:		Mike Moss
-//	Modified On:	09/24/2013
-
-//C++11 Only
+//	Modified On:	10/03/2013
 
 //Required Libraries:
+// 	pthread
 //	wsock32 (windows only)
 
-//Definitions for "webserver_Ox.hpp"
-#include "webserver_Ox.hpp"
+//Definitions for "webserver_threaded.hpp"
+#include "webserver_threaded.hpp"
 
 //File Utility Header
 #include "file_util.hpp"
@@ -21,6 +20,15 @@
 
 //String Utility Header
 #include "string_util.hpp"
+
+//Thread Argument Passing Container
+class client_thread_arg
+{
+	public:
+		msl::socket socket;
+		std::string web_directory;
+		bool(*user_service_client)(msl::socket& client,const std::string& message);
+};
 
 //Static Global Service Client Function
 void service_client(msl::socket client,const std::string&message,const std::string web_directory,bool(*user_service_client)(msl::socket& client,const std::string& message))
@@ -104,25 +112,28 @@ void service_client(msl::socket client,const std::string&message,const std::stri
 }
 
 //Static Global Client Thread Function
-static void client_thread(msl::socket client,const std::string web_directory,bool(*user_service_client)(msl::socket& client,const std::string& message))
+static void* client_thread(void* args)
 {
-	//Client Message Buffer
-	std::string message="";
+	//Extract Thread Argument Container
+	client_thread_arg* client_data=(client_thread_arg*)args;
 
-	//Keep Getting Messages
-	while(true)
+	//Check Thread Argument Container
+	if(client_data!=NULL)
 	{
-		//Dead Check Variable
-		bool dead=false;
+		//Client Message Buffer
+		std::string message="";
 
-		//Get a Byte
-		while(client.good()&&client.available()>0)
+		//Keep Getting Messages
+		while(true)
 		{
+			//Give OS a Break
+			usleep(0);
+
 			//Temp
 			char byte='\n';
 
 			//Get a Byte
-			if(client.read(&byte,1)==1)
+			while(client_data->socket.available()>0&&client_data->socket.read(&byte,1)==1)
 			{
 				//Add the Byte to Client Buffer
 				message+=byte;
@@ -130,62 +141,59 @@ static void client_thread(msl::socket client,const std::string web_directory,boo
 				//Check for an End Byte
 				if(msl::ends_with(message,"\r\n\r\n"))
 				{
-					service_client(client,message,web_directory,user_service_client);
+					service_client(client_data->socket,message,client_data->web_directory,
+						client_data->user_service_client);
 					message.clear();
 				}
 			}
 
-			//If There are Bytes to Read But None are Readable then Client is "dead"
-			else
+			//Disconnect Bad Clients
+			if(!client_data->socket.good())
 			{
-				dead=true;
+				client_data->socket.close();
 				break;
 			}
 		}
-
-		//Disconnect Bad Clients
-		if(!client.good()||dead)
-		{
-			client.close();
-			return;
-		}
-
-		//Give OS a Break
-		usleep(0);
 	}
+
+	//Clean Up Thread Argument Container
+	delete client_data;
+
+	//Return No Data
+	return NULL;
 }
 
 //Constructor (Default)
-msl::Ox::webserver::webserver(const std::string& address,bool(*user_service_client)(msl::socket& client,const std::string& message),
+msl::webserver_threaded::webserver_threaded(const std::string& address,bool(*user_service_client)(msl::socket& client,const std::string& message),
 	const std::string& web_directory):_user_service_client(user_service_client),_socket(address),_web_directory(web_directory)
 {}
 
 //Boolean Operator (Tests if Server is Good)
-msl::Ox::webserver::operator bool() const
+msl::webserver_threaded::operator bool() const
 {
 	return good();
 }
 
 //Not Operator (For Boolean Operator)
-bool msl::Ox::webserver::operator!() const
+bool msl::webserver_threaded::operator!() const
 {
 	return !good();
 }
 
 //Good Function (Tests if Server is Good)
-bool msl::Ox::webserver::good() const
+bool msl::webserver_threaded::good() const
 {
 	return _socket.good();
 }
 
 //Setup Function (Creates Socket)
-void msl::Ox::webserver::setup()
+void msl::webserver_threaded::setup()
 {
 	_socket.create_tcp();
 }
 
 //Update Function (Connects Clients and Runs Server)
-void msl::Ox::webserver::update()
+void msl::webserver_threaded::update()
 {
 	//Check for a Connecting Client
 	msl::socket client=_socket.accept();
@@ -193,13 +201,22 @@ void msl::Ox::webserver::update()
 	//If Client Connected
 	if(client.good())
 	{
-		//Keeping an Array Of Threads Has Been Disabled But Left in Just Incase
-		//	the New Standard Allows for Cancelling Threads...
-		//_threads.push_back(new std::thread(client_thread,client,_web_directory,_user_service_client));
-		//_threads.back()->detach();
+		//Create a Thread
+		pthread_t new_client_thread;
 
-		std::thread* new_client_thread=new std::thread(client_thread,client,_web_directory,_user_service_client);
-		new_client_thread->detach();
+		//Create Thread Argument Container
+		client_thread_arg* new_client_data=new client_thread_arg;
+		new_client_data->socket=client;
+		new_client_data->web_directory=_web_directory;
+		new_client_data->user_service_client=_user_service_client;
+
+		//Create Thread
+		if(pthread_create(&new_client_thread,NULL,&client_thread,(void*)new_client_data)==0)
+			pthread_detach(new_client_thread);
+
+		//On Error Delete Thread Argument Container
+		else
+			delete new_client_data;
 	}
 
 	//Give OS a Break
@@ -207,12 +224,7 @@ void msl::Ox::webserver::update()
 }
 
 //Close Function (Closes Server) (Warning!!!  This doesn't close all the threads, there is no way to kill a running joined thread in C++11...yet...)
-void msl::Ox::webserver::close()
+void msl::webserver_threaded::close()
 {
-	//Delete Threads
-	for(auto ii:_threads)
-		delete ii;
-
-	//Close Server
 	_socket.close();
 }

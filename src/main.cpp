@@ -2,7 +2,7 @@
 #include "msl/socket.hpp"
 #include "msl/socket_util.hpp"
 #include "msl/string_util.hpp"
-#include "msl/webserver_Ox.hpp"
+#include "msl/webserver_threaded.hpp"
 #include "msl/2d.hpp"
 #include <string>
 #include "falconer.hpp"
@@ -30,7 +30,7 @@ void web_server_thread_function();
 void jpeg_thread_function();
 
 bool service_client(msl::socket& client,const std::string& message);
-msl::Ox::webserver server("0.0.0.0:8080",service_client);
+msl::webserver_threaded server("0.0.0.0:8080",service_client);
 std::string make_json();
 
 Kinect kinect;
@@ -221,7 +221,7 @@ void draw()
 	else
 		data+="Landed\n";
 
-	data+="Server:\t"+msl::to_string((bool)server)+"\n";
+	data+="Server:\t"+msl::to_string((bool)server.good())+"\n";
 
 	double width=180;
 	double height=160;
@@ -235,7 +235,13 @@ void web_server_thread_function()
 {
 	while(true)
 	{
-		last_image=raw_to_jpeg_array(a.video_data(),640,368,3,JCS_RGB);
+		try
+		{
+			last_image=raw_to_jpeg_array(a.video_data(),640,360,3,JCS_RGB);
+		}
+		catch(...)
+		{}
+
 		server.update();
 		usleep(0);
 	}
@@ -255,8 +261,6 @@ template <typename T> void clamp(const T& min,const T& max,T& value)
 //Service Client Function Definition
 bool service_client(msl::socket& client,const std::string& message)
 {
-	std::cout<<message<<std::endl;
-
 	//Get Requests
 	if(msl::starts_with(message,"GET"))
 	{
@@ -272,10 +276,16 @@ bool service_client(msl::socket& client,const std::string& message)
 
 		if(msl::starts_with(request,"/photo.jpeg"))
 		{
-			std::stringstream jpeg;
-			jpeg.write((char *)&last_image[0], last_image.size());
-			std::string response_str=msl::http_pack_string(jpeg.str(),"image/jpeg");
-			client.write(response_str.c_str(),response_str.size());
+			if((char*)&last_image[0]!=NULL)
+			{
+				if(last_image.size()>0)
+				{
+					std::string jpeg((char*)&last_image[0],last_image.size());
+					std::string response_str=msl::http_pack_string(jpeg,"image/jpeg");
+					client.write(response_str.c_str(),response_str.size());
+				}
+			}
+
 			return true;
 		}
 		else if(msl::starts_with(request,"/uav/0/goto"))
@@ -313,30 +323,35 @@ bool service_client(msl::socket& client,const std::string& message)
 
 			pdcontroller.set_desired_location(desired_location);
 
-			client<<msl::http_pack_string("Location Recieved","text/plain");
+			std::string response=msl::http_pack_string("Location Recieved","text/plain");
+			client.write(response.c_str(),response.size());
 			return true;
 		}
 		else if(msl::starts_with(request,"/uav/0/land"))
 		{
 			a.land();
-			client<<msl::http_pack_string("Take off","text/plain");
+			std::string response=msl::http_pack_string("Take off","text/plain");
+			client.write(response.c_str(),response.size());
 			return true;
 		}
 		else if(msl::starts_with(request,"/uav/0/takeoff"))
 		{
 			a.takeoff();
-			client<<msl::http_pack_string("land","text/plain");
+			std::string response=msl::http_pack_string("land","text/plain");
+			client.write(response.c_str(),response.size());
 			return true;
 		}
 		else if(msl::starts_with(request,"/uav/0/status"))
 		{
-			client<<msl::http_pack_string(make_json(), "application/json");
+			std::string response=msl::http_pack_string(make_json(), "application/json");
+			client.write(response.c_str(),response.size());
 			return true;
 		}
 		else if(msl::starts_with(request,"/uav/0/control"))
 		{
 			drone_autonomous = !drone_autonomous;
-			client<<msl::http_pack_string("changing control","text/plain");
+			std::string response=msl::http_pack_string("changing control","text/plain");
+			client.write(response.c_str(),response.size());
 			return true;
 		}
 	}

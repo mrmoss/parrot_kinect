@@ -166,6 +166,12 @@ bool msl::socket::good() const
 	if(_socket==static_cast<unsigned int>(SOCKET_ERROR)||_socket==static_cast<unsigned int>(INVALID_SOCKET))
 		return false;
 
+	//Check for Disconnected Socket (Magic Situation of Select=1 and RECV=0)
+	char temp;
+
+	if(available()>0&&socket_peek(_socket,&temp,1)==0)
+		return false;
+
 	//Check Reading Error
 	return (available()>=0);
 }
