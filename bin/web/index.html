@@ -93,7 +93,6 @@ function get_image()
     {
       document.getElementById("video1").src = 'photo.jpeg?' + new Date().getTime();
     }
-    //ctx.drawImage(img, 0, 0);
   }
   catch(e)
   {}
@@ -115,6 +114,8 @@ function swapBuffer()
     v1.style.zIndex="-1";
     buffer_index=0;
   }
+
+  get_image();
 }
 
 function init()
@@ -124,8 +125,6 @@ function init()
 
   //var canvas = document.getElementById('canvas');
   //ctx = canvas.getContext("2d");
-
-  setInterval(get_image,100);
 
   // Chech for webgl implementation
   if(!Detector.webgl)
@@ -180,7 +179,8 @@ function init()
   parrot.position.z = .01;
   scene1.add(parrot);
 
-  setInterval(getStatus, 1000);
+  getStatus();
+  swapBuffer();
 
   mainLoop();
 }
@@ -236,6 +236,7 @@ function statusResponse(data)
 	parrot.position.x = my_json.x*6;
 	parrot.position.y = my_json.z*6;
 	robot_mode = my_json.robot;
+	getStatus();
 }
 
 </script>
