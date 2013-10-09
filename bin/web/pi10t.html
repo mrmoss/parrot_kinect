@@ -69,6 +69,7 @@ var container, v_container, camera1, camera2, scene1, scene2, if_renderer, video
 // for the arrow animation
 var arrow, arrowTex, currentFrame, totalFrames;
 var parrot, parrotTex;
+var rover, roverTex;
 var clock, elapsedTime = 0;
 
 var request = new XMLHttpRequest();
@@ -77,10 +78,10 @@ var averageResponse = 100;	// This will be overwritten when we start recieving d
 var message_count = 0;
 
 var paused = false;
-
 var IF_ASPECT_RATIO  = 1.0;
 var IF_HEIGHT = $(window).height() * 0.7;
 var IF_WIDTH = IF_HEIGHT * IF_ASPECT_RATIO;
+
 
 //var ctx;
 //var img = new Image();
@@ -94,25 +95,37 @@ function get_image()
 {
 	try
 	{
-		if(buffer_index==0)
-		{
-			document.getElementById("video0").src = 'photo.jpeg?' + new Date().getTime();
-			document.getElementById("video1").style.zIndex="0";
-			document.getElementById("video0").style.zIndex="-1";
-			
-			buffer_index=1;
-		}
-		else
-		{
-			document.getElementById("video1").src = 'photo.jpeg?' + new Date().getTime();
-			document.getElementById("video0").style.zIndex="0";
-			document.getElementById("video1").style.zIndex="-1";
-			buffer_index=0;
-		}
-		//ctx.drawImage(img, 0, 0);
-	}
-	catch(e)
-	{}
+	if(buffer_index==0)
+    {
+      document.getElementById("video0").src = 'photo.jpeg?' + new Date().getTime();
+    }
+    else
+    {
+      document.getElementById("video1").src = 'photo.jpeg?' + new Date().getTime();
+    }
+  }
+  catch(e)
+  {}
+}
+
+function swapBuffer()
+{
+  v1 = document.getElementById("video1");
+  v0 = document.getElementById("video0");
+  if(buffer_index==0)
+  {
+    v1.style.zIndex="0";
+    v0.style.zIndex="-1";
+    buffer_index=1;
+  }
+  else
+  {
+    v0.style.zIndex="0";
+    v1.style.zIndex="-1";
+    buffer_index=0;
+  }
+
+  get_image();
 }
 
 function init()
@@ -123,7 +136,6 @@ function init()
 	//var canvas = document.getElementById('canvas');
 	//ctx = canvas.getContext("2d");
 
-	setInterval(get_image,100);
 
   // Chech for webgl implementation
   if(!Detector.webgl)
@@ -193,7 +205,21 @@ function init()
   parrot.position.z = .01;
   scene1.add(parrot);
 
-  setInterval(getStatus, 100);
+  var roverWidth = roverHeight = 1;
+  roverTex = THREE.ImageUtils.loadTexture("images/car.gif");
+  roverTex.wrapS = roverTex.wrapT = THREE.RepeatWrapping;
+  var roverGeometry = new THREE.PlaneGeometry(roverWidth, roverHeight, wIncrement, hIncrement);
+  var roverMaterial = new THREE.MeshBasicMaterial( { map: roverTex, transparent: true } );
+  rover = new THREE.Mesh(roverGeometry, roverMaterial);
+  rover.position.x = -5;
+  rover.position.y = -5;
+  rover.position.z = .01;
+
+  scene1.add(rover);
+
+  getStatus();
+  swapBuffer();
+
 
   mainLoop();
 }
@@ -233,8 +259,9 @@ function updateAnimations()
 function resizeFunc()
 {
   var height = $(window).height();
-  IF_HEIGHT = VIDEO_HEIGHT = height * 0.7;
-  IF_WIDTH  = IF_HEIGHT * IF_ASPECT_RATIO;
+  IF_HEIGHT = $(window).height() * 0.7;
+  IF_WIDTH = IF_HEIGHT * IF_ASPECT_RATIO;
+
   $("#if_container").width(IF_WIDTH);
   $("#if_container").height(IF_HEIGHT);
   $("[type=button]").height(height * 0.05);
@@ -243,6 +270,7 @@ function resizeFunc()
   var left_position=parseInt(document.getElementById("if_container").style.width,10)+10;
   document.getElementById("video0").style.left=left_position+"px";
   document.getElementById("video1").style.left=left_position+"px";
+
 }
 
 function getCoords(event)
@@ -296,7 +324,7 @@ function sendMessage(url, callBackFunc, binaryData)
     url: url,
     timeout: 5000,
     success: callBackFunc,
-    error: timeOut,
+    //error: timeOut,
     beforeSend: function(xhr, binaryData) {
 		if(binaryData)
 			xhr.overrideMimeType("text/plain; charset=x-user-defined");
@@ -311,7 +339,8 @@ function statusResponse(data)
 	var my_json = JSON.parse(data);
 	parrot.position.x = my_json.x*6;
 	parrot.position.y = my_json.z*6;
-	robot_mode = my_json.robot; 
+	robot_mode = my_json.robot;
+	getStatus(); 
 }
 
 function takeOffResponse(data)
