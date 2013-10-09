@@ -38,17 +38,9 @@
     <div id="if_container" onclick="getCoords(event)" width="640" height="360"></div>
   </td>
   <td>
-	  <img id="video0" style="position:absolute;left:500px;top:0px;" width="640" height="360"> </img>
-	  <img id="video1" style="position:absolute;left:500px;top:0px;" width="640" height="360"> </img>
+	  <img id="video0" style="position:absolute;left:500px;top:0px;" onload="swapBuffer()" onerror="swapBuffer()" onabort="swapBuffer()" width="640" height="360"> </img>
+	  <img id="video1" style="position:absolute;left:500px;top:0px;" onload="swapBuffer()" onerror="swapBuffer()" onabort="swapBuffer()" width="640" height="360"> </img>
     <!--<canvas id="canvas" width="640" height="360"> </canvas>-->
-  </td>
-</tr>
-<tr>
-  <td colspan="2">
-    <input type="button" id="take-off" value="Take off" onclick="takeOff()" />
-    <input type="button" id="land" value="Land" onclick="land()" />
-    <input type="button" id="pause" value="Pause" onclick="togglePause()" />
-    <!--<input type="button" id="goto" value="Goto" onclick="toggleGoto()" /> -->
   </td>
 </tr>
 <tr>
@@ -67,9 +59,7 @@ var mouseX, mouseY;
 var container, v_container, camera1, camera2, scene1, scene2, if_renderer, video_renderer;
 
 // for the arrow animation
-var arrow, arrowTex, currentFrame, totalFrames;
 var parrot, parrotTex;
-var rover, roverTex;
 var clock, elapsedTime = 0;
 
 var request = new XMLHttpRequest();
@@ -78,30 +68,30 @@ var averageResponse = 100;	// This will be overwritten when we start recieving d
 var message_count = 0;
 
 var paused = false;
+
 var IF_ASPECT_RATIO  = 1.0;
 var IF_HEIGHT = $(window).height() * 0.7;
 var IF_WIDTH = IF_HEIGHT * IF_ASPECT_RATIO;
-
 
 //var ctx;
 //var img = new Image();
 var x = 0;
 var y = 0;
 
-var robot_mode = false; 
+var robot_mode = false;
 var buffer_index=0;
 
 function get_image()
 {
-	try
-	{
-	if(buffer_index==0)
+  try
+  {
+    if(buffer_index==0)
     {
-      document.getElementById("video0").src = 'photo.jpeg?' + new Date().getTime();
+      document.getElementById("video1").src = 'photo.jpeg?' + new Date().getTime();
     }
     else
     {
-      document.getElementById("video1").src = 'photo.jpeg?' + new Date().getTime();
+      document.getElementById("video0").src = 'photo.jpeg?' + new Date().getTime();
     }
   }
   catch(e)
@@ -112,6 +102,7 @@ function swapBuffer()
 {
   v1 = document.getElementById("video1");
   v0 = document.getElementById("video0");
+
   if(buffer_index==0)
   {
     v1.style.zIndex="0";
@@ -131,11 +122,10 @@ function swapBuffer()
 function init()
 {
 
-	document.getElementById("bar").style.backgroundColor = "#ff00ff"; 
-	
-	//var canvas = document.getElementById('canvas');
-	//ctx = canvas.getContext("2d");
+  document.getElementById("bar").style.backgroundColor = "#ff00ff";
 
+  //var canvas = document.getElementById('canvas');
+  //ctx = canvas.getContext("2d");
 
   // Chech for webgl implementation
   if(!Detector.webgl)
@@ -178,7 +168,19 @@ function init()
   var arenaMap = new THREE.Mesh(mapGeometry, mapMaterial);
   scene1.add(arenaMap);
 
-  // create object to display arrow animation
+  // create object to display parrot drone
+  var parrotWidth = parrotHeight = 1;
+  parrotTex = THREE.ImageUtils.loadTexture("images/parrot_drone.gif");
+  parrotTex.wrapS = parrotTex.wrapT = THREE.RepeatWrapping;
+  var parrotGeometry = new THREE.PlaneGeometry(parrotWidth, parrotHeight, wIncrement, hIncrement);
+  var parrotMaterial = new THREE.MeshBasicMaterial( { map: parrotTex, transparent: true } );
+  parrot = new THREE.Mesh(parrotGeometry, parrotMaterial);
+  parrot.position.x = 0;
+  parrot.position.y = 0;
+  parrot.position.z = .01;
+  scene1.add(parrot);
+
+    // create object to display arrow animation
   var arrowWidth = arrowHeight = 1;
   totalFrames = 10;
   arrowTex = THREE.ImageUtils.loadTexture("images/ArrowAnimation.gif");
@@ -192,18 +194,6 @@ function init()
   arrow.position.z = .01;
   scene1.add(arrow);
   currentFrame = totalFrames-1;
-
-  // create object to display parrot drone
-  var parrotWidth = parrotHeight = 1;
-  parrotTex = THREE.ImageUtils.loadTexture("images/parrot_drone.gif");
-  parrotTex.wrapS = parrotTex.wrapT = THREE.RepeatWrapping;
-  var parrotGeometry = new THREE.PlaneGeometry(parrotWidth, parrotHeight, wIncrement, hIncrement);
-  var parrotMaterial = new THREE.MeshBasicMaterial( { map: parrotTex, transparent: true } );
-  parrot = new THREE.Mesh(parrotGeometry, parrotMaterial);
-  parrot.position.x = 0;
-  parrot.position.y = 0;
-  parrot.position.z = .01;
-  scene1.add(parrot);
 
   var roverWidth = roverHeight = 1;
   roverTex = THREE.ImageUtils.loadTexture("images/car.gif");
@@ -219,7 +209,6 @@ function init()
 
   getStatus();
   swapBuffer();
-
 
   mainLoop();
 }
@@ -256,21 +245,21 @@ function updateAnimations()
   arrowTex.offset.x = currentFrame/totalFrames;
 }
 
-function resizeFunc()
+function showMessage(msgType, message)
 {
-  var height = $(window).height();
-  IF_HEIGHT = $(window).height() * 0.7;
-  IF_WIDTH = IF_HEIGHT * IF_ASPECT_RATIO;
-
-  $("#if_container").width(IF_WIDTH);
-  $("#if_container").height(IF_HEIGHT);
-  $("[type=button]").height(height * 0.05);
-  $("#messages").height(height * 0.2);
-  if_renderer.setSize(IF_WIDTH, IF_HEIGHT);
-  var left_position=parseInt(document.getElementById("if_container").style.width,10)+10;
-  document.getElementById("video0").style.left=left_position+"px";
-  document.getElementById("video1").style.left=left_position+"px";
-
+  /*if(msgType == "errorMsg")
+  {
+    if(errorCount.val == undefined)
+    {
+      $("#messages").append("<div  class='errorMsg' id='timeOut'></div>");
+    }
+    $("#timeOut").html("("+errorCount()+")"+message);
+  }
+  else
+  {
+    $("#messages").append("<div class='"+msgType+"'>"+message+"</div>");
+  }*/
+  document.getElementById("messages").innerHTML = message;
 }
 
 function getCoords(event)
@@ -281,7 +270,7 @@ function getCoords(event)
   // Convert mouseX and mouseY to the range -.5*range,+.5*range
   var x= mouseX-IF_WIDTH/2;
   var z=-mouseY+IF_HEIGHT/2;
-  
+
 
   // Convert x and y to the range -6,+6 feet
   x = x/(IF_WIDTH/2) * 6;
@@ -318,20 +307,44 @@ function land()
   sendMessage("/uav/0/land?number="+message_count, landResponse, false);
 }
 
-function sendMessage(url, callBackFunc, binaryData)
+
+function resizeFunc()
 {
+  var height = $(window).height();
+  IF_HEIGHT = VIDEO_HEIGHT = height * 0.7;
+  IF_WIDTH  = IF_HEIGHT * IF_ASPECT_RATIO;
+  $("#if_container").width(IF_WIDTH);
+  $("#if_container").height(IF_HEIGHT);
+  $("[type=button]").height(height * 0.05);
+  $("#messages").height(height * 0.2);
+  if_renderer.setSize(IF_WIDTH, IF_HEIGHT);
+  var left_position=parseInt(document.getElementById("if_container").style.width,10)+10;
+  document.getElementById("video0").style.left=left_position+"px";
+  document.getElementById("video1").style.left=left_position+"px";
+}
+
+function sendMessage(url, callBackFunc, binaryData, time)
+{
+  if(!time)
+    time=5000;
+
   $.ajax({
     url: url,
-    timeout: 5000,
+    timeout: time,
     success: callBackFunc,
-    error: timeOut,
+    error:  callBackFunc,
     beforeSend: function(xhr, binaryData) {
 		if(binaryData)
 			xhr.overrideMimeType("text/plain; charset=x-user-defined");
 		}
 
-		});
+    });
   message_count+=1;
+}
+
+function getStatus()
+{
+  sendMessage("/uav/0/status?number="+message_count, statusResponse, false, 1000);
 }
 
 function statusResponse(data)
@@ -340,7 +353,7 @@ function statusResponse(data)
 	parrot.position.x = my_json.x*6;
 	parrot.position.y = my_json.z*6;
 	robot_mode = my_json.robot;
-	getStatus(); 
+	getStatus();
 }
 
 function takeOffResponse(data)
@@ -354,53 +367,6 @@ function landResponse(data)
 
 function gotoResponse(data)
 {
-}
-
-function errorCount()
-{
-  if(errorCount.val == undefined)
-    errorCount.val=1;
-  else
-    errorCount.val += 1;
-
-  return errorCount.val;
-}
-
-function timeOut()
-{
-  showMessage("errorMsg", "Error: No response from server.");
-}
-
-function showMessage(msgType, message)
-{
-  /*if(msgType == "errorMsg")
-  {
-    if(errorCount.val == undefined)
-    {
-      $("#messages").append("<div  class='errorMsg' id='timeOut'></div>");
-    }
-    $("#timeOut").html("("+errorCount()+")"+message);
-  }
-  else
-  {
-    $("#messages").append("<div class='"+msgType+"'>"+message+"</div>");
-  }*/
-  document.getElementById("messages").innerHTML = message;
-}
-
-function togglePause()
-{
-  paused = !paused;
-  if(!paused)
-  {
-    setTimeout(getVideoFrame, 1000);
-    $("#pause").val("Pause");
-    requestAnimationFrame(mainLoop);
-  }
-  else
-  {
-    $("#pause").val("Resume");
-  }
 }
 
 </script>

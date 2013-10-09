@@ -38,8 +38,8 @@
     <div id="if_container" width="640" height="360"></div>
   </td>
   <td>
-	  <img id="video0" style="position:absolute;left:500px;top:0px;" onload="swapBuffer()" width="640" height="360"> </img>
-	  <img id="video1" style="position:absolute;left:500px;top:0px;" onload="swapBuffer()" width="640" height="360"> </img>
+	  <img id="video0" style="position:absolute;left:500px;top:0px;" onload="swapBuffer()" onerror="swapBuffer()" onabort="swapBuffer()" width="640" height="360"> </img>
+	  <img id="video1" style="position:absolute;left:500px;top:0px;" onload="swapBuffer()" onerror="swapBuffer()" onabort="swapBuffer()" width="640" height="360"> </img>
     <!--<canvas id="canvas" width="640" height="360"> </canvas>-->
   </td>
 </tr>
@@ -87,11 +87,11 @@ function get_image()
   {
     if(buffer_index==0)
     {
-      document.getElementById("video0").src = 'photo.jpeg?' + new Date().getTime();
+      document.getElementById("video1").src = 'photo.jpeg?' + new Date().getTime();
     }
     else
     {
-      document.getElementById("video1").src = 'photo.jpeg?' + new Date().getTime();
+      document.getElementById("video0").src = 'photo.jpeg?' + new Date().getTime();
     }
   }
   catch(e)
@@ -102,6 +102,7 @@ function swapBuffer()
 {
   v1 = document.getElementById("video1");
   v0 = document.getElementById("video0");
+
   if(buffer_index==0)
   {
     v1.style.zIndex="0";
@@ -210,12 +211,16 @@ function resizeFunc()
   document.getElementById("video1").style.left=left_position+"px";
 }
 
-function sendMessage(url, callBackFunc, binaryData)
+function sendMessage(url, callBackFunc, binaryData, time)
 {
+  if(!time)
+    time=5000;
+
   $.ajax({
     url: url,
-    timeout: 5000,
+    timeout: time,
     success: callBackFunc,
+    error:  callBackFunc,
     beforeSend: function(xhr, binaryData) {
 		if(binaryData)
 			xhr.overrideMimeType("text/plain; charset=x-user-defined");
@@ -227,7 +232,7 @@ function sendMessage(url, callBackFunc, binaryData)
 
 function getStatus()
 {
-  sendMessage("/uav/0/status?number="+message_count, statusResponse, false);
+  sendMessage("/uav/0/status?number="+message_count, statusResponse, false, 1000);
 }
 
 function statusResponse(data)
