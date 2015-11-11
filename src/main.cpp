@@ -35,6 +35,7 @@ std::string make_json();
 
 Kinect kinect;
 bool drone_autonomous = false;
+bool video_enabled=false;
 vec3 desired_location = vec3(0,0.1,kcs_distance_to_origin);
 PDController pdcontroller(desired_location);
 PIDController pidcontroller(desired_location);
@@ -43,7 +44,7 @@ std::vector<unsigned char> last_image;
 
 int main()
 {
-	a.set_video_feed_bottom();
+	if (video_enabled) a.set_video_feed_bottom();
 	server.setup();
 
 	if(server.good()&&a.connect(5))
@@ -149,6 +150,9 @@ void loop(const double dt)
 
 	if(msl::input_check_pressed(kb_o))
 		drone_autonomous = !drone_autonomous;
+	
+	if(msl::input_check_pressed(kb_v))
+		video_enabled = !video_enabled;
 
 	if(moved)
 	{
@@ -157,16 +161,19 @@ void loop(const double dt)
 	else if(drone_autonomous)
 	{
 		pdcontroller.autonomous_flight(a, kinect);
-		pidcontroller.autonomous_flight(a, kinect);
+		// pidcontroller.autonomous_flight(a, kinect);
 	}
 
-	a.video_update();
-
-	glBindTexture(GL_TEXTURE_2D,textureId);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,640,360,0,GL_RGB,GL_UNSIGNED_BYTE,(GLvoid*)a.video_data());
-	glBindTexture(GL_TEXTURE_2D,0);
+	if (video_enabled)
+	{
+		a.video_update();
+		
+		glBindTexture(GL_TEXTURE_2D,textureId);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,640,360,0,GL_RGB,GL_UNSIGNED_BYTE,(GLvoid*)a.video_data());
+		glBindTexture(GL_TEXTURE_2D,0);
+	}
 
 	kinect.update_location();
 }

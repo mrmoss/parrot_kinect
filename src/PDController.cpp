@@ -46,12 +46,14 @@ void PDController::autonomous_flight(ardrone & drone, Kinect & kinect)
 		
 		//std::cout<<altitude<<"\t\t"<<y_error_new<<std::endl;
 
-		double max=1;
+		double max=0.6;
 		clamp(roll,-max,max);
 		clamp(pitch,-max,max);
 		clamp(altitude,-max,max);
 	}
 
 	drone.manuever(altitude,pitch,roll,yaw);
-	//std::cout << "PD :" << pitch << " " << roll << std::endl;
+	
+	std::cout << "PD :" << pitch << " " << roll << std::endl;
 }
+
